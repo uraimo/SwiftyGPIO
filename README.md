@@ -1,2 +1,11 @@
-# SwiftyGPIO
-Swift library to interact with Linux (sysfs) GPIO [RaspberryPi,BeagleBone,CHIP,etc...]
+![SwiftyGPIO](https://github.com/uraimo/SwiftyGPIO/raw/master/logo.png)
+
+**A Swift library to interact with Linux GPIOs (Conforming to SysFS), turn on your leds!**
+
+<p>
+<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/swift2-compatible-4BC51D.svg?style=flat" alt="Swift 2 compatible" /></a>
+<a href="https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/LICENSE"><img src="http://img.shields.io/badge/license-MIT-blue.svg?style=flat" alt="License: MIT" /></a>
+</p>
+
+
+Built to be used on Linux ARM Boards (RaspberryPi,BeagleBone,CHIP,etc...)
