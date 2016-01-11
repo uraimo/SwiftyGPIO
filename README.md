@@ -9,4 +9,74 @@
 </p>
 
 
-Built to be used on Linux ARM Boards (RaspberryPi, BeagleBone, CHIP, etc...)
+Built to be used esclusively on Linux ARM Boards with GPIOs (RaspberryPi,BeagleBone,CHIP,etc...)
+                     
+## Installation
+
+To use this library, you'll need a Linux ARM board with Swift.
+You can either compile it yourself following these instructions:
+
+http://www.housedillon.com/?p=2267
+
+or use precompiled binaries following one of these guides: 
+
+http://www.housedillon.com/?p=2293
+http://dev.iachieved.it/iachievedit/open-source-swift-on-raspberry-pi-2/
+
+Once done, considering that at the moment the package manager is not available on ARM, you'll need to download Sources/SwiftyGPIO.swift: 
+
+    wget 
+
+In the same directory create and additional file that will contain the code of your application (e.g. main.swift), and once done compile with:
+
+    swiftc SwiftyGPIO.swift main.swift
+
+The compiler will create a *main* executable.
+
+## Examples
+
+At the moment, the library don't provide yet defaults for the supported boards.
+In this initial implementation you can instantiate explicitly a GPIO providing a mnemonic name and the GPIO id of the pin you want to use(check your board reference).
+
+The following example shows the current values of the pin attributes, changes direction and value and then shows again a recap of the attributes:
+
+```Swift
+let id = 408
+var gp01 = GPIO(name: "P0",id: 408)
+print("Current Status")
+print("Direction: "+gp01.direction.rawValue)
+print("Edge: "+gp01.edge.rawValue)
+print("Active Low: "+String(gp01.activeLow))
+print("Value: "+String(gp01.value))
+
+gp01.direction = .OUT
+gp01.value = 1
+
+print("New Status")
+print("Direction: "+gp01.direction.rawValue)
+print("Edge: "+gp01.edge.rawValue)
+print("Active Low: "+String(gp01.activeLow))
+print("Value: "+String(gp01.value))
+```
+
+This example makes a led blink with a frequency of 150ms:
+
+```Swift
+import Glibc
+
+let id = 408
+var gp01 = GPIO(name: "P0",id: 408)
+gp01.direction = .OUT
+repeat{
+	gp01.value = (gp01.value == 0) ? 1 : 0
+	usleep(150*1000)
+}while(true) 
+```
+
+## TODO
+
+- [x] Create Package.swift
+- [x] Basic example w/ package import
+- [ ] Add GPIOs default configurations for supported boards
+- [ ] Refactoring
+
