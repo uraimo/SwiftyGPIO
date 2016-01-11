@@ -9,7 +9,7 @@
 </p>
 
 
-Built to be used esclusively on Linux ARM Boards with GPIOs (RaspberryPi, BeagleBone, CHIP, etc...)
+Built to be used esclusively on **Linux ARM Boards** with GPIOs (RaspberryPi, BeagleBone, Tegra, CHIP, etc...)
                      
 ## Installation
 
@@ -27,7 +27,7 @@ In the same directory create and additional file that will contain the code of y
 
     swiftc SwiftyGPIO.swift main.swift
 
-The compiler will create a *main* executable.
+The compiler will create a **main** binary you can run.
 
 ## Examples
 
