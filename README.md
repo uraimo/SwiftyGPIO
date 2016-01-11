@@ -20,6 +20,8 @@ You can either compile it yourself following [these instructions](http://www.hou
 Once done, considering that at the moment the package manager is not available on ARM, you'll need to manually download Sources/SwiftyGPIO.swift: 
 
     wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift
+    
+For a sample project that uses the package manager retrieving SwiftyGPIO from GitHub check the **Examples** directory.
 
 In the same directory create and additional file that will contain the code of your application (e.g. main.swift), and once done compile with:
 
