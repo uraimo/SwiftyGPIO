@@ -150,6 +150,8 @@ public struct SwiftyGPIO {
                 return GPIORPIB2ZERO
             case .CHIP:
                 return GPIOCHIP
+            case .BeagleBoneBlack:
+                return GPIOBEAGLEBONE
         }
     }
 
@@ -241,6 +243,55 @@ public struct SwiftyGPIO {
         .P6:GPIO(name:"XIO-P6",id:414),
         .P7:GPIO(name:"XIO-P7",id:415)
     ]
+
+    //BeagleBoneBlack
+    //
+    //The gpio id is the sum of the related gpio controller base number
+    //and the progressive id of the gpio within its group...
+    //The key of the map is assigned sequentially following the orders of
+    //the pins, and i realize it could not be that useful(likely to change
+    //in the future in favor of a better alternative).
+    //
+    //Only the pins described as gpio in the official documentation are 
+    //included here: https://github.com/CircuitCo/BeagleBone-Black/blob/master/BBB_SRM.pdf?raw=true
+    //Clearly this does not support mode change.
+    //
+    static let GPIOBEAGLEBONE:[GPIOName:GPIO] = [
+        .P0:GPIO(name:"P8_PIN03_GPIO1_6",id:38),  //P8
+        .P1:GPIO(name:"P8_PIN04_GPIO1_7",id:39),
+        .P2:GPIO(name:"P8_PIN05_GPIO1_2",id:34),
+        .P3:GPIO(name:"P8_PIN06_GPIO1_3",id:35),
+        .P4:GPIO(name:"P8_PIN11_GPIO1_13",id:66),
+        .P5:GPIO(name:"P8_PIN12_GPIO1_12",id:67),
+        .P6:GPIO(name:"P8_PIN14_GPIO0_26",id:26),
+        .P7:GPIO(name:"P8_PIN15_GPIO1_15",id:47),
+        .P8:GPIO(name:"P8_PIN16_GPIO1_14",id:46),
+        .P9:GPIO(name:"P8_PIN17_GPIO0_27",id:27),
+        .P10:GPIO(name:"P8_PIN18_GPIO2_1",id:65),
+        .P11:GPIO(name:"P8_PIN20_GPIO1_31",id:63),
+        .P12:GPIO(name:"P8_PIN21_GPIO1_30",id:62),
+        .P13:GPIO(name:"P8_PIN22_GPIO1_5",id:37),
+        .P14:GPIO(name:"P8_PIN23_GPIO1_4",id:36),
+        .P15:GPIO(name:"P8_PIN24_GPIO1_1",id:33),
+        .P16:GPIO(name:"P8_PIN25_GPIO1_0",id:32),
+        .P17:GPIO(name:"P8_PIN26_GPIO1_29",id:61),
+        .P18:GPIO(name:"P8_PIN27_GPIO2_22",id:86),
+        .P19:GPIO(name:"P8_PIN28_GPIO2_24",id:88),
+        .P20:GPIO(name:"P8_PIN29_GPIO2_23",id:87),
+        .P21:GPIO(name:"P8_PIN30_GPIO2_25",id:89),
+        .P22:GPIO(name:"P8_PIN39_GPIO2_12",id:76),
+        .P23:GPIO(name:"P8_PIN40_GPIO2_13",id:77),
+        .P24:GPIO(name:"P8_PIN41_GPIO2_10",id:74),
+        .P25:GPIO(name:"P8_PIN42_GPIO2_11",id:75),
+        .P26:GPIO(name:"P8_PIN43_GPIO2_8",id:72),
+        .P27:GPIO(name:"P8_PIN44_GPIO2_9",id:73),
+        .P28:GPIO(name:"P8_PIN45_GPIO2_6",id:70),
+        .P29:GPIO(name:"P8_PIN46_GPIO2_7",id:71),
+        .P30:GPIO(name:"P9_PIN12_GPIO1_28",id:60),   //P9
+        .P31:GPIO(name:"P9_PIN15_GPIO1_16",id:48),
+        .P32:GPIO(name:"P9_PIN23_GPIO1_17",id:49),   //Ignore Pin25, requires oscillator disabled
+        .P33:GPIO(name:"P9_PIN27_GPIO3_19",id:125)
+    ]
 }
 
 public enum SupportedBoard {
@@ -248,6 +299,7 @@ public enum SupportedBoard {
     case RaspberryPiRev2   // Pi A,B Revision 2 
     case RaspberryPiB2Zero // Pi B+,2,Zero with 40 pin header
     case CHIP
+    case BeagleBoneBlack
 }
 
 public enum GPIOName {
@@ -283,4 +335,20 @@ public enum GPIOName {
     case P29
     case P30
     case P31
+    case P32
+    case P33
+    case P34
+    case P35
+    case P36
+    case P37
+    case P38
+    case P39
+    case P40
+    case P41
+    case P42
+    case P43
+    case P44
+    case P45
+    case P46
+    case P47
 }
