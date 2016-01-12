@@ -19,7 +19,7 @@ It's built to run **esclusively on Linux ARM Boards** (RaspberryPi, BeagleBone B
 Tested:
 * C.H.I.P.
 
-Not tested **(Can you help with this? See [#3](https://github.com/uraimo/SwiftyGPIO/issues/3)** and [#4](https://github.com/uraimo/SwiftyGPIO/issues/4)) but should work:
+Not tested **(Can you help with this? See [#3](https://github.com/uraimo/SwiftyGPIO/issues/3) and [#4](https://github.com/uraimo/SwiftyGPIO/issues/4))** but should work:
 * Raspberry Pi A,B Revision 1
 * Raspberry Pi A,B Revision 2
 * Raspberry Pi B+, Pi 2, Pi Zero
