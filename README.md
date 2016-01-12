@@ -21,14 +21,14 @@ Tested:
 * $9 C.H.I.P.
 
 Not tested (See [#4](https://github.com/uraimo/SwiftyGPIO/issues/4)) but they should work:
-* Raspberry Pi A+,B+ (called revision 2)
-* Raspberry Pi 2, Pi Zero
+* Raspberry Pi A,B Revision 2
+* Raspberry Pi B+, Pi 2, Pi Zero
                      
 ## Installation
 
 To use this library, you'll need a Linux ARM board with Swift2.
 
-You can either compile Swift yourself following [these instructions](http://www.housedillon.com/?p=2267) or use precompiled binaries following one of guides from [@hpux735](http://www.housedillon.com/?p=2293) or [@iachievedit](http://dev.iachieved.it/iachievedit/open-source-swift-on-raspberry-pi-2/).
+You can either compile Swift yourself following [these instructions](http://www.housedillon.com/?p=2267) or use precompiled binaries following one of guides from [@hpux735](http://www.housedillon.com/?p=2293) or [@iachievedit](http://dev.iachieved.it/iachievedit/open-source-swift-on-raspberry-pi-2/) if you have a Raspberry Pi 2 or a C.H.I.P..
 
 Once done, considering that at the moment the package manager is not available on ARM, you'll need to manually download Sources/SwiftyGPIO.swift: 
 
