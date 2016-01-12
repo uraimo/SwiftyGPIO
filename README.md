@@ -1,6 +1,6 @@
 ![SwiftyGPIO](https://github.com/uraimo/SwiftyGPIO/raw/master/logo.png)
 
-**A Swift library to interact with Linux GPIOs(SysFS), turn on your leds!**
+**A Swift library to interact with Linux GPIOs, turn on your leds!**
 
 <p>
 <img src="https://img.shields.io/badge/os-linux-green.svg?style=flat" alt="Linux-only" />
@@ -9,7 +9,7 @@
 </p>
 
 
-Built to be used esclusively on **Linux ARM Boards** with GPIOs (RaspberryPi, BeagleBone, Tegra, CHIP, etc...)
+Built to be used **esclusively on Linux ARM Boards** with GPIOs (RaspberryPi, BeagleBone Black, Tegra, CHIP, etc...)
                      
 ## Installation
 
@@ -28,6 +28,14 @@ In the same directory create and additional file that will contain the code of y
     swiftc SwiftyGPIO.swift main.swift
 
 The compiler will create a **main** binary you can run.
+
+## Under the hood
+
+SwiftyGPIO interact with GPIOs through the sysfs file-based interface described [here](https://www.kernel.org/doc/Documentation/gpio/sysfs.txt).
+
+The GPIO is exported when a new GPIO struct is created using the provided numerical id, that most of the times is different from the physical id of the pin. SysFS GPIO ids can usually be found in the board documentation, defaults will be provided soon.
+
+At the moment GPIOs are never unexported, let me know if you could find that useful. Multiple exporting when creating an already configured GPIO is not a problem, successive attempts to export a GPIO are simply ignored.
 
 ## Examples
 
