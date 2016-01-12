@@ -139,6 +139,12 @@ Other examples are available in the *Examples* directory.
 - [x] Create Package.swift
 - [x] Basic example w/ package import
 - [x] Add GPIOs default configurations for supported boards
+- [ ] Support for additional GPIOs on separate header for RasPi Rev 2 boards?
+- [ ] Add BeagleBone Black pinout defaults
+- [ ] Add Tegra TK1 when Swift support confirmed
+- [ ] Add UDOOs when Swift support confirmed
 - [ ] Testing on the Raspberries
 - [ ] Testing on the BeagleBone Black
+- [ ] SysFS PWN and/or software PWM?
+- [ ] Support for external ADCs or support for platform-specific ADC drivers?
 - [ ] Refactoring
