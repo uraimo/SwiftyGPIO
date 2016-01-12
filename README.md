@@ -13,6 +13,16 @@
 This library provides an easy way to interact with digital GPIOs using Swift on Linux. You'll be able to configure a port attributes (direction,edge,active low) and get/set the current value.
 
 It's built to run **esclusively on Linux ARM Boards** (RaspberryPi, BeagleBone Black, UDOO, Tegra, CHIP, etc...) with accessible GPIOs.
+
+## Supported Boards
+
+Tested:
+* Raspberry Pi A,B Revision 1
+* $9 C.H.I.P.
+
+Not tested(See #4) but they should work:
+* Raspberry Pi A+,B+ (called revision 2)
+* Raspberry Pi 2, Pi Zero
                      
 ## Installation
 
