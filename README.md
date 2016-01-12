@@ -19,7 +19,7 @@ It's built to run **esclusively on Linux ARM Boards** (RaspberryPi, BeagleBone B
 Tested:
 * C.H.I.P.
 
-Not tested (See [#4](https://github.com/uraimo/SwiftyGPIO/issues/4)) but should work:
+Not tested (Can you help with this? See [#3](https://github.com/uraimo/SwiftyGPIO/issues/3) and [#4](https://github.com/uraimo/SwiftyGPIO/issues/4)) but should work:
 * Raspberry Pi A,B Revision 1
 * Raspberry Pi A,B Revision 2
 * Raspberry Pi B+, Pi 2, Pi Zero
@@ -27,7 +27,7 @@ Not tested (See [#4](https://github.com/uraimo/SwiftyGPIO/issues/4)) but should 
                      
 ## Installation
 
-To use this library, you'll need a Linux ARM board with Swift2.
+To use this library, you'll need a Linux ARM board with Swift 2.
 
 You can either compile Swift yourself following [these instructions](http://www.housedillon.com/?p=2267) or use precompiled binaries following one of guides from [@hpux735](http://www.housedillon.com/?p=2293) or [@iachievedit](http://dev.iachieved.it/iachievedit/open-source-swift-on-raspberry-pi-2/) if you have a Raspberry Pi 2 or a C.H.I.P..
 
@@ -35,7 +35,7 @@ Once done, considering that at the moment the package manager is not available o
 
     wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift
     
-(For a sample project that uses the package manager retrieving SwiftyGPIO from GitHub check the **Examples** directory)
+(For sample projects that uses the package manager retrieving SwiftyGPIO from GitHub check the **Examples** directory)
 
 Once downloaded, in the same directory create an additional file that will contain the code of your application (e.g. main.swift). 
 
@@ -47,9 +47,21 @@ The compiler will create a **main** executable.
 
 ## Usage
 
-Let's suppose we have a led connected between the GPIO pin P0 and GND and we want to turn it on.
+Let's suppose we are using a CHIP board and have a led connected between the GPIO pin P0 and GND and we want to turn it on.
 
-First, to write to that GPIO port P0, we need to create a GPIO object:
+First, we need to retrieve the list of GPIOs available on the board and get a reference to the one we want to modify:
+
+    let gpios = SwiftyGPIO.getGPIOsForBoard(.CHIP)
+    var gp = gpios[.P0]!
+
+The following are the possible values for the supported boards:
+    
+* .RaspberryPiRev1 (Pi A,B Revision 1)
+* .RaspberryPiRev2 (Pi A,B Revision 2) 
+* .RaspberryPiB2Zero (Pi B+,2,Zero with 40 pin header)
+* .CHIP (the $9 C.H.I.P. computer).
+
+Alternatively, if our board is not supported, a GPIO object can be instantiated directly, using its SysFS GPIO Id:
 
     var gp = GPIO(name: "P0",id: 408)
     
@@ -63,9 +75,9 @@ Then we'll change the pin value to the HIGH value "1":
 
 That's it, the led will turn on.
 
-To read the value coming in the P0 port, the direction must be configured as *.IN* and the value read from the *value* property:
+To read the value coming in the P0 port, the direction must be configured as *.IN* and the value can be read from the *value* property:
 
-    gp.direction = .OUT
+    gp.direction = .IN
     let current = gp.value
 
 The other properties available on the GPIO object (edge,active low) refer to the additional attributes of the GPIO that can be configured but you will not need them most of the times. For a detailed description refer to the [kernel documentation](https://www.kernel.org/doc/Documentation/gpio/sysfs.txt)
@@ -74,34 +86,32 @@ The other properties available on the GPIO object (edge,active low) refer to the
 
 SwiftyGPIO interact with GPIOs through the sysfs file-based interface described [here](https://www.kernel.org/doc/Documentation/gpio/sysfs.txt).
 
-The GPIO is exported when a new GPIO struct is created using the provided numerical id, that most of the times is different from the physical id of the pin. SysFS GPIO ids can usually be found in the board documentation, defaults will be provided soon.
+The GPIO is exported the first time one of the GPIO methods is invoked, using the GPIO id provided during the creation of the object (either provided manually or from the defaults). Most of the times that is will be different from the physical id of the pin. SysFS GPIO ids can usually be found in the board documentation, defaults will be provided soon.
 
 At the moment GPIOs are never unexported, let me know if you could find that useful. Multiple exporting when creating an already configured GPIO is not a problem, successive attempts to export a GPIO are simply ignored.
 
 ## Examples
 
-At the moment, the library doesn't provide yet defaults for the supported boards.
-In this initial implementation you can instantiate explicitly a GPIO struct providing a mnemonic name and the GPIO id of the pin you want to use (check your board documentation).
 
 The following example, built to run on the $9 C.H.I.P., shows the current values of GPIO0(sysfs id 408) attributes, changes direction and value and then shows again a recap of the attributes:
 
 ```Swift
-let id = 408
-var gp01 = GPIO(name: "P0",id: 408)
+let gpios = SwiftyGPIO.getGPIOsForBoard(.CHIP)
+var gp0 = gpios[.P0]!
 print("Current Status")
-print("Direction: "+gp01.direction.rawValue)
-print("Edge: "+gp01.edge.rawValue)
-print("Active Low: "+String(gp01.activeLow))
-print("Value: "+String(gp01.value))
+print("Direction: "+gp0.direction.rawValue)
+print("Edge: "+gp0.edge.rawValue)
+print("Active Low: "+String(gp0.activeLow))
+print("Value: "+String(gp0.value))
 
-gp01.direction = .OUT
-gp01.value = 1
+gp0.direction = .OUT
+gp0.value = 1
 
 print("New Status")
-print("Direction: "+gp01.direction.rawValue)
-print("Edge: "+gp01.edge.rawValue)
-print("Active Low: "+String(gp01.activeLow))
-print("Value: "+String(gp01.value))
+print("Direction: "+gp0.direction.rawValue)
+print("Edge: "+gp0.edge.rawValue)
+print("Active Low: "+String(gp0.activeLow))
+print("Value: "+String(gp0.value))
 ```
 
 This second example makes a led blink with a frequency of 150ms:
@@ -109,11 +119,12 @@ This second example makes a led blink with a frequency of 150ms:
 ```Swift
 import Glibc
 
-let id = 408
-var gp01 = GPIO(name: "P0",id: 408)
-gp01.direction = .OUT
+let gpios = SwiftyGPIO.getGPIOsForBoard(.CHIP)
+var gp0 = gpios[.P0]!
+gp0.direction = .OUT
+
 repeat{
-	gp01.value = (gp01.value == 0) ? 1 : 0
+	gp0.value = (gp0.value == 0) ? 1 : 0
 	usleep(150*1000)
 }while(true) 
 ```
@@ -122,6 +133,7 @@ repeat{
 
 - [x] Create Package.swift
 - [x] Basic example w/ package import
-- [ ] Add GPIOs default configurations for supported boards
+- [x] Add GPIOs default configurations for supported boards
+- [ ] Testing on the Raspberries
+- [ ] Testing on the BeagleBone Black
 - [ ] Refactoring
-
