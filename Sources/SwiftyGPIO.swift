@@ -76,24 +76,24 @@ public class GPIO {
 extension GPIO {
     
     private func enableIO(id: Int){
-        writeToFile(BASEPATH+"/export",value:String(id))
+        writeToFile(BASEPATH+"export",value:String(id))
 		exported = true
     }
     
     private func performSetting(filename: String, value: String){
-        writeToFile(BASEPATH+"/"+filename, value:value)
+        writeToFile(BASEPATH+filename, value:value)
     }
     
     private func performSetting(filename: String, value: Int){
-        writeToFile(BASEPATH+"/"+filename, value: String(value))
+        writeToFile(BASEPATH+filename, value: String(value))
     }
     
     private func getStringValue(filename: String)->String?{
-        return readFromFile(BASEPATH+"/"+filename)
+        return readFromFile(BASEPATH+filename)
     }
     
     private func getIntValue(filename: String)->Int?{
-        if let res = readFromFile(BASEPATH+"/"+filename) {
+        if let res = readFromFile(BASEPATH+filename) {
             return Int(res)
         }
         return nil
