@@ -61,9 +61,11 @@ The following are the possible values for the supported boards:
 * .RaspberryPiB2Zero (Pi B+,2,Zero with 40 pin header)
 * .CHIP (the $9 C.H.I.P. computer).
 
-Alternatively, if our board is not supported, a GPIO object can be instantiated directly, using its SysFS GPIO Id:
+The map returned by *getGPIOsForBoard* contains all the GPIOs of a specific board as described by [these diagrams](https://github.com/uraimo/SwiftyGPIO/wiki/GPIO-Pinout). 
 
-    var gp = GPIO(name: "P0",id: 408)
+Alternatively, if our board is not supported, each single GPIO object can be instantiated manually, using its SysFS GPIO Id:
+
+    var gp = GPIO(name: "P0",id: 408)  // User defined name and GPIO Id
     
 The next step is configuring the port direction, that can be either *GPIODirection.IN* or *GPIODirection.OUT*, in this case we'll choose .OUT:
 
