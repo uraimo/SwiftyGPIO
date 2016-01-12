@@ -1,6 +1,6 @@
 ![SwiftyGPIO](https://github.com/uraimo/SwiftyGPIO/raw/master/logo.png)
 
-**A Swift library to interact with Linux GPIOs, turn on your leds!**
+**A Swift library to interact with Linux GPIOs, turn on your leds and more!**
 
 <p>
 <img src="https://img.shields.io/badge/os-linux-green.svg?style=flat" alt="Linux-only" />
@@ -10,7 +10,7 @@
 
 ## Summary
 
-This library provides an easy way to interact with digital GPIOs using Swift on Linux. You'll be able to configure a port attributes (direction,edge,active low) and get/set the current value.
+This library provides an easy way to interact with digital GPIOs using Swift on Linux. You'll be able to configure a port attributes (direction,edge,active low) and read/write the current value.
 
 It's built to run **esclusively on Linux ARM Boards** (RaspberryPi, BeagleBone Black, UDOO, Tegra, CHIP, etc...) with accessible GPIOs.
 
@@ -77,7 +77,7 @@ Then we'll change the pin value to the HIGH value "1":
 
 That's it, the led will turn on.
 
-To read the value coming in the P0 port, the direction must be configured as *.IN* and the value can be read from the *value* property:
+Now, suppose we have a switch connected to P0 instead, to read the value coming in the P0 port, the direction must be configured as *.IN* and the value can be read from the *value* property:
 
     gp.direction = .IN
     let current = gp.value
