@@ -8,26 +8,56 @@
 <a href="https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/LICENSE"><img src="http://img.shields.io/badge/license-MIT-blue.svg?style=flat" alt="License: MIT" /></a>
 </p>
 
+## Summary
 
-Built to be used **esclusively on Linux ARM Boards** with GPIOs (RaspberryPi, BeagleBone Black, Tegra, CHIP, etc...)
+This library provides an easy way to interact with digital GPIOs using Swift on Linux. You'll be able to configure a port attributes (direction,edge,active low) and get/set the current value.
+
+It's built to run **esclusively on Linux ARM Boards** (RaspberryPi, BeagleBone Black, UDOO, Tegra, CHIP, etc...) with accessible GPIOs.
                      
 ## Installation
 
 To use this library, you'll need a Linux ARM board with Swift2.
 
-You can either compile it yourself following [these instructions](http://www.housedillon.com/?p=2267) or use precompiled binaries following one of guides from [@hpux735](http://www.housedillon.com/?p=2293) or [@iachievedit](http://dev.iachieved.it/iachievedit/open-source-swift-on-raspberry-pi-2/).
+You can either compile Swift yourself following [these instructions](http://www.housedillon.com/?p=2267) or use precompiled binaries following one of guides from [@hpux735](http://www.housedillon.com/?p=2293) or [@iachievedit](http://dev.iachieved.it/iachievedit/open-source-swift-on-raspberry-pi-2/).
 
 Once done, considering that at the moment the package manager is not available on ARM, you'll need to manually download Sources/SwiftyGPIO.swift: 
 
     wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift
     
-For a sample project that uses the package manager retrieving SwiftyGPIO from GitHub check the **Examples** directory.
+(For a sample project that uses the package manager retrieving SwiftyGPIO from GitHub check the **Examples** directory)
 
-In the same directory create and additional file that will contain the code of your application (e.g. main.swift), and once done compile with:
+Once downloaded, in the same directory create an additional file that will contain the code of your application (e.g. main.swift). 
+
+When your code is ready, compile it with:
 
     swiftc SwiftyGPIO.swift main.swift
 
-The compiler will create a **main** binary you can run.
+The compiler will create a **main** executable.
+
+## Usage
+
+Let's suppose we have a led connected between the GPIO pin P0 and GND and we want to turn it on.
+
+First, to write to that GPIO port P0, we need to create a GPIO object:
+
+    var gp = GPIO(name: "P0",id: 408)
+    
+The next step is configuring the port direction, that can be either *GPIODirection.IN* or *GPIODirection.OUT*, in this case we'll choose .OUT:
+
+    gp.direction = .OUT
+
+Then we'll change the pin value to the HIGH value "1":
+	
+    gp.value = 1
+
+That's it, the led will turn on.
+
+To read the value coming in the P0 port, the direction must be configured as *.IN* and the value read from the *value* property:
+
+    gp.direction = .OUT
+    let current = gp.value
+
+The other properties available on the GPIO object (edge,active low) refer to the additional attributes of the GPIO that can be configured but you will not need them most of the times. For a detailed description refer to the [kernel documentation](https://www.kernel.org/doc/Documentation/gpio/sysfs.txt)
 
 ## Under the hood
 
@@ -40,7 +70,7 @@ At the moment GPIOs are never unexported, let me know if you could find that use
 ## Examples
 
 At the moment, the library doesn't provide yet defaults for the supported boards.
-In this initial implementation you can instantiate explicitly a GPIO providing a mnemonic name and the GPIO id of the pin you want to use (check your board documentation).
+In this initial implementation you can instantiate explicitly a GPIO struct providing a mnemonic name and the GPIO id of the pin you want to use (check your board documentation).
 
 The following example, built to run on the $9 C.H.I.P., shows the current values of GPIO0(sysfs id 408) attributes, changes direction and value and then shows again a recap of the attributes:
 
