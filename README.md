@@ -34,7 +34,7 @@ The compiler will create a **main** binary you can run.
 At the moment, the library doesn't provide yet defaults for the supported boards.
 In this initial implementation you can instantiate explicitly a GPIO providing a mnemonic name and the GPIO id of the pin you want to use (check your board documentation).
 
-The following example shows the current values of GPIO0 attributes, changes direction and value and then shows again a recap of the attributes:
+The following example, built to run on the $9 C.H.I.P., shows the current values of GPIO0(sysfs id 408) attributes, changes direction and value and then shows again a recap of the attributes:
 
 ```Swift
 let id = 408
