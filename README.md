@@ -20,7 +20,7 @@ Tested:
 * Raspberry Pi A,B Revision 1
 * $9 C.H.I.P.
 
-Not tested(See #4) but they should work:
+Not tested (See [#4](https://github.com/uraimo/SwiftyGPIO/issues/4)) but they should work:
 * Raspberry Pi A+,B+ (called revision 2)
 * Raspberry Pi 2, Pi Zero
                      
