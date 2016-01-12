@@ -92,8 +92,7 @@ At the moment GPIOs are never unexported, let me know if you could find that use
 
 ## Examples
 
-
-The following example, built to run on the $9 C.H.I.P., shows the current values of GPIO0(sysfs id 408) attributes, changes direction and value and then shows again a recap of the attributes:
+The following example, built to run on the $9 C.H.I.P., shows the current value of all the GPIO0 attributes, changes direction and value and then shows again a recap of the attributes:
 
 ```Swift
 let gpios = SwiftyGPIO.getGPIOsForBoard(.CHIP)
@@ -128,6 +127,8 @@ repeat{
 	usleep(150*1000)
 }while(true) 
 ```
+
+Other examples are available in the *Examples* directory.
 
 ## TODO
 
