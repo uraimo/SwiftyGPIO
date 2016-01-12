@@ -17,12 +17,13 @@ It's built to run **esclusively on Linux ARM Boards** (RaspberryPi, BeagleBone B
 ## Supported Boards
 
 Tested:
-* Raspberry Pi A,B Revision 1
-* $9 C.H.I.P.
+* C.H.I.P.
 
-Not tested (See [#4](https://github.com/uraimo/SwiftyGPIO/issues/4)) but they should work:
+Not tested (See [#4](https://github.com/uraimo/SwiftyGPIO/issues/4)) but should work:
+* Raspberry Pi A,B Revision 1
 * Raspberry Pi A,B Revision 2
 * Raspberry Pi B+, Pi 2, Pi Zero
+* BeagleBone Black
                      
 ## Installation
 
