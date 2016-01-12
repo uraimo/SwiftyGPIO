@@ -103,7 +103,13 @@ extension GPIO {
     private func writeToFile(path: String, value:String){
         let fp = fopen(path,"w")
         if fp != nil {
-            fwrite(value, strideof(CChar), value.characters.count, fp)
+            let ret = fwrite(value, strideof(CChar), value.characters.count, fp)
+			if ret<value.characters.count {
+				if ferror(fp) != 0 {
+					perror("Error while writing to file")
+					abort()
+				}
+			}
             fclose(fp)
         }
     }
@@ -116,6 +122,12 @@ extension GPIO {
         if fp != nil {
             let buf = UnsafeMutablePointer<CChar>.alloc(MAXLEN)
             let len = fread(buf, strideof(CChar), MAXLEN, fp)
+ 			if len < MAXLEN {
+				if ferror(fp) != 0 {
+					perror("Error while reading from file")
+					abort()
+				}
+			}
             fclose(fp)
 		    //Remove the trailing \n
             buf[len-1]=0
