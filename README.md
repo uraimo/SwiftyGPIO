@@ -12,7 +12,7 @@
 
 This library provides an easy way to interact with digital GPIOs using Swift on Linux. You'll be able to configure a port attributes (direction,edge,active low) and read/write the current value.
 
-It's built to run **esclusively on Linux ARM Boards** (RaspberryPi, BeagleBone Black, UDOO, Tegra, CHIP, etc...) with accessible GPIOs.
+It's built to run **exclusively on Linux ARM Boards** (RaspberryPi, BeagleBone Black, UDOO, Tegra, CHIP, etc...) with accessible GPIOs.
 
 **Do you own an unsupported/untested board and would like to help? Check out issues  [#3](https://github.com/uraimo/SwiftyGPIO/issues/3) and [#4](https://github.com/uraimo/SwiftyGPIO/issues/4)**
 
@@ -29,7 +29,7 @@ Not tested but should work:
                      
 ## Installation
 
-To use this library, you'll need a Linux ARM board with Swift 2.
+To use this library, you'll need a Linux ARM board with Swift 2.2.
 
 You can either compile Swift yourself following [these instructions](http://www.housedillon.com/?p=2267) or use precompiled binaries following one of guides from [@hpux735](http://www.housedillon.com/?p=2293) or [@iachievedit](http://dev.iachieved.it/iachievedit/open-source-swift-on-raspberry-pi-2/) if you have a Raspberry Pi 2 or a C.H.I.P..
 
