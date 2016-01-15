@@ -20,12 +20,12 @@ It's built to run **exclusively on Linux ARM Boards** (RaspberryPi, BeagleBone B
 
 Tested:
 * C.H.I.P.
+* BeagleBone Black
 
 Not tested but should work:
 * Raspberry Pi A,B Revision 1
 * Raspberry Pi A,B Revision 2
 * Raspberry Pi B+, Pi 2, Pi Zero
-* BeagleBone Black
                      
 ## Installation
 
