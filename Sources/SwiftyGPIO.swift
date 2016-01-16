@@ -16,6 +16,12 @@ public enum GPIOEdge:String {
     case BOTH="both"
 }
 
+public enum ByteOrder{
+    case MSBFIRST
+    case LSBFIRST
+}
+
+
 public class GPIO {
     var name:String=""
     var id:Int=0
@@ -135,6 +141,36 @@ extension GPIO {
         return res
     }
 
+}
+
+public struct VirtualSPI{
+    let dataGPIO,clockGPIO:GPIO
+
+    init(dataGPIO:GPIO,clockGPIO:GPIO){
+        self.dataGPIO = dataGPIO
+        self.dataGPIO.direction = .OUT
+        self.dataGPIO.value = 0
+        self.clockGPIO = clockGPIO
+        self.clockGPIO.direction = .OUT
+        self.clockGPIO.value = 0
+    }
+
+    func sendByte(value:UInt8, order:ByteOrder = .MSBFIRST, clockDelayUsec:Int=0){
+        for i in 0...7 {
+            switch order {
+                case .MSBFIRST:
+                    dataGPIO.value = Int( value & UInt8(1 << (7-i)) )
+                case .LSBFIRST:
+                    dataGPIO.value = Int( value & UInt8(1 << i) )
+            }
+
+            clockGPIO.value = 1
+            if clockDelayUsec>0 {
+                usleep(UInt32(clockDelayUsec))
+            }
+            clockGPIO.value = 0
+        }
+    }
 }
 
 
@@ -261,8 +297,8 @@ public struct SwiftyGPIO {
         .P1:GPIO(name:"P8_PIN04_GPIO1_7",id:39),
         .P2:GPIO(name:"P8_PIN05_GPIO1_2",id:34),
         .P3:GPIO(name:"P8_PIN06_GPIO1_3",id:35),
-        .P4:GPIO(name:"P8_PIN11_GPIO1_13",id:66),
-        .P5:GPIO(name:"P8_PIN12_GPIO1_12",id:67),
+        .P4:GPIO(name:"P8_PIN11_GPIO1_13",id:45),
+        .P5:GPIO(name:"P8_PIN12_GPIO1_12",id:44),
         .P6:GPIO(name:"P8_PIN14_GPIO0_26",id:26),
         .P7:GPIO(name:"P8_PIN15_GPIO1_15",id:47),
         .P8:GPIO(name:"P8_PIN16_GPIO1_14",id:46),
