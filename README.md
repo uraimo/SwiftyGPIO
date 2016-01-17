@@ -23,7 +23,7 @@ Tested:
 * BeagleBone Black
 * Raspberry Pi 2
 
-Not tested but they should work(basically everything that has an ARMv7):
+Not tested but they should work(basically everything that has an ARMv7 and ubuntu 14.04):
 * UDOOs
 * OLinuXinos
 * ODROIDs
