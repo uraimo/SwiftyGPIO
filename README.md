@@ -21,11 +21,12 @@ It's built to run **exclusively on Linux ARM Boards** (RaspberryPi, BeagleBone B
 Tested:
 * C.H.I.P.
 * BeagleBone Black
+* Raspberry Pi 2
 
-Not tested but should work:
+Not tested, Swift is not yet available for ARM6 boards:
 * Raspberry Pi A,B Revision 1
 * Raspberry Pi A,B Revision 2
-* Raspberry Pi B+, Pi 2, Pi Zero
+* Raspberry Pi A+, B+, Pi Zero
                      
 ## Installation
 
@@ -56,11 +57,12 @@ First, we need to retrieve the list of GPIOs available on the board and get a re
     let gpios = SwiftyGPIO.getGPIOsForBoard(.CHIP)
     var gp = gpios[.P0]!
 
-The following are the possible values for the supported boards:
+The following are the possible values for the predefined boards:
     
-* .RaspberryPiRev1 (Pi A,B Revision 1)
-* .RaspberryPiRev2 (Pi A,B Revision 2) 
-* .RaspberryPiB2Zero (Pi B+,2,Zero with 40 pin header)
+* .RaspberryPiRev1 (Pi A,B Revision 1, pre-2012, 26 pin header)
+* .RaspberryPiRev2 (Pi A,B Revision 2, post-2012, 26 pin header) 
+* .GPIORPIPlus2ZERO (Raspberry Pi A+ and B+, Raspberry 2, Raspberry Zero, all with a 40 pin header)
+* .BeagleBoneBlack (BeagleBone Black)
 * .CHIP (the $9 C.H.I.P. computer).
 
 The map returned by *getGPIOsForBoard* contains all the GPIOs of a specific board as described by [these diagrams](https://github.com/uraimo/SwiftyGPIO/wiki/GPIO-Pinout). 
@@ -139,12 +141,14 @@ Other examples are available in the *Examples* directory.
 - [x] Create Package.swift
 - [x] Basic example w/ package import
 - [x] Add GPIOs default configurations for supported boards
+- [x] Testing on the BeagleBone Black
 - [ ] Support for additional GPIOs on separate header for RasPi Rev 2 boards?
-- [ ] Add BeagleBone Black pinout defaults
+- [x] Add BeagleBone Black pinout defaults
 - [ ] Add Tegra TK1 when Swift support confirmed
 - [ ] Add UDOOs when Swift support confirmed
 - [ ] Testing on the Raspberries
-- [ ] Testing on the BeagleBone Black
 - [ ] SysFS PWN and/or software PWM?
+- [ ] Support for hardware SPI
+- [ ] Software SPI via GPIOs
 - [ ] Support for external ADCs or support for platform-specific ADC drivers?
 - [ ] Refactoring
