@@ -61,7 +61,7 @@ The following are the possible values for the predefined boards:
     
 * .RaspberryPiRev1 (Pi A,B Revision 1, pre-2012, 26 pin header)
 * .RaspberryPiRev2 (Pi A,B Revision 2, post-2012, 26 pin header) 
-* .GPIORPIPlus2ZERO (Raspberry Pi A+ and B+, Raspberry 2, Raspberry Zero, all with a 40 pin header)
+* .RaspberryPiPlus2Zero (Raspberry Pi A+ and B+, Raspberry 2, Raspberry Zero, all with a 40 pin header)
 * .BeagleBoneBlack (BeagleBone Black)
 * .CHIP (the $9 C.H.I.P. computer).
 
