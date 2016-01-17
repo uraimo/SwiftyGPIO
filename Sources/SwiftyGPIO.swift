@@ -155,7 +155,7 @@ public struct SwiftyGPIO {
         }
     }
 
-    // RaspberryPiRev1: A,B
+    // RaspberryPi A and B Revision 1 (Before September 2012) - 26 pin header boards
     // 0, 1, 4, 7, 8, 9, 10, 11, 14, 15, 17, 18, 21, 22, 23, 24, 25
     static let GPIORPIRev1:[GPIOName:GPIO] = [
         .P0:GPIO(name:"GPIO0",id:0),
@@ -177,7 +177,7 @@ public struct SwiftyGPIO {
         .P25:GPIO(name:"GPIO25",id:25)
     ]
 
-    // RaspberryPiRev2: A,B
+    // RaspberryPi A and B Revision 2 (After September 2012) - 26 pin header boards
     //TODO: Additional GPIO from 28-31 ignored for now
     // 2, 3, 4, 7, 8, 9, 10, 11, 14, 15, 17, 18, 22, 23, 24, 25, 27
     static let GPIORPIRev2:[GPIOName:GPIO] = [
@@ -200,9 +200,9 @@ public struct SwiftyGPIO {
         .P27:GPIO(name:"GPIO27",id:27)
     ]
 
-    // RaspberryPi2: B+,2,Zero
+    // RaspberryPi A+ and B+, Raspberry 2, Raspberry Zero - 40 pin header boards
     // 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
-    static let GPIORPIB2ZERO:[GPIOName:GPIO] = [
+    static let GPIORPIPlus2ZERO:[GPIOName:GPIO] = [
         .P2:GPIO(name:"GPIO2",id:2),
         .P3:GPIO(name:"GPIO3",id:3),
         .P4:GPIO(name:"GPIO4",id:4),
