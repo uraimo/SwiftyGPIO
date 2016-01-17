@@ -146,7 +146,7 @@ public struct SwiftyGPIO {
                 return GPIORPIRev1
             case .RaspberryPiRev2:
                 return GPIORPIRev2
-            case .RaspberryPiB2Zero:
+            case .GPIORPIPlus2ZERO:
                 return GPIORPIB2ZERO
             case .CHIP:
                 return GPIOCHIP
