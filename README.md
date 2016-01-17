@@ -14,7 +14,7 @@ This library provides an easy way to interact with digital GPIOs using Swift on 
 
 It's built to run **exclusively on Linux ARM Boards** (RaspberryPi, BeagleBone Black, UDOO, Tegra, CHIP, etc...) with accessible GPIOs.
 
-**Do you own an unsupported/untested board and would like to help? Check out issues  [#3](https://github.com/uraimo/SwiftyGPIO/issues/3) and [#4](https://github.com/uraimo/SwiftyGPIO/issues/4)**
+**Do you own an unsupported/untested board and would like to help? Check out issue  [#10](https://github.com/uraimo/SwiftyGPIO/issues/10)**
 
 ## Supported Boards
 
@@ -22,6 +22,13 @@ Tested:
 * C.H.I.P.
 * BeagleBone Black
 * Raspberry Pi 2
+
+Not tested but they should work(basically everything that has an ARMv7):
+* UDOOs
+* OLinuXinos
+* ODROIDs
+* Cubieboards
+* Tegra Jetson TK1
 
 Not tested, Swift is not yet available for ARM6 boards:
 * Raspberry Pi A,B Revision 1
