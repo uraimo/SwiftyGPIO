@@ -99,7 +99,7 @@ The other properties available on the GPIO object (edge,active low) refer to the
 
 SwiftyGPIO interact with GPIOs through the sysfs file-based interface described [here](https://www.kernel.org/doc/Documentation/gpio/sysfs.txt).
 
-The GPIO is exported the first time one of the GPIO methods is invoked, using the GPIO id provided during the creation of the object (either provided manually or from the defaults). Most of the times that is will be different from the physical id of the pin. SysFS GPIO ids can usually be found in the board documentation, defaults will be provided soon.
+The GPIO is exported the first time one of the GPIO methods is invoked, using the GPIO id provided during the creation of the object (either provided manually or from the defaults). Most of the times that id will be different from the physical id of the pin. SysFS GPIO ids can usually be found in the board documentation, we provide a few presets for tested boards (do you have the complete list of ids for an unsupported board and want to help? Cool! Consider opening a PR).
 
 At the moment GPIOs are never unexported, let me know if you could find that useful. Multiple exporting when creating an already configured GPIO is not a problem, successive attempts to export a GPIO are simply ignored.
 
@@ -149,13 +149,13 @@ Other examples are available in the *Examples* directory.
 - [x] Basic example w/ package import
 - [x] Add GPIOs default configurations for supported boards
 - [x] Testing on the BeagleBone Black
-- [ ] Support for additional GPIOs on separate header for RasPi Rev 2 boards?
+- [x] Software SPI via GPIOs
 - [x] Add BeagleBone Black pinout defaults
+- [ ] Support for additional GPIOs on separate header for RasPi Rev 2 boards?
 - [ ] Add Tegra TK1 when Swift support confirmed
 - [ ] Add UDOOs when Swift support confirmed
-- [ ] Testing on the Raspberries
+- [ ] Testing on the Raspberries 1
 - [ ] SysFS PWN and/or software PWM?
 - [ ] Support for hardware SPI
-- [ ] Software SPI via GPIOs
 - [ ] Support for external ADCs or support for platform-specific ADC drivers?
 - [ ] Refactoring
