@@ -1,5 +1,7 @@
 #if arch(arm) && os(Linux)
     import Glibc
+#else
+    import Darwin
 #endif
 
 internal let BASEPATH="/sys/class/gpio/"
