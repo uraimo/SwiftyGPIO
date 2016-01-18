@@ -61,8 +61,10 @@ Let's suppose we are using a CHIP board and have a led connected between the GPI
 
 First, we need to retrieve the list of GPIOs available on the board and get a reference to the one we want to modify:
 
-    let gpios = SwiftyGPIO.getGPIOsForBoard(.CHIP)
-    var gp = gpios[.P0]!
+```swift
+let gpios = SwiftyGPIO.getGPIOsForBoard(.CHIP)
+var gp = gpios[.P0]!
+```
 
 The following are the possible values for the predefined boards:
     
@@ -76,22 +78,30 @@ The map returned by *getGPIOsForBoard* contains all the GPIOs of a specific boar
 
 Alternatively, if our board is not supported, each single GPIO object can be instantiated manually, using its SysFS GPIO Id:
 
-    var gp = GPIO(name: "P0",id: 408)  // User defined name and GPIO Id
+```swift
+var gp = GPIO(name: "P0",id: 408)  // User defined name and GPIO Id
+```
     
 The next step is configuring the port direction, that can be either *GPIODirection.IN* or *GPIODirection.OUT*, in this case we'll choose .OUT:
 
-    gp.direction = .OUT
+```swift
+gp.direction = .OUT
+```
 
 Then we'll change the pin value to the HIGH value "1":
-	
-    gp.value = 1
+
+```swift
+gp.value = 1
+```
 
 That's it, the led will turn on.
 
 Now, suppose we have a switch connected to P0 instead, to read the value coming in the P0 port, the direction must be configured as *.IN* and the value can be read from the *value* property:
 
-    gp.direction = .IN
-    let current = gp.value
+```swift
+gp.direction = .IN
+let current = gp.value
+```
 
 The other properties available on the GPIO object (edge,active low) refer to the additional attributes of the GPIO that can be configured but you will not need them most of the times. For a detailed description refer to the [kernel documentation](https://www.kernel.org/doc/Documentation/gpio/sysfs.txt)
 
