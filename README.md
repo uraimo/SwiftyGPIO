@@ -55,6 +55,10 @@ When your code is ready, compile it with:
     swiftc SwiftyGPIO.swift main.swift
 
 The compiler will create a **main** executable.
+As everything interacting with GPIOs via sysfs, if you are not already root, you will need to run that binary with `sudo ./main`.
+
+If you prefer an alternative approach that does not require to use sudo every time check out this [answer on stackoverflow](https://stackoverflow.com/questions/30938991/access-gpio-sys-class-gpio-as-non-root/30940526#30940526).
+After following those instruction, remember to add your user (e.g. pi) to the gpio group with `sudo usermod -aG gpio pi` and to reboot so that the changes you made are applied.
 
 ## Usage
 
