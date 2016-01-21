@@ -145,7 +145,7 @@ extension GPIO {
 
 }
 
-public struct VirtualSPI{
+public struct VirtualSPI : SPIOutput{
     let dataGPIO,clockGPIO:GPIO
 
     init(dataGPIO:GPIO,clockGPIO:GPIO){
@@ -173,6 +173,15 @@ public struct VirtualSPI{
             clockGPIO.value = 0
         }
     }
+    
+    func isHardware()->Bool{
+        return false
+    }
+}
+
+protocol SPIOutput{
+    func sendByte(value:UInt8, order:ByteOrder, clockDelayUsec:Int)
+    func isHardware()->Bool
 }
 
 
