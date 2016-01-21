@@ -156,6 +156,20 @@ repeat{
 }while(true) 
 ```
 
+Swifty GPIO also provide a bit banging software implementation of a SPI interface, you just need two GPIOs to initialize it:
+
+```Swift
+let gpios = SwiftyGPIO.getGPIOsForBoard(.CHIP)
+var sclk = gpios[.P0]!
+var dnmosi = gpios[.P1]!
+
+var spi = VirtualSPI(dataGPIO:dnmosi,clockGPIO:sclk) 
+
+pi.sendByte(UInt8(truncatingBitPattern:0x9F)) 
+```
+
+Notice that we are converting the 0x9F `Int` using the constructor `UInt8(truncatingBitPattern:)`, that in this case it's not actually needed, but it's recommended for every user-provided or calculated integer because Swift does not support implicit truncation for conversion to smaller integer types, it will just crash if the `Int` you are trying to convert does not fit in a `UInt8`.
+
 Other examples are available in the *Examples* directory.
 
 ## TODO
