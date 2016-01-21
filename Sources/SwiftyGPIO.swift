@@ -160,10 +160,10 @@ public struct VirtualSPI{
     func sendByte(value:UInt8, order:ByteOrder = .MSBFIRST, clockDelayUsec:Int=0){
         for i in 0...7 {
             switch order {
-                case .MSBFIRST:
-                    dataGPIO.value = Int( value & UInt8(1 << (7-i)) )
                 case .LSBFIRST:
-                    dataGPIO.value = Int( value & UInt8(1 << i) )
+                    dataGPIO.value = ((value & UInt8(1 << i)) == 0) ? 0 : 1
+                case .MSBFIRST:
+                    dataGPIO.value = ((value & UInt8(1 << (7-i))) == 0) ? 0 : 1
             }
 
             clockGPIO.value = 1
