@@ -24,21 +24,21 @@ Tested:
 * BeagleBone Black
 * Raspberry Pi 2
 
-Not tested but they should work(basically everything that has an ARMv7 and ubuntu 14.04):
+Not tested but they should work(basically everything that has an ARMv7 and Ubuntu 14+):
 * UDOOs
 * OLinuXinos
 * ODROIDs
 * Cubieboards
 * Tegra Jetson TK1
 
-Not tested, Swift is not yet available for ARM6 boards:
+Not tested, Swift is not yet available for ARMv6 boards:
 * Raspberry Pi A,B Revision 1
 * Raspberry Pi A,B Revision 2
 * Raspberry Pi A+, B+, Pi Zero
                      
 ## Installation
 
-To use this library, you'll need a Linux ARM board with Swift 2.2.
+To use this library, you'll need a Linux ARM(only ARMv7 at the moment) board with Swift 2.2.
 
 You can either compile Swift yourself following [these instructions](http://www.housedillon.com/?p=2267) or use precompiled binaries following one of guides from [@hpux735](http://www.housedillon.com/?p=2293) or [@iachievedit](http://dev.iachieved.it/iachievedit/open-source-swift-on-raspberry-pi-2/) if you have a Raspberry Pi 2, BeagleBoneBlack, C.H.I.P. or one of the other ARMv7 boards.
 
@@ -172,5 +172,6 @@ Other examples are available in the *Examples* directory.
 - [ ] Testing on the Raspberries 1
 - [ ] SysFS PWN and/or software PWM?
 - [ ] Support for hardware SPI
+- [ ] Block/Function execution on gpio interrupts
 - [ ] Support for external ADCs or support for platform-specific ADC drivers?
 - [ ] Refactoring
