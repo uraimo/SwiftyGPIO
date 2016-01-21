@@ -172,6 +172,11 @@ Notice that we are converting the 0x9F `Int` using the constructor `UInt8(trunca
 
 Other examples are available in the *Examples* directory.
 
+## Projects that use SwiftyGPIO
+
+* [Nokia5110(PCD8544) LCD Library](http://github.com/uraimo/5110lcd_pcd8544.swift) - Show text and graphics on a Nokia 3110/5110 LCD display.
+<Your project here>
+
 ## TODO
 
 - [x] Create Package.swift
