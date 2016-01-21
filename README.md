@@ -184,7 +184,7 @@ Other examples are available in the *Examples* directory.
 - [ ] Add Tegra TK1 when Swift support confirmed
 - [ ] Add UDOOs when Swift support confirmed
 - [ ] Testing on the Raspberries 1
-- [ ] SysFS PWN and/or software PWM?
+- [ ] SysFS PWM and/or software PWM?
 - [ ] Support for hardware SPI
 - [ ] Block/Function execution on gpio interrupts
 - [ ] Support for external ADCs or support for platform-specific ADC drivers?
