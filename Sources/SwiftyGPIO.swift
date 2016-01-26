@@ -148,6 +148,8 @@ extension GPIO {
 public protocol SPIOutput{                     
     func sendByte(value:UInt8, order:ByteOrder, clockDelayUsec:Int)
     func sendByte(value:UInt8)
+    func sendStream(values:[UInt8], order:ByteOrder, clockDelayUsec:Int)
+    func sendStream(values:[UInt8])
     func isHardware()->Bool
 }
 
@@ -182,6 +184,29 @@ public struct VirtualSPI : SPIOutput{
 
     public func sendByte(value:UInt8){
         self.sendByte(value,order:.MSBFIRST,clockDelayUsec:0)
+    }
+
+    public func sendStream(values:[UInt8], order:ByteOrder, clockDelayUsec:Int){
+        for value in values {        
+            for i in 0...7 {
+                switch order {
+                    case .LSBFIRST:
+                        dataGPIO.value = ((value & UInt8(1 << i)) == 0) ? 0 : 1
+                    case .MSBFIRST:
+                        dataGPIO.value = ((value & UInt8(1 << (7-i))) == 0) ? 0 : 1
+                }
+
+                clockGPIO.value = 1
+                if clockDelayUsec>0 {
+                    usleep(UInt32(clockDelayUsec))
+                }
+                clockGPIO.value = 0
+            }
+        }
+    }
+ 
+    public func sendStream(values:[UInt8]){
+        self.sendStream(values,order:.MSBFIRST,clockDelayUsec:0)
     }
 
     public func isHardware()->Bool{
