@@ -152,7 +152,60 @@ public protocol SPIOutput{
     func sendStream(values:[UInt8], order:ByteOrder, clockDelayUsec:Int)
     func sendStream(values:[UInt8])
     func isHardware()->Bool
+    func isOut()->Bool
 }
+
+public struct HardwareSPI : SPIOutput{
+    let spiId:String
+    let isOutput:Bool
+
+    init(spiId:String,isOutput:Bool){
+        self.spiId=spiId
+        self.isOutput=isOutput
+        //TODO: Check if available?
+    }
+
+    public func sendStream(values:[UInt8], order:ByteOrder, clockDelayUsec:Int){
+        guard isOutput else {return}
+
+        if clockDelayUsec > 0 {
+            //TODO: ioctl with new freq
+        }
+        
+        writeToFile(SPIBASEPATH+spiId, values:values)
+    }
+
+    public func sendStream(values:[UInt8]){sendStream(values,order:.MSBFIRST,clockDelayUsec:0)}
+    public func sendByte(value:UInt8){sendByte(value,order:.MSBFIRST,clockDelayUsec:0)}
+
+    public func sendByte(value:UInt8, order:ByteOrder, clockDelayUsec:Int){
+        sendStream([value],order:order,clockDelayUsec:clockDelayUsec)
+    }
+
+    public func isHardware()->Bool{
+        return true
+    } 
+
+    public func isOut()->Bool{
+        return isOutput
+    }
+ 
+    private func writeToFile(path: String, values:[UInt8]){
+        let fp = fopen(path,"w")
+        if fp != nil {
+            let ret = fwrite(values, strideof(CChar), values.count, fp)
+            if ret<values.count {
+                if ferror(fp) != 0 {
+                    perror("Error while writing to file")
+                    abort()
+                }
+            }
+            fclose(fp)
+        }
+    }
+ 
+}
+
 
 public struct VirtualSPI : SPIOutput{
     let dataGPIO,clockGPIO:GPIO
@@ -228,11 +281,11 @@ public struct SwiftyGPIO {
     public static func getHardwareSPIsForBoard(board: SupportedBoard)->[SPIOutput]?{
         switch(board){
             case .RaspberryPiRev1:
-                fallthought
+                fallthrough
             case .RaspberryPiRev2:
                 fallthrough
             case .RaspberryPiPlus2Zero:
-                return [SPIRPI[0],SPIRPI[1]]
+                return [SPIRPI[0]!,SPIRPI[1]!]
             default:
                 return nil
         }
@@ -316,8 +369,8 @@ public struct SwiftyGPIO {
 
     // Raspberries w/raspbian
     static let SPIRPI:[Int:SPIOutput] = [
-        0:HardwareSPI(spiId:"0.0",isOut:true),
-        1:HardwareSPI(spiId:"0.1",isOut:false)
+        0:HardwareSPI(spiId:"0.0",isOutput:true),
+        1:HardwareSPI(spiId:"0.1",isOutput:false)
     ]
 
     // CHIP
