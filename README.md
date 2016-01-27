@@ -198,7 +198,7 @@ repeat{
 }while(true) 
 ```
 
-Swifty GPIO also provide a bit banging software implementation of a SPI interface, you just need two GPIOs to initialize it:
+We can't test the hardware SPI with the CHIP but SwiftyGPIO also provide a bit banging software implementation of a SPI interface, you just need two GPIOs to initialize it:
 
 ```Swift
 let gpios = SwiftyGPIO.getGPIOsForBoard(.CHIP)
@@ -207,7 +207,7 @@ var dnmosi = gpios[.P1]!
 
 var spi = VirtualSPI(dataGPIO:dnmosi,clockGPIO:sclk) 
 
-pi.sendByte(UInt8(truncatingBitPattern:0x9F)) 
+pi.sendData([UInt8(truncatingBitPattern:0x9F)]) 
 ```
 
 Notice that we are converting the 0x9F `Int` using the constructor `UInt8(truncatingBitPattern:)`, that in this case it's not actually needed, but it's recommended for every user-provided or calculated integer because Swift does not support implicit truncation for conversion to smaller integer types, it will just crash if the `Int` you are trying to convert does not fit in a `UInt8`.
@@ -217,7 +217,7 @@ Other examples are available in the *Examples* directory.
 ## Projects that use SwiftyGPIO
 
 * [Nokia5110(PCD8544) LCD Library](http://github.com/uraimo/5110lcd_pcd8544.swift) - Show text and graphics on a Nokia 3110/5110 LCD display.
-<Your project here>
+* {Your project here!}
 
 ## TODO
 
@@ -227,12 +227,12 @@ Other examples are available in the *Examples* directory.
 - [x] Testing on the BeagleBone Black
 - [x] Software SPI via GPIOs
 - [x] Add BeagleBone Black pinout defaults
+- [x] Support for hardware SPI
 - [ ] Support for additional GPIOs on separate header for RasPi Rev 2 boards?
 - [ ] Add Tegra TK1 when Swift support confirmed
 - [ ] Add UDOOs when Swift support confirmed
 - [ ] Testing on the Raspberries 1
-- [ ] SysFS PWM and/or software PWM?
-- [ ] Support for hardware SPI
+- [ ] SysFS PWM and/or software PWM and/or ServoBlaster?
 - [ ] Block/Function execution on gpio interrupts
 - [ ] Support for external ADCs or support for platform-specific ADC drivers?
 - [ ] Refactoring
