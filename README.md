@@ -62,6 +62,10 @@ After following those instruction, remember to add your user (e.g. pi) to the gp
 
 ## Usage
 
+Currently, SwiftyGPIO expose GPIOs and SPIs(if not available a bit-banging VirtualSPI can be created), l'et's see how to use them.
+
+#### GPIOs
+
 Let's suppose we are using a CHIP board and have a led connected between the GPIO pin P0 and GND and we want to turn it on.
 
 First, we need to retrieve the list of GPIOs available on the board and get a reference to the one we want to modify:
@@ -109,6 +113,44 @@ let current = gp.value
 ```
 
 The other properties available on the GPIO object (edge,active low) refer to the additional attributes of the GPIO that can be configured but you will not need them most of the times. For a detailed description refer to the [kernel documentation](https://www.kernel.org/doc/Documentation/gpio/sysfs.txt)
+
+#### SPIs
+
+If your board has SPI connections and SwiftyGPIO has them among its presets, a list of the available SPIs can be retrieved invoking `getHardwareSPIsForBoard` with one of the predefined boards. Let's see some examples using a Raspberry2 that has one bidirectional SPI, managed by SwiftyGPIO as two mono-directional SPIObjects:
+ 
+```swift
+let spis = SwiftyGPIO.getHardwareSPIsForBoard(.RaspberryPiPlus2Zero)
+var spi = spis?[0]
+```
+
+The first item returned is the output channel and this can be verified invoking the method `isOut` on the `SPIObject`.
+
+Alternatively, we can create a software SPI using two GPIOs, one that wil serve as clock pin and the other will be used to send the actual data. This kind of bit-banging SPI is way slower than the hardware one, so, the recommended approach is to use hardware SPIs when available.
+
+To create a software SPI, just retrieve two pins and create a `VirtualSPI` object:
+```swift
+let gpios = SwiftyGPIO.getGPIOsForBoard(.RaspberryPiPlus2Zero)
+var sclk = gpios[.P2]!
+var dnmosi = gpios[.P3]!
+var spi = VirtualSPI(dataGPIO:dnmosi,clockGPIO:sclk) 
+```
+
+Both objects implement the same `SPIObject` protocol and so provide the same methods.
+To distinguish between hardware and software SPIObjects, use the `isHardware` method.
+
+To send one or more byte over a SPI, use the `sendData` method.
+In its simplest form it just needs an array of UInt8 as parameter:
+
+```swift
+spi?.sendData([UInt(42)])
+```
+
+But for software SPIs (for now, these values are ignored when using a hardware SPI) you can also specify the preferred byte ordering (MSB,LSB) and the delay between two succesive bits (clock width):
+
+```swift
+spi?.sendData([UInt(42)], order:.LSBFIRST, clockDelayUsec:1000)
+```
+
 
 ## Under the hood
 
