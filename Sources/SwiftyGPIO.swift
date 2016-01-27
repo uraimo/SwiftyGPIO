@@ -4,7 +4,8 @@
     import Darwin
 #endif
 
-internal let BASEPATH="/sys/class/gpio/"
+internal let GPIOBASEPATH="/sys/class/gpio/"
+internal let SPIBASEPATH="/dev/spidev"
 
 public enum GPIODirection:String {
     case IN="in"
@@ -83,24 +84,24 @@ public class GPIO {
 extension GPIO {
 
     private func enableIO(id: Int){
-        writeToFile(BASEPATH+"export",value:String(id))
+        writeToFile(GPIOBASEPATH+"export",value:String(id))
         exported = true
     }
 
     private func performSetting(filename: String, value: String){
-        writeToFile(BASEPATH+filename, value:value)
+        writeToFile(GPIOBASEPATH+filename, value:value)
     }
 
     private func performSetting(filename: String, value: Int){
-        writeToFile(BASEPATH+filename, value: String(value))
+        writeToFile(GPIOBASEPATH+filename, value: String(value))
     }
 
     private func getStringValue(filename: String)->String?{
-        return readFromFile(BASEPATH+filename)
+        return readFromFile(GPIOBASEPATH+filename)
     }
 
     private func getIntValue(filename: String)->Int?{
-        if let res = readFromFile(BASEPATH+filename) {
+        if let res = readFromFile(GPIOBASEPATH+filename) {
             return Int(res)
         }
         return nil
