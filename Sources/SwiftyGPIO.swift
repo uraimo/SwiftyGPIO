@@ -147,10 +147,8 @@ extension GPIO {
 }
 
 public protocol SPIOutput{                     
-    func sendByte(value:UInt8, order:ByteOrder, clockDelayUsec:Int)
-    func sendByte(value:UInt8)
-    func sendStream(values:[UInt8], order:ByteOrder, clockDelayUsec:Int)
-    func sendStream(values:[UInt8])
+    func sendData(values:[UInt8], order:ByteOrder, clockDelayUsec:Int)
+    func sendData(values:[UInt8])
     func isHardware()->Bool
     func isOut()->Bool
 }
@@ -165,7 +163,7 @@ public struct HardwareSPI : SPIOutput{
         //TODO: Check if available?
     }
 
-    public func sendStream(values:[UInt8], order:ByteOrder, clockDelayUsec:Int){
+    public func sendData(values:[UInt8], order:ByteOrder, clockDelayUsec:Int){
         guard isOutput else {return}
 
         if clockDelayUsec > 0 {
@@ -175,12 +173,7 @@ public struct HardwareSPI : SPIOutput{
         writeToFile(SPIBASEPATH+spiId, values:values)
     }
 
-    public func sendStream(values:[UInt8]){sendStream(values,order:.MSBFIRST,clockDelayUsec:0)}
-    public func sendByte(value:UInt8){sendByte(value,order:.MSBFIRST,clockDelayUsec:0)}
-
-    public func sendByte(value:UInt8, order:ByteOrder, clockDelayUsec:Int){
-        sendStream([value],order:order,clockDelayUsec:clockDelayUsec)
-    }
+    public func sendData(values:[UInt8]){sendData(values,order:.MSBFIRST,clockDelayUsec:0)}
 
     public func isHardware()->Bool{
         return true
@@ -220,7 +213,7 @@ public struct VirtualSPI : SPIOutput{
     }
 
 
-    public func sendStream(values:[UInt8], order:ByteOrder, clockDelayUsec:Int){
+    public func sendData(values:[UInt8], order:ByteOrder, clockDelayUsec:Int){
         for value in values {        
             for i in 0...7 {
                 switch order {
@@ -239,18 +232,10 @@ public struct VirtualSPI : SPIOutput{
         }
     }
  
-    public func sendStream(values:[UInt8]){
-        self.sendStream(values,order:.MSBFIRST,clockDelayUsec:0)
+    public func sendData(values:[UInt8]){
+        self.sendData(values,order:.MSBFIRST,clockDelayUsec:0)
     }
 
-    public func sendByte(value:UInt8, order:ByteOrder, clockDelayUsec:Int){
-        sendStream([value],order:order,clockDelayUsec:clockDelayUsec)
-    }
-
-    public func sendByte(value:UInt8){
-        self.sendByte(value,order:.MSBFIRST,clockDelayUsec:0)
-    }
- 
     public func isHardware()->Bool{
         return false
     }
