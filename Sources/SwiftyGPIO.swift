@@ -224,6 +224,19 @@ public struct SwiftyGPIO {
         }
     }
 
+    public static func getHardwareSPIsForBoard(board: SupportedBoard)->[SPIOutput]?{
+        switch(board){
+            case .RaspberryPiRev1:
+                fallthought
+            case .RaspberryPiRev2:
+                fallthrough
+            case .RaspberryPiPlus2Zero:
+                return [SPIRPI[0],SPIRPI[1]]
+            default:
+                return nil
+        }
+    }
+
     // RaspberryPi A and B Revision 1 (Before September 2012) - 26 pin header boards
     // 0, 1, 4, 7, 8, 9, 10, 11, 14, 15, 17, 18, 21, 22, 23, 24, 25
     static let GPIORPIRev1:[GPIOName:GPIO] = [
@@ -298,6 +311,12 @@ public struct SwiftyGPIO {
         .P25:GPIO(name:"GPIO25",id:25),
         .P26:GPIO(name:"GPIO26",id:26),
         .P27:GPIO(name:"GPIO27",id:27)
+    ]
+
+    // Raspberries w/raspbian
+    static let SPIRPI:[Int:SPIOutput] = [
+        0:HardwareSPI(spiId:"0.0",isOut:true),
+        1:HardwareSPI(spiId:"0.1",isOut:false)
     ]
 
     // CHIP
