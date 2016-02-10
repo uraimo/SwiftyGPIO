@@ -23,6 +23,9 @@ Tested:
 * C.H.I.P.
 * BeagleBone Black
 * Raspberry Pi 2
+* Raspberry Pi A,B Revision 1
+* Raspberry Pi A,B Revision 2
+* Raspberry Pi A+, B+, Pi Zero
 
 Not tested but they should work(basically everything that has an ARMv7 and Ubuntu 14+):
 * UDOOs
@@ -31,10 +34,6 @@ Not tested but they should work(basically everything that has an ARMv7 and Ubunt
 * Cubieboards
 * Tegra Jetson TK1
 
-Not tested, Swift is not yet available for ARMv6 boards:
-* Raspberry Pi A,B Revision 1
-* Raspberry Pi A,B Revision 2
-* Raspberry Pi A+, B+, Pi Zero
                      
 ## Installation
 
@@ -70,13 +69,13 @@ Currently, SwiftyGPIO expose GPIOs and SPIs(if not available a bit-banging Virtu
 
 #### GPIOs
 
-Let's suppose we are using a CHIP board and have a led connected between the GPIO pin P0 and GND and we want to turn it on.
+Let's suppose we are using a Raspberry 2 board and have a led connected between the GPIO pin P2 and GND and we want to turn it on.
 
 First, we need to retrieve the list of GPIOs available on the board and get a reference to the one we want to modify:
 
 ```swift
-let gpios = SwiftyGPIO.getGPIOsForBoard(.CHIP)
-var gp = gpios[.P0]!
+let gpios = SwiftyGPIO.getGPIOsForBoard(.RaspberryPiPlus2Zero)
+var gp = gpios[.P2]!
 ```
 
 The following are the possible values for the predefined boards:
@@ -92,7 +91,7 @@ The map returned by *getGPIOsForBoard* contains all the GPIOs of a specific boar
 Alternatively, if our board is not supported, each single GPIO object can be instantiated manually, using its SysFS GPIO Id:
 
 ```swift
-var gp = GPIO(name: "P0",id: 408)  // User defined name and GPIO Id
+var gp = GPIO(name: "P2",id: 2)  // User defined name and GPIO Id
 ```
     
 The next step is configuring the port direction, that can be either *GPIODirection.IN* or *GPIODirection.OUT*, in this case we'll choose .OUT:
@@ -109,7 +108,7 @@ gp.value = 1
 
 That's it, the led will turn on.
 
-Now, suppose we have a switch connected to P0 instead, to read the value coming in the P0 port, the direction must be configured as *.IN* and the value can be read from the *value* property:
+Now, suppose we have a switch connected to P2 instead, to read the value coming in the P2 port, the direction must be configured as *.IN* and the value can be read from the *value* property:
 
 ```swift
 gp.direction = .IN
