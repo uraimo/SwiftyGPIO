@@ -25,21 +25,23 @@ Tested:
 * Raspberry Pi 2
 * Raspberry Pi A,B Revision 1
 * Raspberry Pi A,B Revision 2
-* Raspberry Pi A+, B+, Pi Zero
+* Raspberry Pi A+, B+
 
-Not tested but they should work(basically everything that has an ARMv7 and Ubuntu 14+):
+Not tested but they should work(basically everything that has an ARMv7/Ubuntu14/Raspbian or an ARMv6/Raspbian):
+* Raspberry Pi Zero
 * UDOOs
 * OLinuXinos
 * ODROIDs
 * Cubieboards
 * Tegra Jetson TK1
 
-                     
+ 
 ## Installation
 
-To use this library, you'll need a Linux ARM(only ARMv7 at the moment) board with Swift 2.2.
+To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with Swift 2.2.
 
 You can either compile Swift yourself following [these instructions](http://www.housedillon.com/?p=2267) or use precompiled binaries following one of guides from [@hpux735](http://www.housedillon.com/?p=2293) or [@iachievedit](http://dev.iachieved.it/iachievedit/open-source-swift-on-raspberry-pi-2/) if you have a Raspberry Pi 2, BeagleBoneBlack, C.H.I.P. or one of the other ARMv7 boards.
+If you have a ARMv6 RaspberryPi 1 (A,B,A+,B+) or a Zero, get the precompiled binaries from [here](https://www.uraimo.com/2016/02/10/swift-available-on-armv6-raspberry-1-zero/). 
 
 Once done, considering that at the moment the package manager is not available on ARM, you'll need to manually download Sources/SwiftyGPIO.swift: 
 
@@ -219,12 +221,12 @@ pi.sendData([UInt8(truncatingBitPattern:0x9F)])
 
 Notice that we are converting the 0x9F `Int` using the constructor `UInt8(truncatingBitPattern:)`, that in this case it's not actually needed, but it's recommended for every user-provided or calculated integer because Swift does not support implicit truncation for conversion to smaller integer types, it will just crash if the `Int` you are trying to convert does not fit in a `UInt8`.
 
-Other examples are available in the *Examples* directory.
+Other examples for differen boards are available in the *Examples* directory.
 
 ## Projects that use SwiftyGPIO
 
 * [Nokia5110(PCD8544) LCD Library](http://github.com/uraimo/5110lcd_pcd8544.swift) - Show text and graphics on a Nokia 3110/5110 LCD display.
-* {Your project here!}
+* {Your project or library here!!}
 
 ## TODO
 
@@ -235,10 +237,10 @@ Other examples are available in the *Examples* directory.
 - [x] Software SPI via GPIOs
 - [x] Add BeagleBone Black pinout defaults
 - [x] Support for hardware SPI
+- [x] Testing on the Raspberries 1
 - [ ] Support for additional GPIOs on separate header for RasPi Rev 2 boards?
 - [ ] Add Tegra TK1 when Swift support confirmed
 - [ ] Add UDOOs when Swift support confirmed
-- [ ] Testing on the Raspberries 1
 - [ ] SysFS PWM and/or software PWM and/or ServoBlaster?
 - [ ] Block/Function execution on gpio interrupts
 - [ ] Support for external ADCs or support for platform-specific ADC drivers?
