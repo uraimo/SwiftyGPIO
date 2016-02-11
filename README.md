@@ -71,7 +71,7 @@ Currently, SwiftyGPIO expose GPIOs and SPIs(if not available a bit-banging Virtu
 
 #### GPIOs
 
-Let's suppose we are using a Raspberry 2 board and have a led connected between the GPIO pin P2 and GND and we want to turn it on.
+Let's suppose we are using a Raspberry 2 board and have a led connected between the GPIO pin P2 (possibly with a resistance of 1k or so) and GND and we want to turn it on.
 
 First, we need to retrieve the list of GPIOs available on the board and get a reference to the one we want to modify:
 
