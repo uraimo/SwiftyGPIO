@@ -21,14 +21,14 @@ It's built to run **exclusively on Linux ARM Boards** (RaspberryPi, BeagleBone B
 
 Tested:
 * C.H.I.P.
-* BeagleBone Black
-* Raspberry Pi 2
+* BeagleBone Black (Thanks to [@hpux735](https://twitter.com/hpux735))
+* Raspberry Pi 2 (Thanks to [@iachievedit](https://twitter.com/iachievedit))
+* Raspberry Pi Zero (Thanks to [@MacmeDan](https://twitter.com/MacmeDan))
 * Raspberry Pi A,B Revision 1
 * Raspberry Pi A,B Revision 2
 * Raspberry Pi A+, B+
 
 Not tested but they should work(basically everything that has an ARMv7/Ubuntu14/Raspbian or an ARMv6/Raspbian):
-* Raspberry Pi Zero
 * UDOOs
 * OLinuXinos
 * ODROIDs
