@@ -214,22 +214,50 @@ public struct VirtualSPI : SPIOutput{
 
 
     public func sendData(values:[UInt8], order:ByteOrder, clockDelayUsec:Int){
+
+        let mosipath = GPIOBASEPATH+"gpio"+String(self.dataGPIO.id)+"/value"
+        let sclkpath = GPIOBASEPATH+"gpio"+String(self.clockGPIO.id)+"/value"
+        let HIGH = "1"
+        let LOW = "0"
+
+        let fpmosi = fopen(mosipath,"w")
+        let fpsclk = fopen(sclkpath,"w")
+        guard (fpmosi != nil)&&(fpsclk != nil) else {
+            perror("Error while opening gpio")
+            abort()
+        }
+
+        var bit:String = LOW
         for value in values {        
             for i in 0...7 {
                 switch order {
                     case .LSBFIRST:
-                        dataGPIO.value = ((value & UInt8(1 << i)) == 0) ? 0 : 1
+                        bit = ((value & UInt8(1 << i)) == 0) ? LOW : HIGH
                     case .MSBFIRST:
-                        dataGPIO.value = ((value & UInt8(1 << (7-i))) == 0) ? 0 : 1
+                        bit = ((value & UInt8(1 << (7-i))) == 0) ? LOW : HIGH
                 }
-
-                clockGPIO.value = 1
+            
+                writeToFP(fpmosi,value:bit)
+                writeToFP(fpsclk,value:HIGH)
                 if clockDelayUsec>0 {
                     usleep(UInt32(clockDelayUsec))
                 }
-                clockGPIO.value = 0
+                writeToFP(fpsclk,value:LOW)
             }
         }
+        fclose(fpmosi)
+        fclose(fpsclk)
+    }
+
+    private func writeToFP(fp: UnsafeMutablePointer<FILE>, value:String){
+       let ret = fwrite(value, strideof(CChar), 1, fp)
+       if ret<1 {
+           if ferror(fp) != 0 {
+               perror("Error while writing to file")
+               abort()
+           }
+       }
+       fflush(fp)
     }
  
     public func sendData(values:[UInt8]){
