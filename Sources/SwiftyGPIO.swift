@@ -380,8 +380,10 @@ public struct SwiftyGPIO {
                 return GPIORPIRev1
             case .RaspberryPiRev2:
                 return GPIORPIRev2
-            case .RaspberryPiPlus2Zero:
-                return GPIORPIPlus2ZERO
+            case .RaspberryPiPlusZero:
+                return GPIORPIPlusZERO
+            case .RaspberryPi2:
+                return GPIORPI2
             case .CHIP:
                 return GPIOCHIP
             case .BeagleBoneBlack:
@@ -395,7 +397,9 @@ public struct SwiftyGPIO {
                 fallthrough
             case .RaspberryPiRev2:
                 fallthrough
-            case .RaspberryPiPlus2Zero:
+            case .RaspberryPiPlusZero:
+                return [SPIRPI[0]!,SPIRPI[1]!]
+            case .RaspberryPi2:
                 return [SPIRPI[0]!,SPIRPI[1]!]
             default:
                 return nil
@@ -405,79 +409,110 @@ public struct SwiftyGPIO {
     // RaspberryPi A and B Revision 1 (Before September 2012) - 26 pin header boards
     // 0, 1, 4, 7, 8, 9, 10, 11, 14, 15, 17, 18, 21, 22, 23, 24, 25
     static let GPIORPIRev1:[GPIOName:GPIO] = [
-        .P0:GPIO(name:"GPIO0",id:0),
-        .P1:GPIO(name:"GPIO1",id:1),
-        .P4:GPIO(name:"GPIO4",id:4),
-        .P7:GPIO(name:"GPIO7",id:7),
-        .P8:GPIO(name:"GPIO8",id:8),
-        .P9:GPIO(name:"GPIO9",id:9),
-        .P10:GPIO(name:"GPIO10",id:10),
-        .P11:GPIO(name:"GPIO11",id:11),
-        .P14:GPIO(name:"GPIO14",id:14),
-        .P15:GPIO(name:"GPIO15",id:15),
-        .P17:GPIO(name:"GPIO17",id:17),
-        .P18:GPIO(name:"GPIO18",id:18),
-        .P21:GPIO(name:"GPIO21",id:21),
-        .P22:GPIO(name:"GPIO22",id:22),
-        .P23:GPIO(name:"GPIO23",id:23),
-        .P24:GPIO(name:"GPIO24",id:24),
-        .P25:GPIO(name:"GPIO25",id:25)
+        .P0:RaspiGPIO(name:"GPIO0",id:0,baseAddr:0x20000000),
+        .P1:RaspiGPIO(name:"GPIO1",id:1,baseAddr:0x20000000),
+        .P4:RaspiGPIO(name:"GPIO4",id:4,baseAddr:0x20000000),
+        .P7:RaspiGPIO(name:"GPIO7",id:7,baseAddr:0x20000000),
+        .P8:RaspiGPIO(name:"GPIO8",id:8,baseAddr:0x20000000),
+        .P9:RaspiGPIO(name:"GPIO9",id:9,baseAddr:0x20000000),
+        .P10:RaspiGPIO(name:"GPIO10",id:10,baseAddr:0x20000000),
+        .P11:RaspiGPIO(name:"GPIO11",id:11,baseAddr:0x20000000),
+        .P14:RaspiGPIO(name:"GPIO14",id:14,baseAddr:0x20000000),
+        .P15:RaspiGPIO(name:"GPIO15",id:15,baseAddr:0x20000000),
+        .P17:RaspiGPIO(name:"GPIO17",id:17,baseAddr:0x20000000),
+        .P18:RaspiGPIO(name:"GPIO18",id:18,baseAddr:0x20000000),
+        .P21:RaspiGPIO(name:"GPIO21",id:21,baseAddr:0x20000000),
+        .P22:RaspiGPIO(name:"GPIO22",id:22,baseAddr:0x20000000),
+        .P23:RaspiGPIO(name:"GPIO23",id:23,baseAddr:0x20000000),
+        .P24:RaspiGPIO(name:"GPIO24",id:24,baseAddr:0x20000000),
+        .P25:RaspiGPIO(name:"GPIO25",id:25,baseAddr:0x20000000)
     ]
 
     // RaspberryPi A and B Revision 2 (After September 2012) - 26 pin header boards
     //TODO: Additional GPIO from 28-31 ignored for now
     // 2, 3, 4, 7, 8, 9, 10, 11, 14, 15, 17, 18, 22, 23, 24, 25, 27
     static let GPIORPIRev2:[GPIOName:GPIO] = [
-        .P2:GPIO(name:"GPIO2",id:2),
-        .P3:GPIO(name:"GPIO3",id:3),
-        .P4:GPIO(name:"GPIO4",id:4),
-        .P7:GPIO(name:"GPIO7",id:7),
-        .P8:GPIO(name:"GPIO8",id:8),
-        .P9:GPIO(name:"GPIO9",id:9),
-        .P10:GPIO(name:"GPIO10",id:10),
-        .P11:GPIO(name:"GPIO11",id:11),
-        .P14:GPIO(name:"GPIO14",id:14),
-        .P15:GPIO(name:"GPIO15",id:15),
-        .P17:GPIO(name:"GPIO17",id:17),
-        .P18:GPIO(name:"GPIO18",id:18),
-        .P22:GPIO(name:"GPIO22",id:22),
-        .P23:GPIO(name:"GPIO23",id:23),
-        .P24:GPIO(name:"GPIO24",id:24),
-        .P25:GPIO(name:"GPIO25",id:25),
-        .P27:GPIO(name:"GPIO27",id:27)
+        .P2:RaspiGPIO(name:"GPIO2",id:2,baseAddr:0x20000000),
+        .P3:RaspiGPIO(name:"GPIO3",id:3,baseAddr:0x20000000),
+        .P4:RaspiGPIO(name:"GPIO4",id:4,baseAddr:0x20000000),
+        .P7:RaspiGPIO(name:"GPIO7",id:7,baseAddr:0x20000000),
+        .P8:RaspiGPIO(name:"GPIO8",id:8,baseAddr:0x20000000),
+        .P9:RaspiGPIO(name:"GPIO9",id:9,baseAddr:0x20000000),
+        .P10:RaspiGPIO(name:"GPIO10",id:10,baseAddr:0x20000000),
+        .P11:RaspiGPIO(name:"GPIO11",id:11,baseAddr:0x20000000),
+        .P14:RaspiGPIO(name:"GPIO14",id:14,baseAddr:0x20000000),
+        .P15:RaspiGPIO(name:"GPIO15",id:15,baseAddr:0x20000000),
+        .P17:RaspiGPIO(name:"GPIO17",id:17,baseAddr:0x20000000),
+        .P18:RaspiGPIO(name:"GPIO18",id:18,baseAddr:0x20000000),
+        .P22:RaspiGPIO(name:"GPIO22",id:22,baseAddr:0x20000000),
+        .P23:RaspiGPIO(name:"GPIO23",id:23,baseAddr:0x20000000),
+        .P24:RaspiGPIO(name:"GPIO24",id:24,baseAddr:0x20000000),
+        .P25:RaspiGPIO(name:"GPIO25",id:25,baseAddr:0x20000000),
+        .P27:RaspiGPIO(name:"GPIO27",id:27,baseAddr:0x20000000)
     ]
 
-    // RaspberryPi A+ and B+, Raspberry 2, Raspberry Zero - 40 pin header boards
+    // RaspberryPi A+ and B+, Raspberry Zero - 40 pin header boards
     // 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
-    static let GPIORPIPlus2ZERO:[GPIOName:GPIO] = [
-        .P2:GPIO(name:"GPIO2",id:2),
-        .P3:GPIO(name:"GPIO3",id:3),
-        .P4:GPIO(name:"GPIO4",id:4),
-        .P5:GPIO(name:"GPIO5",id:5),
-        .P6:GPIO(name:"GPIO6",id:6),
-        .P7:GPIO(name:"GPIO7",id:7),
-        .P8:GPIO(name:"GPIO8",id:8),
-        .P9:GPIO(name:"GPIO9",id:9),
-        .P10:GPIO(name:"GPIO10",id:10),
-        .P11:GPIO(name:"GPIO11",id:11),
-        .P12:GPIO(name:"GPIO12",id:12),
-        .P13:GPIO(name:"GPIO13",id:13),
-        .P14:GPIO(name:"GPIO14",id:14),
-        .P15:GPIO(name:"GPIO15",id:15),
-        .P16:GPIO(name:"GPIO16",id:16),
-        .P17:GPIO(name:"GPIO17",id:17),
-        .P18:GPIO(name:"GPIO18",id:18),
-        .P19:GPIO(name:"GPIO19",id:19),
-        .P20:GPIO(name:"GPIO20",id:20),
-        .P21:GPIO(name:"GPIO21",id:21),
-        .P22:GPIO(name:"GPIO22",id:22),
-        .P23:GPIO(name:"GPIO23",id:23),
-        .P24:GPIO(name:"GPIO24",id:24),
-        .P25:GPIO(name:"GPIO25",id:25),
-        .P26:GPIO(name:"GPIO26",id:26),
-        .P27:GPIO(name:"GPIO27",id:27)
+    static let GPIORPIPlusZERO:[GPIOName:GPIO] = [
+        .P2:RaspiGPIO(name:"GPIO2",id:2,baseAddr:0x20000000),
+        .P3:RaspiGPIO(name:"GPIO3",id:3,baseAddr:0x20000000),
+        .P4:RaspiGPIO(name:"GPIO4",id:4,baseAddr:0x20000000),
+        .P5:RaspiGPIO(name:"GPIO5",id:5,baseAddr:0x20000000),
+        .P6:RaspiGPIO(name:"GPIO6",id:6,baseAddr:0x20000000),
+        .P7:RaspiGPIO(name:"GPIO7",id:7,baseAddr:0x20000000),
+        .P8:RaspiGPIO(name:"GPIO8",id:8,baseAddr:0x20000000),
+        .P9:RaspiGPIO(name:"GPIO9",id:9,baseAddr:0x20000000),
+        .P10:RaspiGPIO(name:"GPIO10",id:10,baseAddr:0x20000000),
+        .P11:RaspiGPIO(name:"GPIO11",id:11,baseAddr:0x20000000),
+        .P12:RaspiGPIO(name:"GPIO12",id:12,baseAddr:0x20000000),
+        .P13:RaspiGPIO(name:"GPIO13",id:13,baseAddr:0x20000000),
+        .P14:RaspiGPIO(name:"GPIO14",id:14,baseAddr:0x20000000),
+        .P15:RaspiGPIO(name:"GPIO15",id:15,baseAddr:0x20000000),
+        .P16:RaspiGPIO(name:"GPIO16",id:16,baseAddr:0x20000000),
+        .P17:RaspiGPIO(name:"GPIO17",id:17,baseAddr:0x20000000),
+        .P18:RaspiGPIO(name:"GPIO18",id:18,baseAddr:0x20000000),
+        .P19:RaspiGPIO(name:"GPIO19",id:19,baseAddr:0x20000000),
+        .P20:RaspiGPIO(name:"GPIO20",id:20,baseAddr:0x20000000),
+        .P21:RaspiGPIO(name:"GPIO21",id:21,baseAddr:0x20000000),
+        .P22:RaspiGPIO(name:"GPIO22",id:22,baseAddr:0x20000000),
+        .P23:RaspiGPIO(name:"GPIO23",id:23,baseAddr:0x20000000),
+        .P24:RaspiGPIO(name:"GPIO24",id:24,baseAddr:0x20000000),
+        .P25:RaspiGPIO(name:"GPIO25",id:25,baseAddr:0x20000000),
+        .P26:RaspiGPIO(name:"GPIO26",id:26,baseAddr:0x20000000),
+        .P27:RaspiGPIO(name:"GPIO27",id:27,baseAddr:0x20000000)
     ]
-
+ 
+    // RaspberryPi 2
+    // 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+    static let GPIORPI2:[GPIOName:GPIO] = [
+        .P2:RaspiGPIO(name:"GPIO2",id:2,baseAddr:0x3F000000),
+        .P3:RaspiGPIO(name:"GPIO3",id:3,baseAddr:0x3F000000),
+        .P4:RaspiGPIO(name:"GPIO4",id:4,baseAddr:0x3F000000),
+        .P5:RaspiGPIO(name:"GPIO5",id:5,baseAddr:0x3F000000),
+        .P6:RaspiGPIO(name:"GPIO6",id:6,baseAddr:0x3F000000),
+        .P7:RaspiGPIO(name:"GPIO7",id:7,baseAddr:0x3F000000),
+        .P8:RaspiGPIO(name:"GPIO8",id:8,baseAddr:0x3F000000),
+        .P9:RaspiGPIO(name:"GPIO9",id:9,baseAddr:0x3F000000),
+        .P10:RaspiGPIO(name:"GPIO10",id:10,baseAddr:0x3F000000),
+        .P11:RaspiGPIO(name:"GPIO11",id:11,baseAddr:0x3F000000),
+        .P12:RaspiGPIO(name:"GPIO12",id:12,baseAddr:0x3F000000),
+        .P13:RaspiGPIO(name:"GPIO13",id:13,baseAddr:0x3F000000),
+        .P14:RaspiGPIO(name:"GPIO14",id:14,baseAddr:0x3F000000),
+        .P15:RaspiGPIO(name:"GPIO15",id:15,baseAddr:0x3F000000),
+        .P16:RaspiGPIO(name:"GPIO16",id:16,baseAddr:0x3F000000),
+        .P17:RaspiGPIO(name:"GPIO17",id:17,baseAddr:0x3F000000),
+        .P18:RaspiGPIO(name:"GPIO18",id:18,baseAddr:0x3F000000),
+        .P19:RaspiGPIO(name:"GPIO19",id:19,baseAddr:0x3F000000),
+        .P20:RaspiGPIO(name:"GPIO20",id:20,baseAddr:0x3F000000),
+        .P21:RaspiGPIO(name:"GPIO21",id:21,baseAddr:0x3F000000),
+        .P22:RaspiGPIO(name:"GPIO22",id:22,baseAddr:0x3F000000),
+        .P23:RaspiGPIO(name:"GPIO23",id:23,baseAddr:0x3F000000),
+        .P24:RaspiGPIO(name:"GPIO24",id:24,baseAddr:0x3F000000),
+        .P25:RaspiGPIO(name:"GPIO25",id:25,baseAddr:0x3F000000),
+        .P26:RaspiGPIO(name:"GPIO26",id:26,baseAddr:0x3F000000),
+        .P27:RaspiGPIO(name:"GPIO27",id:27,baseAddr:0x3F000000)
+    ]
+ 
     // Raspberries w/raspbian
     static let SPIRPI:[Int:SPIOutput] = [
         0:HardwareSPI(spiId:"0.0",isOutput:true),
@@ -550,7 +585,8 @@ public struct SwiftyGPIO {
 public enum SupportedBoard {
     case RaspberryPiRev1   // Pi A,B Revision 1
     case RaspberryPiRev2   // Pi A,B Revision 2 
-    case RaspberryPiPlus2Zero // Pi A+,B+,2,Zero with 40 pin header
+    case RaspberryPiPlusZero // Pi A+,B+,Zero with 40 pin header
+    case RaspberryPi2 // Pi 2 with 40 pin header
     case CHIP
     case BeagleBoneBlack
 }
