@@ -13,9 +13,8 @@
 
 This library provides an easy way to interact with digital GPIOs using Swift on Linux. You'll be able to configure a port attributes (direction,edge,active low) and read/write the current value.
 
-It's built to run **exclusively on Linux ARM Boards** (RaspberryPi, BeagleBone Black, UDOO, Tegra, CHIP, etc...) with accessible GPIOs.
+It's built to run **exclusively on Linux ARM Boards** (RaspberryPis, BeagleBone Black, UDOO, Tegra, CHIP, etc...) with accessible GPIOs.
 
-**Do you own an unsupported/untested board and would like to help? Check out issue  [#10](https://github.com/uraimo/SwiftyGPIO/issues/10)**
 
 ## Supported Boards
 
@@ -56,7 +55,7 @@ When your code is ready, compile it with:
     swiftc SwiftyGPIO.swift main.swift
 
 The compiler will create a **main** executable.
-As everything interacting with GPIOs via sysfs, if you are not already root, you will need to run that binary with `sudo ./main`.
+As everything interacting with GPIOs via sysfs/mmapped registers, if you are not already root, you will need to run that binary with `sudo ./main`.
 
 If you prefer an alternative approach that does not require to use sudo every time check out this [answer on stackoverflow](https://stackoverflow.com/questions/30938991/access-gpio-sys-class-gpio-as-non-root/30940526#30940526).
 After following those instruction, remember to add your user (e.g. pi) to the gpio group with `sudo usermod -aG gpio pi` and to reboot so that the changes you made are applied.
@@ -76,7 +75,7 @@ Let's suppose we are using a Raspberry 2 board and have a led connected between 
 First, we need to retrieve the list of GPIOs available on the board and get a reference to the one we want to modify:
 
 ```swift
-let gpios = SwiftyGPIO.getGPIOsForBoard(.RaspberryPiPlus2Zero)
+let gpios = SwiftyGPIO.getGPIOsForBoard(.RaspberryPi2)
 var gp = gpios[.P2]!
 ```
 
@@ -84,7 +83,8 @@ The following are the possible values for the predefined boards:
     
 * .RaspberryPiRev1 (Pi A,B Revision 1, pre-2012, 26 pin header)
 * .RaspberryPiRev2 (Pi A,B Revision 2, post-2012, 26 pin header) 
-* .RaspberryPiPlus2Zero (Raspberry Pi A+ and B+, Raspberry 2, Raspberry Zero, all with a 40 pin header)
+* .RaspberryPiPlusZero (Raspberry Pi A+ and B+, Raspberry Zero, all with a 40 pin header)
+* .RaspberryPi2 (Raspberry Pi 2 with a 40 pin header)
 * .BeagleBoneBlack (BeagleBone Black)
 * .CHIP (the $9 C.H.I.P. computer).
 
@@ -123,7 +123,7 @@ The other properties available on the GPIO object (edge,active low) refer to the
 
 If your board has SPI connections and SwiftyGPIO has them among its presets, a list of the available SPIs can be retrieved invoking `getHardwareSPIsForBoard` with one of the predefined boards.
 
-On RaspberryPi and other boards the SPI SysFS interface is not enabled by default, check out the setup guide on [wiki](https://github.com/uraimo/SwiftyGPIO/wiki/Enabling-SPI-on-RaspberryPi-and-others).
+On RaspberryPi and other boards the hardware SPI SysFS interface is not enabled by default, check out the setup guide on [wiki](https://github.com/uraimo/SwiftyGPIO/wiki/Enabling-SPI-on-RaspberryPi-and-others).
 
 Let's see some examples using a Raspberry2 that has one bidirectional SPI, managed by SwiftyGPIO as two mono-directional SPIObjects:
  
@@ -134,11 +134,11 @@ var spi = spis?[0]
 
 The first item returned is the output channel and this can be verified invoking the method `isOut` on the `SPIObject`.
 
-Alternatively, we can create a software SPI using two GPIOs, one that wil serve as clock pin and the other will be used to send the actual data. This kind of bit-banging SPI is way slower than the hardware one, so, the recommended approach is to use hardware SPIs when available.
+Alternatively, we can create a software SPI using two GPIOs, one that wil serve as clock pin and the other will be used to send the actual data. This kind of bit-banging SPI is slower than the hardware one, so, the recommended approach is to use hardware SPIs when available.
 
 To create a software SPI, just retrieve two pins and create a `VirtualSPI` object:
 ```swift
-let gpios = SwiftyGPIO.getGPIOsForBoard(.RaspberryPiPlus2Zero)
+let gpios = SwiftyGPIO.getGPIOsForBoard(.RaspberryPi2)
 var sclk = gpios[.P2]!
 var dnmosi = gpios[.P3]!
 var spi = VirtualSPI(dataGPIO:dnmosi,clockGPIO:sclk) 
@@ -154,7 +154,7 @@ In its simplest form it just needs an array of UInt8 as parameter:
 spi?.sendData([UInt(42)])
 ```
 
-But for software SPIs (for now, these values are ignored when using a hardware SPI) you can also specify the preferred byte ordering (MSB,LSB) and the delay between two succesive bits (clock width):
+But for software SPIs (for now, these values are ignored when using a hardware SPI) you can also specify the preferred byte ordering (MSB,LSB) and the delay between two succesive bits (clock width, default 0):
 
 ```swift
 spi?.sendData([UInt(42)], order:.LSBFIRST, clockDelayUsec:1000)
@@ -163,11 +163,15 @@ spi?.sendData([UInt(42)], order:.LSBFIRST, clockDelayUsec:1000)
 
 ## Under the hood
 
-SwiftyGPIO interact with GPIOs through the sysfs file-based interface described [here](https://www.kernel.org/doc/Documentation/gpio/sysfs.txt).
+SwiftyGPIO interact with GPIOs through memory mapped gpio registers (if available, when sending data) and the sysfs file-based interface described [here](https://www.kernel.org/doc/Documentation/gpio/sysfs.txt).
 
 The GPIO is exported the first time one of the GPIO methods is invoked, using the GPIO id provided during the creation of the object (either provided manually or from the defaults). Most of the times that id will be different from the physical id of the pin. SysFS GPIO ids can usually be found in the board documentation, we provide a few presets for tested boards (do you have the complete list of ids for an unsupported board and want to help? Cool! Consider opening a PR).
 
 At the moment GPIOs are never unexported, let me know if you could find that useful. Multiple exporting when creating an already configured GPIO is not a problem, successive attempts to export a GPIO are simply ignored.
+
+Regarding the actual sending of the data, when available SwiftyGPIO will use a mmapped registers interface (max pulse when used directly on a Rpi2 12Mhz) and will use a fallback sysfs interface when no mmapped implementation exists (max pulse when used directly on a Rpi2 4Khz).
+
+At the moment the memory mapped interface is only available on all Raspberries.
 
 ## Examples
 
@@ -238,6 +242,7 @@ Other examples for differen boards are available in the *Examples* directory.
 - [x] Add BeagleBone Black pinout defaults
 - [x] Support for hardware SPI
 - [x] Testing on the Raspberries 1
+- [x] Register-based GPIO for Rasperries
 - [ ] Support for additional GPIOs on separate header for RasPi Rev 2 boards?
 - [ ] Add Tegra TK1 when Swift support confirmed
 - [ ] Add UDOOs when Swift support confirmed
