@@ -1,4 +1,4 @@
 language: objective-c
 osx_image: xcode7.2
-before_script: echo "let O_SYNC=1052672" > Sources/main.swift
+before_script: echo "let O_SYNC:Int32=1052672" > Sources/main.swift
 script: files=$(find Sources -regex '.*[^/]swift') && xcrun -sdk macosx swiftc $files
