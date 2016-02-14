@@ -222,10 +222,13 @@ public struct VirtualSPI : SPIOutput{
 
         let fpmosi = fopen(mosipath,"w")
         let fpsclk = fopen(sclkpath,"w")
+
         guard (fpmosi != nil)&&(fpsclk != nil) else {
             perror("Error while opening gpio")
             abort()
         }
+        setvbuf(fpmosi, nil, _IONBF, 0)
+        setvbuf(fpsclk, nil, _IONBF, 0)
 
         var bit:String = LOW
         for value in values {        
@@ -257,7 +260,6 @@ public struct VirtualSPI : SPIOutput{
                abort()
            }
        }
-       fflush(fp)
     }
  
     public func sendData(values:[UInt8]){
