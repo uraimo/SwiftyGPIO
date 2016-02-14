@@ -310,6 +310,37 @@ public struct VirtualSPI : SPIOutput{
 
 
     public func sendData(values:[UInt8], order:ByteOrder, clockDelayUsec:Int){
+        let mmapped = dataGPIO.isMemoryMapped()
+        if mmapped {
+            sendDataGPIOObj(values, order:order, clockDelayUsec:clockDelayUsec)
+        }else{
+            sendDataSysFS(values, order:order, clockDelayUsec:clockDelayUsec)
+        }
+    }
+
+    public func sendDataGPIOObj(values:[UInt8], order:ByteOrder, clockDelayUsec:Int){
+
+        var bit:Int = 0
+        for value in values {        
+            for i in 0...7 {
+                switch order {
+                    case .LSBFIRST:
+                        bit = ((value & UInt8(1 << i)) == 0) ? 0 : 1
+                    case .MSBFIRST:
+                        bit = ((value & UInt8(1 << (7-i))) == 0) ? 0 : 1
+                }
+            
+                dataGPIO.value = bit
+                clockGPIO.value = 1
+                if clockDelayUsec>0 {
+                    usleep(UInt32(clockDelayUsec))
+                }
+                clockGPIO.value = 0
+            }
+        }
+    }
+ 
+    public func sendDataSysFS(values:[UInt8], order:ByteOrder, clockDelayUsec:Int){
 
         let mosipath = GPIOBASEPATH+"gpio"+String(self.dataGPIO.id)+"/value"
         let sclkpath = GPIOBASEPATH+"gpio"+String(self.clockGPIO.id)+"/value"
