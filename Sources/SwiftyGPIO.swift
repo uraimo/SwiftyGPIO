@@ -79,6 +79,10 @@ public class GPIO {
             return getIntValue("gpio"+String(id)+"/value")!
         }
     }
+
+    public func isMemoryMapped()->Bool{
+        return false
+    }
 }
 
 extension GPIO {
@@ -145,6 +149,98 @@ extension GPIO {
     }
 
 }
+
+public class RaspiGPIO : GPIO {
+    var setGetId=0
+    var baseAddr:Int=0
+    var inited=false
+
+    let BCM2708_PERI_BASE:Int
+    let GPIO_BASE:Int
+    let PAGE_SIZE = 4*1024
+    let BLOCK_SIZE = 4*1024
+
+    var gpioBasePointer:UnsafeMutablePointer<Int>=nil
+    var gpioGetPointer:UnsafeMutablePointer<Int>=nil
+    var gpioSetPointer:UnsafeMutablePointer<Int>=nil
+    var gpioClearPointer:UnsafeMutablePointer<Int>=nil
+
+
+    init(name:String, id:Int, baseAddr:Int) {
+        self.setGetId = 1<<id
+        self.BCM2708_PERI_BASE = baseAddr
+        self.GPIO_BASE = BCM2708_PERI_BASE + 0x200000 /* GPIO controller */
+        super.init(name:name,id:id)
+    }
+
+    public override var value:Int{
+        set(val){
+            if !inited {initIO(id)}
+            gpioSet(val)
+        }
+        get {
+            if !inited {initIO(id)}
+            return gpioGet()
+        }
+    }
+
+    public override func isMemoryMapped()->Bool{
+        return true
+    }
+
+    private func initIO(id: Int){
+        let mem_fd = open("/dev/mem", O_RDWR|O_SYNC)
+        guard (mem_fd > 0) else {
+            print("Can't open /dev/mem")
+            abort()
+        }
+
+        let gpio_map = mmap(
+            nil,                 //Any adddress in our space will do
+            BLOCK_SIZE,          //Map length
+            PROT_READ|PROT_WRITE,// Enable reading & writting to mapped memory
+            MAP_SHARED,          //Shared with other processes
+            mem_fd,              //File to map
+            GPIO_BASE            //Offset to GPIO peripheral
+            )
+
+        close(mem_fd)
+
+        let gpioBasePointer = UnsafeMutablePointer<Int>(gpio_map)
+        if (gpioBasePointer.memory == -1) {    //MAP_FAILED not available, but its value is (void*)-1
+            print("mmap error: " + String(gpioBasePointer))
+            abort()
+        }
+        
+        gpioGetPointer = gpioBasePointer.advancedBy(13)
+        gpioSetPointer = gpioBasePointer.advancedBy(7)
+        gpioClearPointer = gpioBasePointer.advancedBy(10) 
+
+        inited = true
+    }
+ 
+    private func gpioAsInput(){
+        let ptr = gpioBasePointer.advancedBy(id/10)
+        ptr.memory &= ~(7<<((id%10)*3))
+    }
+
+    private func gpioAsOutput(){
+        let ptr = gpioBasePointer.advancedBy(id/10)
+        ptr.memory &= ~(7<<((id%10)*3))
+        ptr.memory |=  (1<<((id%10)*3))
+    }  
+    
+    private func gpioGet()->Int{
+        return ((gpioGetPointer.memory & setGetId)>0) ? 1 : 0
+    }
+
+    private func gpioSet(value:Int){
+        let ptr = value==1 ? gpioSetPointer : gpioClearPointer
+        ptr.memory = setGetId
+    } 
+ 
+}
+ 
 
 public protocol SPIOutput{                     
     func sendData(values:[UInt8], order:ByteOrder, clockDelayUsec:Int)
