@@ -1,4 +1,5 @@
 language: objective-c
 osx_image: xcode7.2
-before_script: echo "let O_SYNC:Int32=1052672" > Sources/main.swift
+# Workaround to compile on OSX/64bits 
+before_script: echo "let O_SYNC:Int32=1052672;typealias off_t=Int" > Sources/main.swift
 script: files=$(find Sources -regex '.*[^/]swift') && xcrun -sdk macosx swiftc $files
