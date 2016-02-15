@@ -6,7 +6,7 @@
 <img src="https://img.shields.io/badge/os-linux-green.svg?style=flat" alt="Linux-only" />
 <a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/swift2-compatible-4BC51D.svg?style=flat" alt="Swift 2 compatible" /></a>
 <a href="https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/LICENSE"><img src="http://img.shields.io/badge/license-MIT-blue.svg?style=flat" alt="License: MIT" /></a>
-<!--<a href="https://travis-ci.org/uraimo/SwiftyGPIO"><img src="https://api.travis-ci.org/uraimo/SwiftyGPIO.svg" alt="Travis CI"></a>-->
+<a href="https://travis-ci.org/uraimo/SwiftyGPIO"><img src="https://api.travis-ci.org/uraimo/SwiftyGPIO.svg" alt="Travis CI"></a>
 </p>
 
 ## Summary
