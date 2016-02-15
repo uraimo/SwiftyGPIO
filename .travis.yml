@@ -1,5 +1,7 @@
 language: objective-c
 osx_image: xcode7.2
-# Workaround to compile on OSX/64bits 
-before_script: echo "let O_SYNC:Int32=1052672;typealias off_t=Int" > Sources/main.swift
+# Ugly workaround to compile on OSX/64bits... where SwiftyGPIO will never run... 
+before_script:
+  - sed -i ""  s/GPIO_BASE:Int/GPIO_BASE:Int64/ Sources/SwiftyGPIO.swift
+  - echo "let O_SYNC:Int32=1052672" > Sources/main.swift
 script: files=$(find Sources -regex '.*[^/]swift') && xcrun -sdk macosx swiftc $files
