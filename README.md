@@ -26,9 +26,9 @@ Tested:
 * Raspberry Pi A,B Revision 1
 * Raspberry Pi A,B Revision 2
 * Raspberry Pi A+, B+
+* UDOOs
 
 Not tested but they should work(basically everything that has an ARMv7/Ubuntu14/Raspbian or an ARMv6/Raspbian):
-* UDOOs
 * OLinuXinos
 * ODROIDs
 * Cubieboards
