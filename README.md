@@ -230,6 +230,8 @@ Other examples for differen boards are available in the *Examples* directory.
 ## Projects that use SwiftyGPIO
 
 * [Nokia5110(PCD8544) LCD Library](http://github.com/uraimo/5110lcd_pcd8544.swift) - Show text and graphics on a Nokia 3110/5110 LCD display.
+* [HD44780U Character LCD Library](https://github.com/uraimo/HD44780CharacterLCD.swift) - Show text on character LCDs controlled by the HD44780 or one of its clones.
+* {Your project or library here!!}
 * {Your project or library here!!}
 
 ## TODO
@@ -243,9 +245,9 @@ Other examples for differen boards are available in the *Examples* directory.
 - [x] Support for hardware SPI
 - [x] Testing on the Raspberries 1
 - [x] Register-based GPIO for Rasperries
+- [x] Add UDOOs when Swift support confirmed
 - [ ] Support for additional GPIOs on separate header for RasPi Rev 2 boards?
 - [ ] Add Tegra TK1 when Swift support confirmed
-- [ ] Add UDOOs when Swift support confirmed
 - [ ] SysFS PWM and/or software PWM and/or ServoBlaster?
 - [ ] Block/Function execution on gpio interrupts
 - [ ] Support for external ADCs or support for platform-specific ADC drivers?
