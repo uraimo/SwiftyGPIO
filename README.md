@@ -232,7 +232,6 @@ Other examples for differen boards are available in the *Examples* directory.
 * [Nokia5110(PCD8544) LCD Library](http://github.com/uraimo/5110lcd_pcd8544.swift) - Show text and graphics on a Nokia 3110/5110 LCD display.
 * [HD44780U Character LCD Library](https://github.com/uraimo/HD44780CharacterLCD.swift) - Show text on character LCDs controlled by the HD44780 or one of its clones.
 * {Your project or library here!!}
-* {Your project or library here!!}
 
 ## TODO
 
