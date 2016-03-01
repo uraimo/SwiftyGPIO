@@ -15,6 +15,15 @@ This library provides an easy way to interact with digital GPIOs and use SPI int
 
 It's built to run **exclusively on Linux ARM Boards** (RaspberryPis, BeagleBone Black, UDOO, Tegra, CHIP, etc...) with accessible GPIOs.
 
+##### Content:
+- [Supported Boards](#supported-boards)
+- [Installation](#installation)
+- [Your First Project: Blinking leds](#your-first-project-blinking-leds)
+- [Usage](#usage)
+- [Examples](#examples)
+- [Under the hood](#under-the-hood)
+- [Projects that use SwiftyGPIO](#projects-that-use-swiftygpio)
+
 
 ## Supported Boards
 
@@ -34,7 +43,7 @@ Not tested but they should work(basically everything that has an ARMv7/Ubuntu14/
 * Cubieboards
 * Tegra Jetson TK1
 
- 
+
 ## Installation
 
 To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with Swift 2.2.
@@ -60,9 +69,11 @@ As everything interacting with GPIOs via sysfs/mmapped registers, if you are not
 If you prefer an alternative approach that does not require to use sudo every time check out this [answer on stackoverflow](https://stackoverflow.com/questions/30938991/access-gpio-sys-class-gpio-as-non-root/30940526#30940526).
 After following those instruction, remember to add your user (e.g. pi) to the gpio group with `sudo usermod -aG gpio pi` and to reboot so that the changes you made are applied.
 
+<a href="#first"></a>
 ## Your First Project: Blinking leds
 
 Joe from iachievedit has written a [fantastic tutorial](http://dev.iachieved.it/iachievedit/raspberry-pi-2-gpio-with-swiftygpio/) that presents a practical example of how to use SwiftyGPIO, if you prefer starting with a real project instead of just reading documentation, check out his tutorial first.
+
 
 ## Usage
 
@@ -161,18 +172,6 @@ spi?.sendData([UInt(42)], order:.LSBFIRST, clockDelayUsec:1000)
 ```
 
 
-## Under the hood
-
-SwiftyGPIO interact with GPIOs through memory mapped gpio registers (if available, when sending data) and the sysfs file-based interface described [here](https://www.kernel.org/doc/Documentation/gpio/sysfs.txt).
-
-The GPIO is exported the first time one of the GPIO methods is invoked, using the GPIO id provided during the creation of the object (either provided manually or from the defaults). Most of the times that id will be different from the physical id of the pin. SysFS GPIO ids can usually be found in the board documentation, we provide a few presets for tested boards (do you have the complete list of ids for an unsupported board and want to help? Cool! Consider opening a PR).
-
-At the moment GPIOs are never unexported, let me know if you could find that useful. Multiple exporting when creating an already configured GPIO is not a problem, successive attempts to export a GPIO are simply ignored.
-
-Regarding the actual sending of the data, when available SwiftyGPIO will use a mmapped registers interface (max pulse when used directly on a Rpi2 12Mhz) and will use a fallback sysfs interface when no mmapped implementation exists (max pulse when used directly on a Rpi2 4Khz).
-
-At the moment the memory mapped interface is only available on all Raspberries.
-
 ## Examples
 
 The following example, built to run on the $9 C.H.I.P., shows the current value of all the GPIO0 attributes, changes direction and value and then shows again a recap of the attributes:
@@ -227,11 +226,27 @@ Notice that we are converting the 0x9F `Int` using the constructor `UInt8(trunca
 
 Other examples for differen boards are available in the *Examples* directory.
 
+
+## Under the hood
+
+SwiftyGPIO interact with GPIOs through memory mapped gpio registers (if available, when sending data) and the sysfs file-based interface described [here](https://www.kernel.org/doc/Documentation/gpio/sysfs.txt).
+
+The GPIO is exported the first time one of the GPIO methods is invoked, using the GPIO id provided during the creation of the object (either provided manually or from the defaults). Most of the times that id will be different from the physical id of the pin. SysFS GPIO ids can usually be found in the board documentation, we provide a few presets for tested boards (do you have the complete list of ids for an unsupported board and want to help? Cool! Consider opening a PR).
+
+At the moment GPIOs are never unexported, let me know if you could find that useful. Multiple exporting when creating an already configured GPIO is not a problem, successive attempts to export a GPIO are simply ignored.
+
+Regarding the actual sending of the data, when available SwiftyGPIO will use a mmapped registers interface (max pulse when used directly on a Rpi2 12Mhz) and will use a fallback sysfs interface when no mmapped implementation exists (max pulse when used directly on a Rpi2 4Khz).
+
+At the moment the memory mapped interface is only available on all Raspberries.
+
+
 ## Projects that use SwiftyGPIO
 
 * [Nokia5110(PCD8544) LCD Library](http://github.com/uraimo/5110lcd_pcd8544.swift) - Show text and graphics on a Nokia 3110/5110 LCD display.
 * [HD44780U Character LCD Library](https://github.com/uraimo/HD44780CharacterLCD.swift) - Show text on character LCDs controlled by the HD44780 or one of its clones.
-* {Your project or library here!!}
+* [WS2812 RGB Led Strips&Co Library](https://github.com/uraimo/WS2812_RGBLCD.swift) - A Swift library for WS2812x RGB led strips, rings, sticks and matrixes *(experimental)* 
+* {Your project or library here!}
+* {In search of an idea for a library? Look [here](https://github.com/uraimo/SwiftyGPIO/issues/16)}
 
 ## TODO
 
