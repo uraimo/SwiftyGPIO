@@ -22,7 +22,7 @@ It's built to run **exclusively on Linux ARM Boards** (RaspberryPis, BeagleBone 
 - [Usage](#usage)
 - [Examples](#examples)
 - [Under the hood](#under-the-hood)
-- [Projects that use SwiftyGPIO](#projects-that-use-swiftygpio)
+- [Built with SwiftyGPIO](#built-with-swiftygpio)
 
 
 ## Supported Boards
@@ -240,13 +240,17 @@ Regarding the actual sending of the data, when available SwiftyGPIO will use a m
 At the moment the memory mapped interface is only available on all Raspberries.
 
 
-## Projects that use SwiftyGPIO
+## Built with SwiftyGPIO
 
+A few projects and library built using SwiftyGPIO. Have you built something that you want to share? Let me know!
+
+### Libraries
 * [Nokia5110(PCD8544) LCD Library](http://github.com/uraimo/5110lcd_pcd8544.swift) - Show text and graphics on a Nokia 3110/5110 LCD display.
 * [HD44780U Character LCD Library](https://github.com/uraimo/HD44780CharacterLCD.swift) - Show text on character LCDs controlled by the HD44780 or one of its clones.
-* [WS2812 RGB Led Strips&Co Library](https://github.com/uraimo/WS2812_RGBLCD.swift) - A Swift library for WS2812x RGB led strips, rings, sticks and matrixes *(experimental)* 
-* {Your project or library here!}
-* {In search of an idea for a library? Look [here](https://github.com/uraimo/SwiftyGPIO/issues/16)}
+* [DHTxx Temperature Sensor Library](https://github.com/pj4533/dhtxx) - Read temperature and humidity values from sensors of the DHT family (DHT11, DHT22, AM2303).
+
+### Awesome Projects 
+* [Portable Wifi Monitor in Swift](https://github.com/pj4533/wifimon) - A battery powered wifi signal monitor to map you wifi coverage.
 
 ## TODO
 
