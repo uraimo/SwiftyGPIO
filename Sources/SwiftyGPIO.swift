@@ -217,7 +217,7 @@ extension GPIO {
                     self.intFuncChange?(self)
                 }
             }
-        }
+        } //NSThread
         thread.start()
         return thread
     }
