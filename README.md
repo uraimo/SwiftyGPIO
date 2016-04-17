@@ -20,6 +20,8 @@ It's built to run **exclusively on Linux ARM Boards** (RaspberryPis, BeagleBone 
 - [Installation](#installation)
 - [Your First Project: Blinking leds](#your-first-project-blinking-leds)
 - [Usage](#usage)
+    - [GPIOs](#gpio)
+    - [SPIs](#spis)
 - [Examples](#examples)
 - [Under the hood](#under-the-hood)
 - [Built with SwiftyGPIO](#built-with-swiftygpio)
@@ -129,6 +131,33 @@ let current = gp.value
 ```
 
 The other properties available on the GPIO object (edge,active low) refer to the additional attributes of the GPIO that can be configured but you will not need them most of the times. For a detailed description refer to the [kernel documentation](https://www.kernel.org/doc/Documentation/gpio/sysfs.txt)
+
+GPIOs also support the execution of closures when the value of the pin changes. Closures can be added with *onRaising* (the pin value changed from 0 to 1), *onFalling* (the value changed from 1 to 0) and *onChange* (the value simply changed from the previous one):
+
+```swift
+let gpios = SwiftyGPIO.getGPIOsForBoard(.RaspberryPi2)
+var gp = gpios[.P2]!
+
+
+gp.onRaising{
+    gpio in
+    print("Transition to 1, current value:" + String(gpio.value))
+}
+gp.onFalling{
+    gpio in
+    print("Transition to 0, current value:" + String(gpio.value))
+}
+gp.onChange{
+    gpio in
+    gpio.clearListeners()
+    print("The value changed, current value:" + String(gpio.value))
+}  
+```
+
+The closure receives as its only parameter a reference to the GPIO object that has been updated so that you don't need to use the external variable.
+Calling *clearListeners()* removes all the closures listening for changes and disables the changes handler.
+While GPIOs are checked for updates, the *direction* of the pin cannot be changed (and configured as *.IN*), but once the listeners have been cleared, either inside the closure or somewhere else, you are free to modify it.
+ 
 
 #### SPIs
 

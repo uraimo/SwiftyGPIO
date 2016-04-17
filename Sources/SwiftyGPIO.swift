@@ -1,3 +1,4 @@
+import Foundation
 #if arch(arm) && os(Linux)
     import Glibc
 #else
@@ -29,6 +30,12 @@ public class GPIO {
     var name:String=""
     var id:Int=0
     var exported=false
+    var listening = false
+    var intThread:NSThread? = nil
+    var intFuncFalling:((GPIO)->Void)? = nil
+    var intFuncRaising:((GPIO)->Void)? = nil
+    var intFuncChange:((GPIO)->Void)? = nil
+
 
     init(name:String,
         id:Int) {
@@ -83,6 +90,36 @@ public class GPIO {
     public func isMemoryMapped()->Bool{
         return false
     }
+
+    func onFalling(closure:(GPIO)->Void){
+        intFuncFalling = closure
+        if intThread == nil {
+            intThread = newInterruptThread()
+            listening = true
+        }
+    }
+
+    func onRaising(closure:(GPIO)->Void){
+        intFuncRaising = closure
+        if intThread == nil {
+            intThread = newInterruptThread()
+            listening = true
+        }
+    }
+
+    func onChange(closure:(GPIO)->Void){
+        intFuncChange = closure
+        if intThread == nil {
+            intThread = newInterruptThread()
+            listening = true
+        }
+    }
+
+    func clearListeners(){
+        (intFuncFalling,intFuncRaising,intFuncChange) = (nil,nil,nil)
+        listening = false
+    }
+
 }
 
 extension GPIO {
@@ -148,6 +185,42 @@ extension GPIO {
         return res
     }
 
+    func newInterruptThread() -> NSThread{
+        let thread = NSThread(){
+
+            let gpath = GPIOBASEPATH+"gpio"+String(self.id)+"/value"
+            self.direction = .IN
+            self.edge = .BOTH
+
+            let fp = open(gpath,O_RDONLY)
+            var buf:[Int8] = [0,0,0] //Dummy read to discard current value
+            read(fp,&buf,3)
+
+            var pfd = pollfd(fd:fp,events:Int16(truncatingBitPattern:POLLPRI),revents:0)
+
+            while self.listening {
+                let ready = poll(&pfd, 1, -1)
+                if ready > -1 {
+                    lseek(fp, 0, SEEK_SET)
+                    read(fp,&buf,2)
+                    buf[1]=0
+
+                    let res = String.fromCString(buf)
+                    switch(res!){
+                    case "0":
+                        self.intFuncFalling?(self)
+                    case "1":
+                        self.intFuncRaising?(self)
+                    default:
+                        break
+                    }
+                    self.intFuncChange?(self)
+                }
+            }
+        }
+        thread.start()
+        return thread
+    }
 }
 
 public class RaspiGPIO : GPIO {
