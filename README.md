@@ -4,7 +4,8 @@
 
 <p>
 <img src="https://img.shields.io/badge/os-linux-green.svg?style=flat" alt="Linux-only" />
-<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/swift2-compatible-4BC51D.svg?style=flat" alt="Swift 2 compatible" /></a>
+<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/swift2.2-compatible-4BC51D.svg?style=flat" alt="Swift 2.2 compatible" /></a>
+<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/swift3-compatible-4BC51D.svg?style=flat" alt="Swift 3 compatible" /></a>
 <a href="https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/LICENSE"><img src="http://img.shields.io/badge/license-MIT-blue.svg?style=flat" alt="License: MIT" /></a>
 
 
@@ -47,20 +48,28 @@ Not tested but they should work(basically everything that has an ARMv7/Ubuntu14/
 
 ## Installation
 
-To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with Swift 2.2.
+To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with Swift 2.2 or Swift 3.
 
-You can either compile Swift yourself following [these instructions](http://www.housedillon.com/?p=2267) or use precompiled binaries following one of guides from [@hpux735](http://www.housedillon.com/?p=2293) or [@iachievedit](http://dev.iachieved.it/iachievedit/open-source-swift-on-raspberry-pi-2/) if you have a Raspberry Pi 2, BeagleBoneBlack, C.H.I.P. or one of the other ARMv7 boards.
-If you have a ARMv6 RaspberryPi 1 (A,B,A+,B+) or a Zero, get the precompiled binaries from [here](https://www.uraimo.com/2016/02/10/swift-available-on-armv6-raspberry-1-zero/). 
+If you have a Raspberry Pi 2 or 3, you can either compile Swift yourself following [these instructions](http://morimori.tokyo/2016/02/09/compiling-swift-on-a-raspberry-pi-2-february-2016-update-and-a-script-to-clone-and-build-open-source-swift/) or use precompiled ARMv7 binaries available from various sources (check out [Joe build server](http://dev.iachieved.it/iachievedit/swift-for-arm-systems/) for binaries straight from the master repo).
+The same binaries should work for BeagleBoneBlack, C.H.I.P. or one of the other ARMv7 boards too.
 
-Once done, considering that at the moment the package manager is not available on ARM, you'll need to manually download Sources/SwiftyGPIO.swift: 
+If you have a ARMv6 RaspberryPi 1 (A,B,A+,B+) or a Zero, get the precompiled binaries from [here](https://www.uraimo.com/2016/03/10/swift-3-available-on-armv6-raspberry-1-zero/) or build them yourself following [this guide](http://saygoodnight.com/2016/05/08/building-swift-for-armv6.html). 
 
-    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift
+Once done, if your version of Swift does not support the Swift Package Manager, just download all the needed files: 
+
+    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Thread.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/POSIXError.swift
     
-(For sample projects that uses the package manager retrieving SwiftyGPIO from GitHub check the **Examples** directory)
+Or if you are using Swift 2.x or a alpha version of Swift 3 just:
+
+    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/swift-2.2/Sources/SwiftyGPIO.swift
 
 Once downloaded, in the same directory create an additional file that will contain the code of your application (e.g. main.swift). 
 
 When your code is ready, compile it with:
+
+    swiftc SwiftyGPIO.swift Thread.swift POSIXError.swift main.swift
+    
+Or if you are using Swift 2.x or a alpha version of Swift 3 just:
 
     swiftc SwiftyGPIO.swift main.swift
 
@@ -86,6 +95,11 @@ Let's suppose we are using a Raspberry 2 board and have a led connected between 
 
 First, we need to retrieve the list of GPIOs available on the board and get a reference to the one we want to modify:
 
+```swift
+let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi2)
+var gp = gpios[.P2]!
+```
+Or if you are using Swift 2.x or a alpha version of Swift 3:
 ```swift
 let gpios = SwiftyGPIO.getGPIOsForBoard(.RaspberryPi2)
 var gp = gpios[.P2]!
@@ -134,7 +148,7 @@ The other properties available on the GPIO object (edge,active low) refer to the
 GPIOs also support the execution of closures when the value of the pin changes. Closures can be added with *onRaising* (the pin value changed from 0 to 1), *onFalling* (the value changed from 1 to 0) and *onChange* (the value simply changed from the previous one):
 
 ```swift
-let gpios = SwiftyGPIO.getGPIOsForBoard(.RaspberryPi2)
+let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi2)
 var gp = gpios[.P2]!
 
 
@@ -167,6 +181,11 @@ On RaspberryPi and other boards the hardware SPI SysFS interface is not enabled 
 Let's see some examples using a Raspberry2 that has one bidirectional SPI, managed by SwiftyGPIO as two mono-directional SPIObjects:
  
 ```swift
+let spis = SwiftyGPIO.hardwareSPIs(for:.RaspberryPiPlus2Zero)
+var spi = spis?[0]
+```
+Or if you are using Swift 2.x or a alpha version of Swift 3:
+```swift
 let spis = SwiftyGPIO.getHardwareSPIsForBoard(.RaspberryPiPlus2Zero)
 var spi = spis?[0]
 ```
@@ -177,7 +196,7 @@ Alternatively, we can create a software SPI using two GPIOs, one that wil serve 
 
 To create a software SPI, just retrieve two pins and create a `VirtualSPI` object:
 ```swift
-let gpios = SwiftyGPIO.getGPIOsForBoard(.RaspberryPi2)
+let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi2)
 var sclk = gpios[.P2]!
 var dnmosi = gpios[.P3]!
 var spi = VirtualSPI(dataGPIO:dnmosi,clockGPIO:sclk) 
@@ -205,7 +224,7 @@ spi?.sendData([UInt(42)], order:.LSBFIRST, clockDelayUsec:1000)
 The following example, built to run on the $9 C.H.I.P., shows the current value of all the GPIO0 attributes, changes direction and value and then shows again a recap of the attributes:
 
 ```Swift
-let gpios = SwiftyGPIO.getGPIOsForBoard(.CHIP)
+let gpios = SwiftyGPIO.GPIOs(for:.CHIP)
 var gp0 = gpios[.P0]!
 print("Current Status")
 print("Direction: "+gp0.direction.rawValue)
@@ -228,7 +247,7 @@ This second example makes a led blink with a frequency of 150ms:
 ```Swift
 import Glibc
 
-let gpios = SwiftyGPIO.getGPIOsForBoard(.CHIP)
+let gpios = SwiftyGPIO.GPIOs(for:.CHIP)
 var gp0 = gpios[.P0]!
 gp0.direction = .OUT
 
@@ -241,7 +260,7 @@ repeat{
 We can't test the hardware SPI with the CHIP but SwiftyGPIO also provide a bit banging software implementation of a SPI interface, you just need two GPIOs to initialize it:
 
 ```Swift
-let gpios = SwiftyGPIO.getGPIOsForBoard(.CHIP)
+let gpios = SwiftyGPIO.GPIOs(for:.CHIP)
 var sclk = gpios[.P0]!
 var dnmosi = gpios[.P1]!
 
@@ -281,22 +300,3 @@ A few projects and library built using SwiftyGPIO. Have you built something that
 * [Portable Wifi Monitor in Swift](http://saygoodnight.com/2016/04/05/portable-wifimon-raspberrypi.html) - A battery powered wifi signal monitor to map you wifi coverage.
 * [Temperature & Humidity Monitor in Swift](http://saygoodnight.com/2016/04/13/swift-temperature-raspberrypi.html) - A temperature monitor with a Raspberry Pi and an AM2302.
 * [Motion Detector with Swift and a Beaglebone Black](http://myroboticadventure.blogspot.it/2016/04/beaglebone-black-motion-detector-with.html) - A motion detector built with a BBB using a HC-SR502 sensor.
-
-## TODO
-
-- [x] Create Package.swift
-- [x] Basic example w/ package import
-- [x] Add GPIOs default configurations for supported boards
-- [x] Testing on the BeagleBone Black
-- [x] Software SPI via GPIOs
-- [x] Add BeagleBone Black pinout defaults
-- [x] Support for hardware SPI
-- [x] Testing on the Raspberries 1
-- [x] Register-based GPIO for Rasperries
-- [x] Add UDOOs when Swift support confirmed
-- [ ] Support for additional GPIOs on separate header for RasPi Rev 2 boards?
-- [ ] Add Tegra TK1 when Swift support confirmed
-- [ ] SysFS PWM and/or software PWM and/or ServoBlaster?
-- [ ] Block/Function execution on gpio interrupts
-- [ ] Support for external ADCs or support for platform-specific ADC drivers?
-- [ ] Refactoring
