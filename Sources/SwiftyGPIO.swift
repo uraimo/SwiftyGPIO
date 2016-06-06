@@ -492,6 +492,8 @@ public struct SwiftyGPIO {
                 return GPIOCHIP
             case .BeagleBoneBlack:
                 return GPIOBEAGLEBONE
+            case .BananaPi:
+                return GPIOBANANAPI
         }
     }
 
@@ -505,6 +507,8 @@ public struct SwiftyGPIO {
                 return [SPIRPI[0]!,SPIRPI[1]!]
             case .RaspberryPi2:
                 return [SPIRPI[0]!,SPIRPI[1]!]
+            case .BananaPi:
+                return [SPIBANANAPI[0]!,SPIBANANAPI[1]!]
             default:
                 return nil
         }
@@ -684,6 +688,44 @@ public struct SwiftyGPIO {
         .P32:GPIO(name:"P9_PIN23_GPIO1_17",id:49),   //Ignore Pin25, requires oscillator disabled
         .P33:GPIO(name:"P9_PIN27_GPIO3_19",id:125)
     ]
+    
+    // BananaPi
+    // CON3 Header GPIOs
+    // Same header of 40pins Raspberries, not compatible with LeMaker Guitar board
+    static let GPIOBANANAPI:[GPIOName:GPIO] =  = [
+        .P2:GPIO(name:"GPIO2",id:2),
+        .P3:GPIO(name:"GPIO3",id:3),
+        .P4:GPIO(name:"GPIO4",id:4),
+        .P5:GPIO(name:"GPIO5",id:5),
+        .P6:GPIO(name:"GPIO6",id:6),
+        .P7:GPIO(name:"GPIO7",id:7),
+        .P8:GPIO(name:"GPIO8",id:8),
+        .P9:GPIO(name:"GPIO9",id:9),
+        .P10:GPIO(name:"GPIO10",id:10),
+        .P11:GPIO(name:"GPIO11",id:11),
+        .P12:GPIO(name:"GPIO12",id:12),
+        .P13:GPIO(name:"GPIO13",id:13),
+        .P14:GPIO(name:"GPIO14",id:14),
+        .P15:GPIO(name:"GPIO15",id:15),
+        .P16:GPIO(name:"GPIO16",id:16),
+        .P17:GPIO(name:"GPIO17",id:17),
+        .P18:GPIO(name:"GPIO18",id:18),
+        .P19:GPIO(name:"GPIO19",id:19),
+        .P20:GPIO(name:"GPIO20",id:20),
+        .P21:GPIO(name:"GPIO21",id:21),
+        .P22:GPIO(name:"GPIO22",id:22),
+        .P23:GPIO(name:"GPIO23",id:23),
+        .P24:GPIO(name:"GPIO24",id:24),
+        .P25:GPIO(name:"GPIO25",id:25),
+        .P26:GPIO(name:"GPIO26",id:26),
+        .P27:GPIO(name:"GPIO27",id:27)
+    ]
+    
+    // BananaPi
+    static let SPIBANANAPI:[Int:SPIOutput] = [
+        0:HardwareSPI(spiId:"0.0",isOutput:true),
+        1:HardwareSPI(spiId:"0.1",isOutput:false)
+    ]
 }
 
 public enum SupportedBoard {
@@ -693,6 +735,7 @@ public enum SupportedBoard {
     case RaspberryPi2 // Pi 2 with 40 pin header
     case CHIP
     case BeagleBoneBlack
+    case BananaPi
 }
 
 public enum GPIOName {
