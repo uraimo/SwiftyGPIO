@@ -9,4 +9,4 @@ install:
 env:
   - SWIFT_VERSION=2.2.1-SNAPSHOT-2016-04-23-a
 script:
-  - swift build
+  - tree /home/travis/.swiftenv/; swift build
