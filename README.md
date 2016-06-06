@@ -5,7 +5,7 @@
 <p>
 <img src="https://img.shields.io/badge/os-linux-green.svg?style=flat" alt="Linux-only" />
 <a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/swift2.2-compatible-4BC51D.svg?style=flat" alt="Swift 2.2 compatible" /></a>
-<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/swift3-compatible-4BC51D.svg?style=flat" alt="Swift 3 compatible" /></a>
+<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/swift3-compatible-4B951D.svg?style=flat" alt="Swift 3 compatible" /></a>
 <a href="https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/LICENSE"><img src="http://img.shields.io/badge/license-MIT-blue.svg?style=flat" alt="License: MIT" /></a>
 
 
@@ -59,7 +59,7 @@ Once done, if your version of Swift does not support the Swift Package Manager, 
 
     wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Thread.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/POSIXError.swift
     
-Or if you are using Swift 2.x or a alpha version of Swift 3 just:
+Or if you are using Swift 2.x or an alpha version of Swift 3 just:
 
     wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/swift-2.2/Sources/SwiftyGPIO.swift
 
@@ -69,7 +69,7 @@ When your code is ready, compile it with:
 
     swiftc SwiftyGPIO.swift Thread.swift POSIXError.swift main.swift
     
-Or if you are using Swift 2.x or a alpha version of Swift 3 just:
+Or if you are using Swift 2.x or an alpha version of Swift 3 just:
 
     swiftc SwiftyGPIO.swift main.swift
 
@@ -99,7 +99,7 @@ First, we need to retrieve the list of GPIOs available on the board and get a re
 let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi2)
 var gp = gpios[.P2]!
 ```
-Or if you are using Swift 2.x or a alpha version of Swift 3:
+Or if you are using Swift 2.x or an alpha version of Swift 3:
 ```swift
 let gpios = SwiftyGPIO.getGPIOsForBoard(.RaspberryPi2)
 var gp = gpios[.P2]!
@@ -184,7 +184,7 @@ Let's see some examples using a Raspberry2 that has one bidirectional SPI, manag
 let spis = SwiftyGPIO.hardwareSPIs(for:.RaspberryPiPlus2Zero)
 var spi = spis?[0]
 ```
-Or if you are using Swift 2.x or a alpha version of Swift 3:
+Or if you are using Swift 2.x or an alpha version of Swift 3:
 ```swift
 let spis = SwiftyGPIO.getHardwareSPIsForBoard(.RaspberryPiPlus2Zero)
 var spi = spis?[0]
