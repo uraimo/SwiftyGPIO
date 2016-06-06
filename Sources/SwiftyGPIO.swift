@@ -692,7 +692,7 @@ public struct SwiftyGPIO {
     // BananaPi
     // CON3 Header GPIOs
     // Same header of 40pins Raspberries, not compatible with LeMaker Guitar board
-    static let GPIOBANANAPI:[GPIOName:GPIO] =  = [
+    static let GPIOBANANAPI:[GPIOName:GPIO] = [
         .P2:GPIO(name:"GPIO2",id:2),
         .P3:GPIO(name:"GPIO3",id:3),
         .P4:GPIO(name:"GPIO4",id:4),
