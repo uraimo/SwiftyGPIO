@@ -15,6 +15,8 @@ This library provides an easy way to interact with digital GPIOs and use SPI int
 
 It's built to run **exclusively on Linux ARM Boards** (RaspberryPis, BeagleBone Black, UDOO, Tegra, CHIP, etc...) with accessible GPIOs.
 
+Since version 0.8 SwiftyGPIO targets Swift 3.0, for Swift 2.x [refer to the specific branch](https://github.com/uraimo/SwiftyGPIO/tree/swift-2.2).
+
 ##### Content:
 - [Supported Boards](#supported-boards)
 - [Installation](#installation)
