@@ -37,9 +37,11 @@ Tested:
 * Raspberry Pi A,B Revision 1
 * Raspberry Pi A,B Revision 2
 * Raspberry Pi A+, B+
+* OrangePi (Thanks to [@colemancda](https://github.com/colemancda))
 * UDOOs
 
 Not tested but they should work(basically everything that has an ARMv7/Ubuntu14/Raspbian or an ARMv6/Raspbian):
+* BananaPi
 * OLinuXinos
 * ODROIDs
 * Cubieboards
@@ -50,7 +52,7 @@ Not tested but they should work(basically everything that has an ARMv7/Ubuntu14/
 
 To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with Swift 2.2 or Swift 3.
 
-If you have a Raspberry Pi 2 or 3, you can either compile Swift yourself following [these instructions](http://morimori.tokyo/2016/02/09/compiling-swift-on-a-raspberry-pi-2-february-2016-update-and-a-script-to-clone-and-build-open-source-swift/) or use precompiled ARMv7 binaries available from various sources (check out [Joe build server](http://dev.iachieved.it/iachievedit/swift-for-arm-systems/) for binaries straight from the master repo).
+If you have a Raspberry Pi 2 or 3, you can either compile Swift yourself following [these instructions](http://morimori.tokyo/2016/02/09/compiling-swift-on-a-raspberry-pi-2-february-2016-update-and-a-script-to-clone-and-build-open-source-swift/) or use precompiled ARMv7 binaries available from various [sources](http://dev.iachieved.it/iachievedit/open-source-swift-on-raspberry-pi-2/) (check out [Joe build server](http://dev.iachieved.it/iachievedit/swift-for-arm-systems/) for binaries straight from the master repo).
 The same binaries should work for BeagleBoneBlack, C.H.I.P. or one of the other ARMv7 boards too.
 
 If you have a ARMv6 RaspberryPi 1 (A,B,A+,B+) or a Zero, get the precompiled binaries from [here](https://www.uraimo.com/2016/03/10/swift-3-available-on-armv6-raspberry-1-zero/) or build them yourself following [this guide](http://saygoodnight.com/2016/05/08/building-swift-for-armv6.html). 
@@ -114,7 +116,7 @@ The following are the possible values for the predefined boards:
 * .BeagleBoneBlack (BeagleBone Black)
 * .CHIP (the $9 C.H.I.P. computer).
 
-The map returned by *getGPIOsForBoard* contains all the GPIOs of a specific board as described by [these diagrams](https://github.com/uraimo/SwiftyGPIO/wiki/GPIO-Pinout). 
+The map returned by `GPIOs(for:)` (or `getGPIOsForBoard` for Swift 2.x) contains all the GPIOs of a specific board as described by [these diagrams](https://github.com/uraimo/SwiftyGPIO/wiki/GPIO-Pinout). 
 
 Alternatively, if our board is not supported, each single GPIO object can be instantiated manually, using its SysFS GPIO Id:
 
@@ -122,7 +124,7 @@ Alternatively, if our board is not supported, each single GPIO object can be ins
 var gp = GPIO(name: "P2",id: 2)  // User defined name and GPIO Id
 ```
     
-The next step is configuring the port direction, that can be either *GPIODirection.IN* or *GPIODirection.OUT*, in this case we'll choose .OUT:
+The next step is configuring the port direction, that can be either `GPIODirection.IN` or `GPIODirection.OUT`, in this case we'll choose .OUT:
 
 ```swift
 gp.direction = .OUT
@@ -136,7 +138,7 @@ gp.value = 1
 
 That's it, the led will turn on.
 
-Now, suppose we have a switch connected to P2 instead, to read the value coming in the P2 port, the direction must be configured as *.IN* and the value can be read from the *value* property:
+Now, suppose we have a switch connected to P2 instead, to read the value coming in the P2 port, the direction must be configured as `.IN` and the value can be read from the `value` property:
 
 ```swift
 gp.direction = .IN
@@ -145,7 +147,7 @@ let current = gp.value
 
 The other properties available on the GPIO object (edge,active low) refer to the additional attributes of the GPIO that can be configured but you will not need them most of the times. For a detailed description refer to the [kernel documentation](https://www.kernel.org/doc/Documentation/gpio/sysfs.txt)
 
-GPIOs also support the execution of closures when the value of the pin changes. Closures can be added with *onRaising* (the pin value changed from 0 to 1), *onFalling* (the value changed from 1 to 0) and *onChange* (the value simply changed from the previous one):
+GPIOs also support the execution of closures when the value of the pin changes. Closures can be added with `onRaising` (the pin value changed from 0 to 1), `onFalling` (the value changed from 1 to 0) and `onChange` (the value simply changed from the previous one):
 
 ```swift
 let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi2)
@@ -168,13 +170,13 @@ gp.onChange{
 ```
 
 The closure receives as its only parameter a reference to the GPIO object that has been updated so that you don't need to use the external variable.
-Calling *clearListeners()* removes all the closures listening for changes and disables the changes handler.
-While GPIOs are checked for updates, the *direction* of the pin cannot be changed (and configured as *.IN*), but once the listeners have been cleared, either inside the closure or somewhere else, you are free to modify it.
+Calling `clearListeners()` removes all the closures listening for changes and disables the changes handler.
+While GPIOs are checked for updates, the `direction` of the pin cannot be changed (and configured as `.IN`), but once the listeners have been cleared, either inside the closure or somewhere else, you are free to modify it.
  
 
 #### SPIs
 
-If your board has SPI connections and SwiftyGPIO has them among its presets, a list of the available SPIs can be retrieved invoking `getHardwareSPIsForBoard` with one of the predefined boards.
+If your board has SPI connections and SwiftyGPIO has them among its presets, a list of the available SPIs can be retrieved invoking `hardwareSPIs(for:)` (or `getHardwareSPIsForBoard` for Swift 2.x) with one of the predefined boards.
 
 On RaspberryPi and other boards the hardware SPI SysFS interface is not enabled by default, check out the setup guide on [wiki](https://github.com/uraimo/SwiftyGPIO/wiki/Enabling-SPI-on-RaspberryPi-and-others).
 
@@ -300,3 +302,5 @@ A few projects and library built using SwiftyGPIO. Have you built something that
 * [Portable Wifi Monitor in Swift](http://saygoodnight.com/2016/04/05/portable-wifimon-raspberrypi.html) - A battery powered wifi signal monitor to map you wifi coverage.
 * [Temperature & Humidity Monitor in Swift](http://saygoodnight.com/2016/04/13/swift-temperature-raspberrypi.html) - A temperature monitor with a Raspberry Pi and an AM2302.
 * [Motion Detector with Swift and a Beaglebone Black](http://myroboticadventure.blogspot.it/2016/04/beaglebone-black-motion-detector-with.html) - A motion detector built with a BBB using a HC-SR502 sensor.
+* Your Project here
+

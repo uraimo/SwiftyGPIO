@@ -7,23 +7,6 @@
 internal let GPIOBASEPATH="/sys/class/gpio/"
 internal let SPIBASEPATH="/dev/spidev"
 
-public enum GPIODirection:String {
-    case IN="in"
-    case OUT="out"
-}
-
-public enum GPIOEdge:String {
-    case NONE="none"
-    case RISING="rising"
-    case FALLING="falling"
-    case BOTH="both"
-}
-
-public enum ByteOrder{
-    case MSBFIRST
-    case LSBFIRST
-}
-
 
 public class GPIO {
     var name:String=""
@@ -222,6 +205,8 @@ extension GPIO {
     }
 }
 
+// MARK: GPIO:Raspberry
+
 public final class RaspiGPIO : GPIO {
     
     var setGetId=0
@@ -313,6 +298,7 @@ public final class RaspiGPIO : GPIO {
  
 }
  
+// MARK: SPI
 
 public protocol SPIOutput {
     func sendData(_ values:[UInt8], order:ByteOrder, clockDelayUsec:Int)
@@ -474,6 +460,7 @@ public struct VirtualSPI : SPIOutput{
     }
 }
 
+// MARK: - GPIOs Presets 
 
 public struct SwiftyGPIO {
 
@@ -493,6 +480,8 @@ public struct SwiftyGPIO {
                 return GPIOBEAGLEBONE
             case .BananaPi:
                 return GPIOBANANAPI
+            case .OrangePi:
+                return GPIOORANGEPI
         }
     }
 
@@ -512,6 +501,7 @@ public struct SwiftyGPIO {
                 return nil
         }
     }
+
 
     // RaspberryPi A and B Revision 1 (Before September 2012) - 26 pin header boards
     // 0, 1, 4, 7, 8, 9, 10, 11, 14, 15, 17, 18, 21, 22, 23, 24, 25
@@ -725,7 +715,42 @@ public struct SwiftyGPIO {
         0:HardwareSPI(spiId:"0.0",isOutput:true),
         1:HardwareSPI(spiId:"0.1",isOutput:false)
     ]
+
+    // OrangePi
+    // The pins are ordered by name: A0-A21(P0-P16), C0-C7(P17-P22), D14(P23), G6-G9(P24-P27) 
+    static let GPIOORANGEPI:[GPIOName:GPIO] = [
+        .P0:GPIO(name:"PA0",id:0),
+        .P1:GPIO(name:"PA1",id:1),
+        .P2:GPIO(name:"PA2",id:2),
+        .P3:GPIO(name:"PA3",id:3),
+        .P4:GPIO(name:"PA6",id:6),
+        .P5:GPIO(name:"PA7",id:7),
+        .P6:GPIO(name:"PA8",id:8),
+        .P7:GPIO(name:"PA9",id:9),
+        .P8:GPIO(name:"PA10",id:10),
+        .P9:GPIO(name:"PA11",id:11),
+        .P10:GPIO(name:"PA12",id:12),
+        .P11:GPIO(name:"PA13",id:13),
+        .P12:GPIO(name:"PA14",id:14),
+        .P13:GPIO(name:"PA18",id:18),
+        .P14:GPIO(name:"PA19",id:19),
+        .P15:GPIO(name:"PA20",id:20),
+        .P16:GPIO(name:"PA21",id:21),
+        .P17:GPIO(name:"PC0",id:64),
+        .P18:GPIO(name:"PC1",id:65),
+        .P19:GPIO(name:"PC2",id:66),
+        .P20:GPIO(name:"PC3",id:67),
+        .P21:GPIO(name:"PC4",id:68),
+        .P22:GPIO(name:"PC7",id:71),
+        .P23:GPIO(name:"PD14",id:110),
+        .P24:GPIO(name:"PG6",id:198),
+        .P25:GPIO(name:"PG7",id:199),
+        .P26:GPIO(name:"PG8",id:200),
+        .P27:GPIO(name:"PG9",id:201)
+    ]
 }
+
+//MARK: - Global Enums
 
 public enum SupportedBoard {
     case RaspberryPiRev1   // Pi A,B Revision 1
@@ -735,6 +760,7 @@ public enum SupportedBoard {
     case CHIP
     case BeagleBoneBlack
     case BananaPi
+    case OrangePi
 }
 
 public enum GPIOName {
@@ -788,6 +814,24 @@ public enum GPIOName {
     case P47
 }
 
+public enum GPIODirection:String {
+    case IN="in"
+    case OUT="out"
+}
+
+public enum GPIOEdge:String {
+    case NONE="none"
+    case RISING="rising"
+    case FALLING="falling"
+    case BOTH="both"
+}
+
+public enum ByteOrder{
+    case MSBFIRST
+    case LSBFIRST
+}
+
+ 
 // MARK: - Darwin / Xcode Support
 
 #if os(OSX)
