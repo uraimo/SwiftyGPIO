@@ -1,11 +1,3 @@
-//
-//  Thread.swift
-//  SwiftFoundation
-//
-//  Created by Alsey Coleman Miller on 4/5/16.
-//  Copyright © 2016 PureSwift. All rights reserved.
-//
-
 #if os(OSX) || os(iOS) || os(watchOS) || os(tvOS)
     import Darwin.C
 #elseif os(Linux)
