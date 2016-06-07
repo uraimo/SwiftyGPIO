@@ -4,8 +4,7 @@
 
 <p>
 <img src="https://img.shields.io/badge/os-linux-green.svg?style=flat" alt="Linux-only" />
-<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/swift2.2-compatible-4BC51D.svg?style=flat" alt="Swift 2.2 compatible" /></a>
-<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/swift3-compatible-4B951D.svg?style=flat" alt="Swift 3 compatible" /></a>
+<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/swift3-compatible-orange.svg?style=flat" alt="Swift 3 compatible" /></a>
 <a href="https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/LICENSE"><img src="http://img.shields.io/badge/license-MIT-blue.svg?style=flat" alt="License: MIT" /></a>
 
 
@@ -35,6 +34,7 @@ Tested:
 * C.H.I.P.
 * BeagleBone Black (Thanks to [@hpux735](https://twitter.com/hpux735))
 * Raspberry Pi 2 (Thanks to [@iachievedit](https://twitter.com/iachievedit))
+* Raspberry Pi 3
 * Raspberry Pi Zero (Thanks to [@MacmeDan](https://twitter.com/MacmeDan))
 * Raspberry Pi A,B Revision 1
 * Raspberry Pi A,B Revision 2
@@ -52,7 +52,7 @@ Not tested but they should work(basically everything that has an ARMv7/Ubuntu14/
 
 ## Installation
 
-To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with [Swift 2.2](https://github.com/uraimo/SwiftyGPIO/tree/swift-2.2) or Swift 3.
+To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with Swift 3.
 
 If you have a Raspberry Pi 2 or 3, you can either compile Swift yourself following [these instructions](http://morimori.tokyo/2016/02/09/compiling-swift-on-a-raspberry-pi-2-february-2016-update-and-a-script-to-clone-and-build-open-source-swift/) or use precompiled ARMv7 binaries available from various sources (check out [Joe build server](http://dev.iachieved.it/iachievedit/swift-for-arm-systems/) for the [latest binaries](http://swift-arm.ddns.net/job/Swift-3.0-ARM-Incremental/lastSuccessfulBuild/artifact/) compiled from the master repo).
 The same binaries should work for BeagleBoneBlack, C.H.I.P. or one of the other ARMv7 boards too.
@@ -62,12 +62,25 @@ If you have a ARMv6 RaspberryPi 1 (A,B,A+,B+) or a Zero, get the precompiled bin
 Once done, if your version of Swift does not support the Swift Package Manager, just download all the needed files: 
 
     wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Thread.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/POSIXError.swift
-    
+
 Once downloaded, in the same directory create an additional file that will contain the code of your application (e.g. main.swift). 
 
 When your code is ready, compile it with:
 
     swiftc SwiftyGPIO.swift Thread.swift POSIXError.swift main.swift
+    
+If your version of Swift supports the SPM, you just need to add SwiftyGPIO as a dependency in your `Package.swift`:
+
+```
+let package = Package(
+    name: "MyProject",
+    dependencies: [
+        .Package(url: "https://github.com/uraimo/SwiftyGPIO.git"),
+        ...
+    ]
+    ...
+)
+```
 
 The compiler will create a **main** executable.
 As everything interacting with GPIOs via sysfs/mmapped registers, if you are not already root, you will need to run that binary with `sudo ./main`.
@@ -101,7 +114,7 @@ The following are the possible values for the predefined boards:
 * .RaspberryPiRev1 (Pi A,B Revision 1, pre-2012, 26 pin header)
 * .RaspberryPiRev2 (Pi A,B Revision 2, post-2012, 26 pin header) 
 * .RaspberryPiPlusZero (Raspberry Pi A+ and B+, Raspberry Zero, all with a 40 pin header)
-* .RaspberryPi2 (Raspberry Pi 2 with a 40 pin header)
+* .RaspberryPi2 (Raspberry Pi 2 or 3 with a 40 pin header)
 * .BeagleBoneBlack (BeagleBone Black)
 * .CHIP (the $9 C.H.I.P. computer).
 * .BananaPi (RaspberryPi clone)
