@@ -1,4 +1,4 @@
-#if arch(arm) && os(Linux)
+#if os(Linux)
     import Glibc
 #else
     import Darwin.C
