@@ -4,7 +4,7 @@
 
 <p>
 <img src="https://img.shields.io/badge/os-linux-green.svg?style=flat" alt="Linux-only" />
-<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/swift2-compatible-4BC51D.svg?style=flat" alt="Swift 2 compatible" /></a>
+<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/swift2.2-compatible-orange.svg?style=flat" alt="Swift 2.2 compatible" /></a>
 <a href="https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/LICENSE"><img src="http://img.shields.io/badge/license-MIT-blue.svg?style=flat" alt="License: MIT" /></a>
 
 
@@ -13,6 +13,8 @@
 This library provides an easy way to interact with digital GPIOs and use SPI interfaces with Swift on Linux. You'll be able to configure a port attributes (direction,edge,active low) and read/write the current GPIO value. And you will also be able to use the SPI interfaces provided by your board or a software big-banging SPI.
 
 It's built to run **exclusively on Linux ARM Boards** (RaspberryPis, BeagleBone Black, UDOO, Tegra, CHIP, etc...) with accessible GPIOs.
+
+**This branch was created before the transition to Swift 3.0 in SwiftyGPIO 0.8 to provide an easy way to get access to the pre-3.0 sources. As such it does not contain the latest developments but, if someone needs them, features from the master branch could be back ported here (open a PR)**
 
 ##### Content:
 - [Supported Boards](#supported-boards)
@@ -32,6 +34,7 @@ Tested:
 * C.H.I.P.
 * BeagleBone Black (Thanks to [@hpux735](https://twitter.com/hpux735))
 * Raspberry Pi 2 (Thanks to [@iachievedit](https://twitter.com/iachievedit))
+* Raspberry Pi 3
 * Raspberry Pi Zero (Thanks to [@MacmeDan](https://twitter.com/MacmeDan))
 * Raspberry Pi A,B Revision 1
 * Raspberry Pi A,B Revision 2
@@ -54,7 +57,7 @@ If you have a ARMv6 RaspberryPi 1 (A,B,A+,B+) or a Zero, get the precompiled bin
 
 Once done, considering that at the moment the package manager is not available on ARM, you'll need to manually download Sources/SwiftyGPIO.swift: 
 
-    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift
+    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/swift-2.2/Sources/SwiftyGPIO.swift
     
 (For sample projects that uses the package manager retrieving SwiftyGPIO from GitHub check the **Examples** directory)
 
