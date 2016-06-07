@@ -61,13 +61,13 @@ If you have a ARMv6 RaspberryPi 1 (A,B,A+,B+) or a Zero, get the precompiled bin
 
 Once done, if your version of Swift does not support the Swift Package Manager, just download all the needed files: 
 
-    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Thread.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/POSIXError.swift
+    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Thread.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/POSIXError.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SunXi.swift
 
-Once downloaded, in the same directory create an additional file that will contain the code of your application (e.g. main.swift). 
+Once downloaded, in the same directory create an additional file that will contain the code of your application named `main.swift`. 
 
 When your code is ready, compile it with:
 
-    swiftc SwiftyGPIO.swift Thread.swift POSIXError.swift main.swift
+    swiftc *.swift
     
 If your version of Swift supports the SPM, you just need to add SwiftyGPIO as a dependency in your `Package.swift`:
 
@@ -81,6 +81,7 @@ let package = Package(
     ...
 )
 ```
+And then build with `swift build`.
 
 The compiler will create a **main** executable.
 As everything interacting with GPIOs via sysfs/mmapped registers, if you are not already root, you will need to run that binary with `sudo ./main`.
