@@ -54,7 +54,7 @@ Not tested but they should work(basically everything that has an ARMv7/Ubuntu14/
 
 To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with [Swift 2.2](https://github.com/uraimo/SwiftyGPIO/tree/swift-2.2) or Swift 3.
 
-If you have a Raspberry Pi 2 or 3, you can either compile Swift yourself following [these instructions](http://morimori.tokyo/2016/02/09/compiling-swift-on-a-raspberry-pi-2-february-2016-update-and-a-script-to-clone-and-build-open-source-swift/) or use precompiled ARMv7 binaries available from various sources (check out [Joe build server](http://dev.iachieved.it/iachievedit/swift-for-arm-systems/) for the latest binaries compiled from the master repo).
+If you have a Raspberry Pi 2 or 3, you can either compile Swift yourself following [these instructions](http://morimori.tokyo/2016/02/09/compiling-swift-on-a-raspberry-pi-2-february-2016-update-and-a-script-to-clone-and-build-open-source-swift/) or use precompiled ARMv7 binaries available from various sources (check out [Joe build server](http://dev.iachieved.it/iachievedit/swift-for-arm-systems/) for the [latest binaries](http://swift-arm.ddns.net/job/Swift-3.0-ARM-Incremental/lastSuccessfulBuild/artifact/) compiled from the master repo).
 The same binaries should work for BeagleBoneBlack, C.H.I.P. or one of the other ARMv7 boards too.
 
 If you have a ARMv6 RaspberryPi 1 (A,B,A+,B+) or a Zero, get the precompiled binaries or build them yourself following [this guide](http://saygoodnight.com/2016/05/08/building-swift-for-armv6.html). 
