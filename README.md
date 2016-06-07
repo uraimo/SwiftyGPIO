@@ -15,7 +15,7 @@ This library provides an easy way to interact with digital GPIOs and use SPI int
 
 It's built to run **exclusively on Linux ARM Boards** (RaspberryPis, BeagleBone Black, UDOO, Tegra, CHIP, etc...) with accessible GPIOs.
 
-Since version 0.8 SwiftyGPIO targets Swift 3.0, for Swift 2.x [refer to the specific branch](https://github.com/uraimo/SwiftyGPIO/tree/swift-2.2).
+**Since version 0.8 SwiftyGPIO targets Swift 3.0, for Swift 2.x [refer to the specific branch](https://github.com/uraimo/SwiftyGPIO/tree/swift-2.2) for sources and documentation.**
 
 ##### Content:
 - [Supported Boards](#supported-boards)
@@ -52,30 +52,22 @@ Not tested but they should work(basically everything that has an ARMv7/Ubuntu14/
 
 ## Installation
 
-To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with Swift 2.2 or Swift 3.
+To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with [Swift 2.2](https://github.com/uraimo/SwiftyGPIO/tree/swift-2.2) or Swift 3.
 
-If you have a Raspberry Pi 2 or 3, you can either compile Swift yourself following [these instructions](http://morimori.tokyo/2016/02/09/compiling-swift-on-a-raspberry-pi-2-february-2016-update-and-a-script-to-clone-and-build-open-source-swift/) or use precompiled ARMv7 binaries available from various [sources](http://dev.iachieved.it/iachievedit/open-source-swift-on-raspberry-pi-2/) (check out [Joe build server](http://dev.iachieved.it/iachievedit/swift-for-arm-systems/) for binaries straight from the master repo).
+If you have a Raspberry Pi 2 or 3, you can either compile Swift yourself following [these instructions](http://morimori.tokyo/2016/02/09/compiling-swift-on-a-raspberry-pi-2-february-2016-update-and-a-script-to-clone-and-build-open-source-swift/) or use precompiled ARMv7 binaries available from various sources (check out [Joe build server](http://dev.iachieved.it/iachievedit/swift-for-arm-systems/) for the latest binaries compiled from the master repo).
 The same binaries should work for BeagleBoneBlack, C.H.I.P. or one of the other ARMv7 boards too.
 
-If you have a ARMv6 RaspberryPi 1 (A,B,A+,B+) or a Zero, get the precompiled binaries from [here](https://www.uraimo.com/2016/03/10/swift-3-available-on-armv6-raspberry-1-zero/) or build them yourself following [this guide](http://saygoodnight.com/2016/05/08/building-swift-for-armv6.html). 
+If you have a ARMv6 RaspberryPi 1 (A,B,A+,B+) or a Zero, get the precompiled binaries or build them yourself following [this guide](http://saygoodnight.com/2016/05/08/building-swift-for-armv6.html). 
 
 Once done, if your version of Swift does not support the Swift Package Manager, just download all the needed files: 
 
     wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Thread.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/POSIXError.swift
     
-Or if you are using Swift 2.x or an alpha version of Swift 3 just:
-
-    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/swift-2.2/Sources/SwiftyGPIO.swift
-
 Once downloaded, in the same directory create an additional file that will contain the code of your application (e.g. main.swift). 
 
 When your code is ready, compile it with:
 
     swiftc SwiftyGPIO.swift Thread.swift POSIXError.swift main.swift
-    
-Or if you are using Swift 2.x or an alpha version of Swift 3 just:
-
-    swiftc SwiftyGPIO.swift main.swift
 
 The compiler will create a **main** executable.
 As everything interacting with GPIOs via sysfs/mmapped registers, if you are not already root, you will need to run that binary with `sudo ./main`.
@@ -86,7 +78,7 @@ After following those instruction, remember to add your user (e.g. pi) to the gp
 <a href="#first"></a>
 ## Your First Project: Blinking leds
 
-Joe from iachievedit has written a [fantastic tutorial](http://dev.iachieved.it/iachievedit/raspberry-pi-2-gpio-with-swiftygpio/) that presents a practical example of how to use SwiftyGPIO, if you prefer starting with a real project instead of just reading documentation, check out his tutorial first.
+Joe from iachievedit has written a [fantastic tutorial](http://dev.iachieved.it/iachievedit/raspberry-pi-2-gpio-with-swiftygpio/) that presents a practical example of how to use SwiftyGPIO with Swift 2.x, if you prefer starting with a real project instead of just reading documentation, check out his tutorial first.
 
 
 ## Usage
@@ -103,11 +95,6 @@ First, we need to retrieve the list of GPIOs available on the board and get a re
 let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi2)
 var gp = gpios[.P2]!
 ```
-Or if you are using Swift 2.x or an alpha version of Swift 3:
-```swift
-let gpios = SwiftyGPIO.getGPIOsForBoard(.RaspberryPi2)
-var gp = gpios[.P2]!
-```
 
 The following are the possible values for the predefined boards:
     
@@ -117,8 +104,10 @@ The following are the possible values for the predefined boards:
 * .RaspberryPi2 (Raspberry Pi 2 with a 40 pin header)
 * .BeagleBoneBlack (BeagleBone Black)
 * .CHIP (the $9 C.H.I.P. computer).
+* .BananaPi (RaspberryPi clone)
+* .OrangePi
 
-The map returned by `GPIOs(for:)` (or `getGPIOsForBoard` for Swift 2.x) contains all the GPIOs of a specific board as described by [these diagrams](https://github.com/uraimo/SwiftyGPIO/wiki/GPIO-Pinout). 
+The map returned by `GPIOs(for:)` contains all the GPIOs of a specific board as described by [these diagrams](https://github.com/uraimo/SwiftyGPIO/wiki/GPIO-Pinout). 
 
 Alternatively, if our board is not supported, each single GPIO object can be instantiated manually, using its SysFS GPIO Id:
 
@@ -186,11 +175,6 @@ Let's see some examples using a Raspberry2 that has one bidirectional SPI, manag
  
 ```swift
 let spis = SwiftyGPIO.hardwareSPIs(for:.RaspberryPiPlus2Zero)
-var spi = spis?[0]
-```
-Or if you are using Swift 2.x or an alpha version of Swift 3:
-```swift
-let spis = SwiftyGPIO.getHardwareSPIsForBoard(.RaspberryPiPlus2Zero)
 var spi = spis?[0]
 ```
 
