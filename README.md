@@ -75,7 +75,7 @@ If your version of Swift supports the SPM, you just need to add SwiftyGPIO as a 
 let package = Package(
     name: "MyProject",
     dependencies: [
-        .Package(url: "https://github.com/uraimo/SwiftyGPIO.git"),
+        .Package(url: "https://github.com/uraimo/SwiftyGPIO.git", majorVersion: 0, minor: 1),
         ...
     ]
     ...
