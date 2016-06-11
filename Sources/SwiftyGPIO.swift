@@ -19,7 +19,7 @@ public class GPIO {
     var intFuncChange:((GPIO)->Void)? = nil
 
 
-    init(name:String,
+    public init(name:String,
         id:Int) {
         self.name=name
         self.id=id
@@ -73,7 +73,7 @@ public class GPIO {
         return false
     }
 
-    func onFalling(_ closure:(GPIO)->Void){
+    public func onFalling(_ closure:(GPIO)->Void){
         intFuncFalling = closure
         if intThread == nil {
             intThread = newInterruptThread()
@@ -81,7 +81,7 @@ public class GPIO {
         }
     }
 
-    func onRaising(_ closure:(GPIO)->Void){
+    public func onRaising(_ closure:(GPIO)->Void){
         intFuncRaising = closure
         if intThread == nil {
             intThread = newInterruptThread()
@@ -89,7 +89,7 @@ public class GPIO {
         }
     }
 
-    func onChange(_ closure:(GPIO)->Void){
+    public func onChange(_ closure:(GPIO)->Void){
         intFuncChange = closure
         if intThread == nil {
             intThread = newInterruptThread()
@@ -97,7 +97,7 @@ public class GPIO {
         }
     }
 
-    func clearListeners(){
+    public func clearListeners(){
         (intFuncFalling,intFuncRaising,intFuncChange) = (nil,nil,nil)
         listening = false
     }
@@ -167,7 +167,7 @@ extension GPIO {
         return res
     }
 
-    func newInterruptThread() -> Thread {
+    private func newInterruptThread() -> Thread {
         
         let thread = try! Thread {
 
@@ -223,7 +223,7 @@ public final class RaspiGPIO : GPIO {
     var gpioSetPointer:UnsafeMutablePointer<Int>!
     var gpioClearPointer:UnsafeMutablePointer<Int>!
 
-    init(name:String, id:Int, baseAddr:Int) {
+    public init(name:String, id:Int, baseAddr:Int) {
         self.setGetId = 1<<id
         self.BCM2708_PERI_BASE = baseAddr
         self.GPIO_BASE = BCM2708_PERI_BASE + 0x200000 /* GPIO controller */
@@ -311,7 +311,7 @@ public struct HardwareSPI : SPIOutput {
     let spiId:String
     let isOutput:Bool
 
-    init(spiId:String,isOutput:Bool){
+    public init(spiId:String,isOutput:Bool){
         self.spiId=spiId
         self.isOutput=isOutput
         //TODO: Check if available?
@@ -357,7 +357,7 @@ public struct HardwareSPI : SPIOutput {
 public struct VirtualSPI : SPIOutput{
     let dataGPIO,clockGPIO:GPIO
 
-    init(dataGPIO:GPIO,clockGPIO:GPIO){
+    public init(dataGPIO:GPIO,clockGPIO:GPIO){
         self.dataGPIO = dataGPIO
         self.dataGPIO.direction = .OUT
         self.dataGPIO.value = 0
