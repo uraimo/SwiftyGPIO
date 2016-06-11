@@ -1,6 +1,9 @@
 import Glibc
+//Remove this import if you are compiling manually with switfc
+import SwiftyGPIO
+ 
 
-let gpios = SwiftyGPIO.getGPIOsForBoard(.RaspberryPiRev2)
+let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPiRev2)
 
 gpios[.P3]!.direction = .OUT
 while true {    

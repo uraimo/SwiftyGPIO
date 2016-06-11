@@ -1,6 +1,8 @@
 import Glibc
+//Remove this import if you are compiling manually with switfc
+import SwiftyGPIO
 
-let gpios = SwiftyGPIO.getGPIOsForBoard(.RaspberryPiB2Zero)
+let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPiB2Zero)
 var gp = GPIO(name: "GPIO_45",id: 45)  
 
 print("Current Status")
