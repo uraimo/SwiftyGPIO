@@ -133,7 +133,7 @@ extension GPIO {
     private func writeToFile(_ path: String, value:String){
         let fp = fopen(path,"w")
         if fp != nil {
-            let ret = fwrite(value, strideof(CChar), value.characters.count, fp)
+            let ret = fwrite(value, strideof(CChar.self), value.characters.count, fp)
             if ret<value.characters.count {
                 if ferror(fp) != 0 {
                     perror("Error while writing to file")
@@ -151,7 +151,7 @@ extension GPIO {
         var res:String?
         if fp != nil {
             let buf = UnsafeMutablePointer<CChar>.init(allocatingCapacity: MAXLEN)
-            let len = fread(buf, strideof(CChar), MAXLEN, fp)
+            let len = fread(buf, strideof(CChar.self), MAXLEN, fp)
             if len < MAXLEN {
                 if ferror(fp) != 0 {
                     perror("Error while reading from file")
@@ -340,7 +340,7 @@ public struct HardwareSPI : SPIOutput {
     private func writeToFile(_ path: String, values:[UInt8]){
         let fp = fopen(path,"w")
         if fp != nil {
-            let ret = fwrite(values, strideof(CChar), values.count, fp)
+            let ret = fwrite(values, strideof(CChar.self), values.count, fp)
             if ret<values.count {
                 if ferror(fp) != 0 {
                     perror("Error while writing to file")
@@ -438,7 +438,7 @@ public struct VirtualSPI : SPIOutput{
     }
 
     private func writeToFP(_ fp: UnsafeMutablePointer<FILE>, value:String){
-       let ret = fwrite(value, strideof(CChar), 1, fp)
+       let ret = fwrite(value, strideof(CChar.self), 1, fp)
        if ret<1 {
            if ferror(fp) != 0 {
                perror("Error while writing to file")
