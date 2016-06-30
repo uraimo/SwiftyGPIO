@@ -19,7 +19,7 @@ It's built to run **exclusively on Linux ARM Boards** (RaspberryPis, BeagleBone 
 ##### Content:
 - [Supported Boards](#supported-boards)
 - [Installation](#installation)
-- [Your First Project: Blinking leds](#your-first-project-blinking-leds)
+- [Your First Project: Blinking Leds And Sensors](#your-first-project-blinking-leds-and-sensors)
 - [Usage](#usage)
     - [GPIOs](#gpio)
     - [SPIs](#spis)
@@ -90,10 +90,15 @@ If you prefer an alternative approach that does not require to use sudo every ti
 After following those instruction, remember to add your user (e.g. pi) to the gpio group with `sudo usermod -aG gpio pi` and to reboot so that the changes you made are applied.
 
 <a href="#first"></a>
-## Your First Project: Blinking leds
+## Your First Project: Blinking leds and sensors
 
-Joe from iachievedit has written a [fantastic tutorial](http://dev.iachieved.it/iachievedit/raspberry-pi-2-gpio-with-swiftygpio/) that presents a practical example of how to use SwiftyGPIO with Swift 2.x, if you prefer starting with a real project instead of just reading documentation, check out his tutorial first.
+If you prefer starting with a real project instead of just reading documentation, more than a few tutorials are available online.
 
+If you are using Swift 3.0 and the latest version of SwiftyGPIO, [Cameron Perry has a great step by step guide](http://mistercameron.com/2016/06/accessing-raspberry-pi-gpio-pins-with-swift/) on how to setup a Raspberry Pi for Swift and using a land and a temperature sensor. 
+
+And if you need instead a practical example of how to use SwiftyGPIO with Swift 2.x (get it from [the specific branch](https://github.com/uraimo/SwiftyGPIO/tree/swift-2.2)), Joe from iachievedit has written a [fantastic tutorial](http://dev.iachieved.it/iachievedit/raspberry-pi-2-gpio-with-swiftygpio/) that will explain everything you need to know.
+
+Additional tutorials are also available in [中文](http://swift.gg/2016/04/01/raspberry-pi-2-gpio-with-swiftygpio/) and [日本語](https://ja.ngs.io/2016/06/01/swifty-gpio/).
 
 ## Usage
 
