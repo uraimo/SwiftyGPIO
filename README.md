@@ -71,7 +71,7 @@ When your code is ready, compile it with:
     
 If your version of Swift supports the SPM, you just need to add SwiftyGPIO as a dependency in your `Package.swift`:
 
-```
+```swift
 let package = Package(
     name: "MyProject",
     dependencies: [
