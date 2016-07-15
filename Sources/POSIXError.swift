@@ -13,7 +13,7 @@ public extension POSIXError {
 #if os(Linux)
     
     /// Enumeration describing POSIX error codes.
-    public enum POSIXError: ErrorProtocol, RawRepresentable {
+    public enum POSIXError: Error, RawRepresentable {
         
         case Value(CInt)
         
