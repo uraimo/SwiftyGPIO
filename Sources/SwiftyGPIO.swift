@@ -150,7 +150,7 @@ extension GPIO {
         let fp = fopen(path,"r")
         var res:String?
         if fp != nil {
-            let buf = UnsafeMutablePointer<CChar>.init(allocatingCapacity: MAXLEN)
+            let buf = UnsafeMutablePointer<CChar>.allocate(capacity: MAXLEN)
             let len = fread(buf, strideof(CChar.self), MAXLEN, fp)
             if len < MAXLEN {
                 if ferror(fp) != 0 {
@@ -162,7 +162,7 @@ extension GPIO {
             //Remove the trailing \n
             buf[len-1]=0
             res = String.init(validatingUTF8: buf)
-            buf.deallocateCapacity(MAXLEN)
+            buf.deallocate(capacity: MAXLEN)
         }
         return res
     }
