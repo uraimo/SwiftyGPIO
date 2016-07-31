@@ -31,3 +31,8 @@ DerivedData
 # Carthage/Checkouts
 
 Carthage/Build
+
+#SPM
+
+.build/
+Packages/

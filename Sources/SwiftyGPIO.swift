@@ -19,7 +19,7 @@ public class GPIO {
     var intFuncChange:((GPIO)->Void)? = nil
 
 
-    init(name:String,
+    public init(name:String,
         id:Int) {
         self.name=name
         self.id=id
@@ -73,7 +73,7 @@ public class GPIO {
         return false
     }
 
-    func onFalling(_ closure:(GPIO)->Void){
+    public func onFalling(_ closure:(GPIO)->Void){
         intFuncFalling = closure
         if intThread == nil {
             intThread = newInterruptThread()
@@ -81,7 +81,7 @@ public class GPIO {
         }
     }
 
-    func onRaising(_ closure:(GPIO)->Void){
+    public func onRaising(_ closure:(GPIO)->Void){
         intFuncRaising = closure
         if intThread == nil {
             intThread = newInterruptThread()
@@ -89,7 +89,7 @@ public class GPIO {
         }
     }
 
-    func onChange(_ closure:(GPIO)->Void){
+    public func onChange(_ closure:(GPIO)->Void){
         intFuncChange = closure
         if intThread == nil {
             intThread = newInterruptThread()
@@ -97,7 +97,7 @@ public class GPIO {
         }
     }
 
-    func clearListeners(){
+    public func clearListeners(){
         (intFuncFalling,intFuncRaising,intFuncChange) = (nil,nil,nil)
         listening = false
     }
@@ -133,7 +133,7 @@ extension GPIO {
     private func writeToFile(_ path: String, value:String){
         let fp = fopen(path,"w")
         if fp != nil {
-            let ret = fwrite(value, strideof(CChar), value.characters.count, fp)
+            let ret = fwrite(value, strideof(CChar.self), value.characters.count, fp)
             if ret<value.characters.count {
                 if ferror(fp) != 0 {
                     perror("Error while writing to file")
@@ -150,8 +150,8 @@ extension GPIO {
         let fp = fopen(path,"r")
         var res:String?
         if fp != nil {
-            let buf = UnsafeMutablePointer<CChar>.init(allocatingCapacity: MAXLEN)
-            let len = fread(buf, strideof(CChar), MAXLEN, fp)
+            let buf = UnsafeMutablePointer<CChar>.allocate(capacity: MAXLEN)
+            let len = fread(buf, strideof(CChar.self), MAXLEN, fp)
             if len < MAXLEN {
                 if ferror(fp) != 0 {
                     perror("Error while reading from file")
@@ -162,12 +162,12 @@ extension GPIO {
             //Remove the trailing \n
             buf[len-1]=0
             res = String.init(validatingUTF8: buf)
-            buf.deallocateCapacity(MAXLEN)
+            buf.deallocate(capacity: MAXLEN)
         }
         return res
     }
 
-    func newInterruptThread() -> Thread {
+    private func newInterruptThread() -> Thread {
         
         let thread = try! Thread {
 
@@ -223,7 +223,7 @@ public final class RaspiGPIO : GPIO {
     var gpioSetPointer:UnsafeMutablePointer<Int>!
     var gpioClearPointer:UnsafeMutablePointer<Int>!
 
-    init(name:String, id:Int, baseAddr:Int) {
+    public init(name:String, id:Int, baseAddr:Int) {
         self.setGetId = 1<<id
         self.BCM2708_PERI_BASE = baseAddr
         self.GPIO_BASE = BCM2708_PERI_BASE + 0x200000 /* GPIO controller */
@@ -311,7 +311,7 @@ public struct HardwareSPI : SPIOutput {
     let spiId:String
     let isOutput:Bool
 
-    init(spiId:String,isOutput:Bool){
+    public init(spiId:String,isOutput:Bool){
         self.spiId=spiId
         self.isOutput=isOutput
         //TODO: Check if available?
@@ -340,7 +340,7 @@ public struct HardwareSPI : SPIOutput {
     private func writeToFile(_ path: String, values:[UInt8]){
         let fp = fopen(path,"w")
         if fp != nil {
-            let ret = fwrite(values, strideof(CChar), values.count, fp)
+            let ret = fwrite(values, strideof(CChar.self), values.count, fp)
             if ret<values.count {
                 if ferror(fp) != 0 {
                     perror("Error while writing to file")
@@ -357,7 +357,7 @@ public struct HardwareSPI : SPIOutput {
 public struct VirtualSPI : SPIOutput{
     let dataGPIO,clockGPIO:GPIO
 
-    init(dataGPIO:GPIO,clockGPIO:GPIO){
+    public init(dataGPIO:GPIO,clockGPIO:GPIO){
         self.dataGPIO = dataGPIO
         self.dataGPIO.direction = .OUT
         self.dataGPIO.value = 0
@@ -438,7 +438,7 @@ public struct VirtualSPI : SPIOutput{
     }
 
     private func writeToFP(_ fp: UnsafeMutablePointer<FILE>, value:String){
-       let ret = fwrite(value, strideof(CChar), 1, fp)
+       let ret = fwrite(value, strideof(CChar.self), 1, fp)
        if ret<1 {
            if ferror(fp) != 0 {
                perror("Error while writing to file")
@@ -719,34 +719,34 @@ public struct SwiftyGPIO {
     // OrangePi
     // The pins are ordered by name: A0-A21(P0-P16), C0-C7(P17-P22), D14(P23), G6-G9(P24-P27) 
     static let GPIOORANGEPI:[GPIOName:GPIO] = [
-        .P0:GPIO(name:"PA0",id:0),
-        .P1:GPIO(name:"PA1",id:1),
-        .P2:GPIO(name:"PA2",id:2),
-        .P3:GPIO(name:"PA3",id:3),
-        .P4:GPIO(name:"PA6",id:6),
-        .P5:GPIO(name:"PA7",id:7),
-        .P6:GPIO(name:"PA8",id:8),
-        .P7:GPIO(name:"PA9",id:9),
-        .P8:GPIO(name:"PA10",id:10),
-        .P9:GPIO(name:"PA11",id:11),
-        .P10:GPIO(name:"PA12",id:12),
-        .P11:GPIO(name:"PA13",id:13),
-        .P12:GPIO(name:"PA14",id:14),
-        .P13:GPIO(name:"PA18",id:18),
-        .P14:GPIO(name:"PA19",id:19),
-        .P15:GPIO(name:"PA20",id:20),
-        .P16:GPIO(name:"PA21",id:21),
-        .P17:GPIO(name:"PC0",id:64),
-        .P18:GPIO(name:"PC1",id:65),
-        .P19:GPIO(name:"PC2",id:66),
-        .P20:GPIO(name:"PC3",id:67),
-        .P21:GPIO(name:"PC4",id:68),
-        .P22:GPIO(name:"PC7",id:71),
-        .P23:GPIO(name:"PD14",id:110),
-        .P24:GPIO(name:"PG6",id:198),
-        .P25:GPIO(name:"PG7",id:199),
-        .P26:GPIO(name:"PG8",id:200),
-        .P27:GPIO(name:"PG9",id:201)
+        .P0:GPIO(sunXi:SunXiGPIO(letter: .A,pin:0)),
+        .P1:GPIO(sunXi:SunXiGPIO(letter:.A,pin:1)),
+        .P2:GPIO(sunXi:SunXiGPIO(letter:.A,pin:2)),
+        .P3:GPIO(sunXi:SunXiGPIO(letter:.A,pin:3)),
+        .P4:GPIO(sunXi:SunXiGPIO(letter:.A,pin:6)),
+        .P5:GPIO(sunXi:SunXiGPIO(letter:.A,pin:7)),
+        .P6:GPIO(sunXi:SunXiGPIO(letter:.A,pin:8)),
+        .P7:GPIO(sunXi:SunXiGPIO(letter:.A,pin:9)),
+        .P8:GPIO(sunXi:SunXiGPIO(letter:.A,pin:10)),
+        .P9:GPIO(sunXi:SunXiGPIO(letter:.A,pin:11)),
+        .P10:GPIO(sunXi:SunXiGPIO(letter:.A,pin:12)),
+        .P11:GPIO(sunXi:SunXiGPIO(letter:.A,pin:13)),
+        .P12:GPIO(sunXi:SunXiGPIO(letter:.A,pin:14)),
+        .P13:GPIO(sunXi:SunXiGPIO(letter:.A,pin:18)),
+        .P14:GPIO(sunXi:SunXiGPIO(letter:.A,pin:19)),
+        .P15:GPIO(sunXi:SunXiGPIO(letter:.A,pin:20)),
+        .P16:GPIO(sunXi:SunXiGPIO(letter:.A,pin:21)),
+        .P17:GPIO(sunXi:SunXiGPIO(letter:.C,pin:0)),
+        .P18:GPIO(sunXi:SunXiGPIO(letter:.C,pin:1)),
+        .P19:GPIO(sunXi:SunXiGPIO(letter:.C,pin:2)),
+        .P20:GPIO(sunXi:SunXiGPIO(letter:.C,pin:3)),
+        .P21:GPIO(sunXi:SunXiGPIO(letter:.C,pin:4)),
+        .P22:GPIO(sunXi:SunXiGPIO(letter:.C,pin:7)),
+        .P23:GPIO(sunXi:SunXiGPIO(letter:.D,pin:14)),
+        .P24:GPIO(sunXi:SunXiGPIO(letter:.G,pin:6)),
+        .P25:GPIO(sunXi:SunXiGPIO(letter:.G,pin:7)),
+        .P26:GPIO(sunXi:SunXiGPIO(letter:.G,pin:8)),
+        .P27:GPIO(sunXi:SunXiGPIO(letter:.G,pin:9))
     ]
 }
 

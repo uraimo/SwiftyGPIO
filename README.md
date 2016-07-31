@@ -4,8 +4,7 @@
 
 <p>
 <img src="https://img.shields.io/badge/os-linux-green.svg?style=flat" alt="Linux-only" />
-<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/swift2.2-compatible-4BC51D.svg?style=flat" alt="Swift 2.2 compatible" /></a>
-<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/swift3-compatible-4B951D.svg?style=flat" alt="Swift 3 compatible" /></a>
+<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/swift3-compatible-orange.svg?style=flat" alt="Swift 3 compatible" /></a>
 <a href="https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/LICENSE"><img src="http://img.shields.io/badge/license-MIT-blue.svg?style=flat" alt="License: MIT" /></a>
 
 
@@ -20,7 +19,7 @@ It's built to run **exclusively on Linux ARM Boards** (RaspberryPis, BeagleBone 
 ##### Content:
 - [Supported Boards](#supported-boards)
 - [Installation](#installation)
-- [Your First Project: Blinking leds](#your-first-project-blinking-leds)
+- [Your First Project: Blinking Leds And Sensors](#your-first-project-blinking-leds-and-sensors)
 - [Usage](#usage)
     - [GPIOs](#gpio)
     - [SPIs](#spis)
@@ -35,6 +34,7 @@ Tested:
 * C.H.I.P.
 * BeagleBone Black (Thanks to [@hpux735](https://twitter.com/hpux735))
 * Raspberry Pi 2 (Thanks to [@iachievedit](https://twitter.com/iachievedit))
+* Raspberry Pi 3
 * Raspberry Pi Zero (Thanks to [@MacmeDan](https://twitter.com/MacmeDan))
 * Raspberry Pi A,B Revision 1
 * Raspberry Pi A,B Revision 2
@@ -52,7 +52,7 @@ Not tested but they should work(basically everything that has an ARMv7/Ubuntu14/
 
 ## Installation
 
-To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with [Swift 2.2](https://github.com/uraimo/SwiftyGPIO/tree/swift-2.2) or Swift 3.
+To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with Swift 3.
 
 If you have a Raspberry Pi 2 or 3, you can either compile Swift yourself following [these instructions](http://morimori.tokyo/2016/02/09/compiling-swift-on-a-raspberry-pi-2-february-2016-update-and-a-script-to-clone-and-build-open-source-swift/) or use precompiled ARMv7 binaries available from various sources (check out [Joe build server](http://dev.iachieved.it/iachievedit/swift-for-arm-systems/) for the [latest binaries](http://swift-arm.ddns.net/job/Swift-3.0-ARM-Incremental/lastSuccessfulBuild/artifact/) compiled from the master repo).
 The same binaries should work for BeagleBoneBlack, C.H.I.P. or one of the other ARMv7 boards too.
@@ -61,13 +61,27 @@ If you have a ARMv6 RaspberryPi 1 (A,B,A+,B+) or a Zero, get the precompiled bin
 
 Once done, if your version of Swift does not support the Swift Package Manager, just download all the needed files: 
 
-    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Thread.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/POSIXError.swift
-    
-Once downloaded, in the same directory create an additional file that will contain the code of your application (e.g. main.swift). 
+    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Thread.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/POSIXError.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SunXi.swift
+
+Once downloaded, in the same directory create an additional file that will contain the code of your application named `main.swift`. 
 
 When your code is ready, compile it with:
 
-    swiftc SwiftyGPIO.swift Thread.swift POSIXError.swift main.swift
+    swiftc *.swift
+    
+If your version of Swift supports the SPM, you just need to add SwiftyGPIO as a dependency in your `Package.swift`:
+
+```swift
+let package = Package(
+    name: "MyProject",
+    dependencies: [
+        .Package(url: "https://github.com/uraimo/SwiftyGPIO.git", majorVersion: 0),
+        ...
+    ]
+    ...
+)
+```
+And then build with `swift build`.
 
 The compiler will create a **main** executable.
 As everything interacting with GPIOs via sysfs/mmapped registers, if you are not already root, you will need to run that binary with `sudo ./main`.
@@ -76,10 +90,15 @@ If you prefer an alternative approach that does not require to use sudo every ti
 After following those instruction, remember to add your user (e.g. pi) to the gpio group with `sudo usermod -aG gpio pi` and to reboot so that the changes you made are applied.
 
 <a href="#first"></a>
-## Your First Project: Blinking leds
+## Your First Project: Blinking leds and sensors
 
-Joe from iachievedit has written a [fantastic tutorial](http://dev.iachieved.it/iachievedit/raspberry-pi-2-gpio-with-swiftygpio/) that presents a practical example of how to use SwiftyGPIO with Swift 2.x, if you prefer starting with a real project instead of just reading documentation, check out his tutorial first.
+If you prefer starting with a real project instead of just reading documentation, more than a few tutorials are available online.
 
+If you are using Swift 3.0 and the latest version of SwiftyGPIO, [Cameron Perry has a great step by step guide](http://mistercameron.com/2016/06/accessing-raspberry-pi-gpio-pins-with-swift/) on how to setup a Raspberry Pi for Swift and using a land and a temperature sensor. 
+
+And if you need instead a practical example of how to use SwiftyGPIO with Swift 2.x (get it from [the specific branch](https://github.com/uraimo/SwiftyGPIO/tree/swift-2.2)), Joe from iachievedit has written a [fantastic tutorial](http://dev.iachieved.it/iachievedit/raspberry-pi-2-gpio-with-swiftygpio/) that will explain everything you need to know.
+
+Additional tutorials are also available in [中文](http://swift.gg/2016/04/01/raspberry-pi-2-gpio-with-swiftygpio/) and [日本語](https://ja.ngs.io/2016/06/01/swifty-gpio/).
 
 ## Usage
 
@@ -101,7 +120,7 @@ The following are the possible values for the predefined boards:
 * .RaspberryPiRev1 (Pi A,B Revision 1, pre-2012, 26 pin header)
 * .RaspberryPiRev2 (Pi A,B Revision 2, post-2012, 26 pin header) 
 * .RaspberryPiPlusZero (Raspberry Pi A+ and B+, Raspberry Zero, all with a 40 pin header)
-* .RaspberryPi2 (Raspberry Pi 2 with a 40 pin header)
+* .RaspberryPi2 (Raspberry Pi 2 or 3 with a 40 pin header)
 * .BeagleBoneBlack (BeagleBone Black)
 * .CHIP (the $9 C.H.I.P. computer).
 * .BananaPi (RaspberryPi clone)
@@ -285,8 +304,9 @@ A few projects and library built using SwiftyGPIO. Have you built something that
 * [DHTxx Temperature Sensor Library](https://github.com/pj4533/dhtxx) - Read temperature and humidity values from sensors of the DHT family (DHT11, DHT22, AM2303).
 
 ### Awesome Projects 
-* [Portable Wifi Monitor in Swift](http://saygoodnight.com/2016/04/05/portable-wifimon-raspberrypi.html) - A battery powered wifi signal monitor to map you wifi coverage.
+* [Portable Wifi Monitor in Swift](http://saygoodnight.com/2016/04/05/portable-wifimon-raspberrypi.html) - A battery powered wifi signal monitor to map your wifi coverage.
 * [Temperature & Humidity Monitor in Swift](http://saygoodnight.com/2016/04/13/swift-temperature-raspberrypi.html) - A temperature monitor with a Raspberry Pi and an AM2302.
 * [Motion Detector with Swift and a Beaglebone Black](http://myroboticadventure.blogspot.it/2016/04/beaglebone-black-motion-detector-with.html) - A motion detector built with a BBB using a HC-SR502 sensor.
+* [DS18B20 Temperature Sensor with Swift](http://mistercameron.com/2016/06/accessing-raspberry-pi-gpio-pins-with-swift/) - Step by step project to read temperature values from a DS18B20 sensor.
 * Your Project here
 

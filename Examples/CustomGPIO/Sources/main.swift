@@ -1,5 +1,7 @@
 import Glibc
-import swiftygpio
+//Remove this import if you are compiling manually with switfc
+import SwiftyGPIO
+
 
 let id = 408
 var gp01 = GPIO(name: "P0",id: 408)
