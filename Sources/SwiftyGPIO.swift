@@ -17,14 +17,14 @@ public class GPIO {
     var intFuncFalling:((GPIO)->Void)? = nil
     var intFuncRaising:((GPIO)->Void)? = nil
     var intFuncChange:((GPIO)->Void)? = nil
-
-
+    
+    
     public init(name:String,
-        id:Int) {
+                id:Int) {
         self.name=name
         self.id=id
     }
-
+    
     public var direction:GPIODirection {
         set(dir){
             if !exported {enableIO(id)}
@@ -35,7 +35,7 @@ public class GPIO {
             return GPIODirection(rawValue: getStringValue("gpio"+String(id)+"/direction")!)!
         }
     }
-
+    
     public var edge:GPIOEdge {
         set(dir){
             if !exported {enableIO(id)}
@@ -46,7 +46,7 @@ public class GPIO {
             return GPIOEdge(rawValue: getStringValue("gpio"+String(id)+"/edge")!)!
         }
     }
-
+    
     public var activeLow:Bool{
         set(act){
             if !exported {enableIO(id)}
@@ -57,7 +57,7 @@ public class GPIO {
             return getIntValue("gpio"+String(id)+"/active_low")==0
         }
     }
-
+    
     public var value:Int{
         set(val){
             if !exported {enableIO(id)}
@@ -68,11 +68,11 @@ public class GPIO {
             return getIntValue("gpio"+String(id)+"/value")!
         }
     }
-
+    
     public func isMemoryMapped() -> Bool {
         return false
     }
-
+    
     public func onFalling(_ closure:(GPIO)->Void){
         intFuncFalling = closure
         if intThread == nil {
@@ -80,7 +80,7 @@ public class GPIO {
             listening = true
         }
     }
-
+    
     public func onRaising(_ closure:(GPIO)->Void){
         intFuncRaising = closure
         if intThread == nil {
@@ -88,7 +88,7 @@ public class GPIO {
             listening = true
         }
     }
-
+    
     public func onChange(_ closure:(GPIO)->Void){
         intFuncChange = closure
         if intThread == nil {
@@ -96,41 +96,41 @@ public class GPIO {
             listening = true
         }
     }
-
+    
     public func clearListeners(){
         (intFuncFalling,intFuncRaising,intFuncChange) = (nil,nil,nil)
         listening = false
     }
-
+    
 }
 
-extension GPIO {
-
-    private func enableIO(_ id: Int){
+fileprivate extension GPIO {
+    
+    func enableIO(_ id: Int){
         writeToFile(GPIOBASEPATH+"export",value:String(id))
         exported = true
     }
-
-    private func performSetting(_ filename: String, value: String){
+    
+    func performSetting(_ filename: String, value: String){
         writeToFile(GPIOBASEPATH+filename, value:value)
     }
-
-    private func performSetting(_ filename: String, value: Int){
+    
+    func performSetting(_ filename: String, value: Int){
         writeToFile(GPIOBASEPATH+filename, value: String(value))
     }
-
-    private func getStringValue(_ filename: String)->String?{
+    
+    func getStringValue(_ filename: String)->String?{
         return readFromFile(GPIOBASEPATH+filename)
     }
-
-    private func getIntValue(_ filename: String)->Int?{
+    
+    func getIntValue(_ filename: String)->Int?{
         if let res = readFromFile(GPIOBASEPATH+filename) {
             return Int(res)
         }
         return nil
     }
-
-    private func writeToFile(_ path: String, value:String){
+    
+    func writeToFile(_ path: String, value:String){
         let fp = fopen(path,"w")
         if fp != nil {
             let ret = fwrite(value, strideof(CChar.self), value.characters.count, fp)
@@ -143,10 +143,10 @@ extension GPIO {
             fclose(fp)
         }
     }
-
-    private func readFromFile(_ path:String) -> String? {
+    
+    func readFromFile(_ path:String) -> String? {
         let MAXLEN = 8
-
+        
         let fp = fopen(path,"r")
         var res:String?
         if fp != nil {
@@ -166,28 +166,28 @@ extension GPIO {
         }
         return res
     }
-
-    private func newInterruptThread() -> Thread {
+    
+    func newInterruptThread() -> Thread {
         
         let thread = try! Thread {
-
+            
             let gpath = GPIOBASEPATH+"gpio"+String(self.id)+"/value"
             self.direction = .IN
             self.edge = .BOTH
-
+            
             let fp = open(gpath,O_RDONLY)
             var buf:[Int8] = [0,0,0] //Dummy read to discard current value
             read(fp,&buf,3)
-
+            
             var pfd = pollfd(fd:fp,events:Int16(truncatingBitPattern:POLLPRI),revents:0)
-
+            
             while self.listening {
                 let ready = poll(&pfd, 1, -1)
                 if ready > -1 {
                     lseek(fp, 0, SEEK_SET)
                     read(fp,&buf,2)
                     buf[1]=0
-
+                    
                     let res = String(validatingUTF8: buf)!
                     switch(res){
                     case "0":
@@ -212,24 +212,24 @@ public final class RaspiGPIO : GPIO {
     var setGetId=0
     var baseAddr:Int=0
     var inited=false
-
+    
     let BCM2708_PERI_BASE:Int
     let GPIO_BASE:Int
     let PAGE_SIZE = 4*1024
     let BLOCK_SIZE = 4*1024
-
+    
     var gpioBasePointer:UnsafeMutablePointer<Int>!
     var gpioGetPointer:UnsafeMutablePointer<Int>!
     var gpioSetPointer:UnsafeMutablePointer<Int>!
     var gpioClearPointer:UnsafeMutablePointer<Int>!
-
+    
     public init(name:String, id:Int, baseAddr:Int) {
         self.setGetId = 1<<id
         self.BCM2708_PERI_BASE = baseAddr
         self.GPIO_BASE = BCM2708_PERI_BASE + 0x200000 /* GPIO controller */
         super.init(name:name,id:id)
     }
-
+    
     public override var value:Int{
         set(val){
             if !inited {initIO(id)}
@@ -240,18 +240,18 @@ public final class RaspiGPIO : GPIO {
             return gpioGet()
         }
     }
-
+    
     public override func isMemoryMapped()->Bool{
         return true
     }
-
+    
     private func initIO(_ id: Int){
         let mem_fd = open("/dev/mem", O_RDWR | O_SYNC)
         guard (mem_fd > 0) else {
             print("Can't open /dev/mem")
             abort()
         }
-
+        
         let gpio_map = mmap(
             nil,                 //Any adddress in our space will do
             BLOCK_SIZE,          //Map length
@@ -259,45 +259,45 @@ public final class RaspiGPIO : GPIO {
             MAP_SHARED,          //Shared with other processes
             mem_fd,              //File to map
             off_t(GPIO_BASE)     //Offset to GPIO peripheral
-            )
-
+            )!
+        
         close(mem_fd)
-
-        let gpioBasePointer = UnsafeMutablePointer<Int>(gpio_map)!
+        
+        let gpioBasePointer = gpio_map.load(as: UnsafeMutablePointer<Int>.self)
         if (gpioBasePointer.pointee == -1) {    //MAP_FAILED not available, but its value is (void*)-1
-            print("mmap error: " + String(gpioBasePointer))
+            print("mmap error: " + "\(gpioBasePointer)")
             abort()
         }
         
         gpioGetPointer = gpioBasePointer.advanced(by: 13)
         gpioSetPointer = gpioBasePointer.advanced(by: 7)
-        gpioClearPointer = gpioBasePointer.advanced(by: 10) 
-
+        gpioClearPointer = gpioBasePointer.advanced(by: 10)
+        
         inited = true
     }
- 
+    
     private func gpioAsInput(){
         let ptr = gpioBasePointer.advanced(by: id/10)
         ptr.pointee &= ~(7<<((id%10)*3))
     }
-
+    
     private func gpioAsOutput(){
         let ptr = gpioBasePointer.advanced(by: id/10)
         ptr.pointee &= ~(7<<((id%10)*3))
         ptr.pointee |=  (1<<((id%10)*3))
-    }  
+    }
     
     private func gpioGet()->Int{
         return ((gpioGetPointer.pointee & setGetId)>0) ? 1 : 0
     }
-
+    
     private func gpioSet(_ value:Int){
         let ptr = value==1 ? gpioSetPointer : gpioClearPointer
         ptr!.pointee = setGetId
-    } 
- 
+    }
+    
 }
- 
+
 // MARK: SPI
 
 public protocol SPIOutput {
@@ -310,33 +310,33 @@ public protocol SPIOutput {
 public struct HardwareSPI : SPIOutput {
     let spiId:String
     let isOutput:Bool
-
+    
     public init(spiId:String,isOutput:Bool){
         self.spiId=spiId
         self.isOutput=isOutput
         //TODO: Check if available?
     }
-
+    
     public func sendData(_ values:[UInt8], order:ByteOrder, clockDelayUsec:Int){
         guard isOutput else {return}
-
+        
         if clockDelayUsec > 0 {
             //TODO: ioctl with new freq
         }
         
         writeToFile(SPIBASEPATH+spiId, values:values)
     }
-
+    
     public func sendData(_ values: [UInt8]){sendData(values,order:.MSBFIRST,clockDelayUsec:0)}
-
+    
     public func isHardware()->Bool{
         return true
-    } 
-
+    }
+    
     public func isOut()->Bool{
         return isOutput
     }
- 
+    
     private func writeToFile(_ path: String, values:[UInt8]){
         let fp = fopen(path,"w")
         if fp != nil {
@@ -350,13 +350,13 @@ public struct HardwareSPI : SPIOutput {
             fclose(fp)
         }
     }
- 
+    
 }
 
 
 public struct VirtualSPI : SPIOutput{
     let dataGPIO,clockGPIO:GPIO
-
+    
     public init(dataGPIO:GPIO,clockGPIO:GPIO){
         self.dataGPIO = dataGPIO
         self.dataGPIO.direction = .OUT
@@ -365,8 +365,8 @@ public struct VirtualSPI : SPIOutput{
         self.clockGPIO.direction = .OUT
         self.clockGPIO.value = 0
     }
-
-
+    
+    
     public func sendData(_ values:[UInt8], order:ByteOrder, clockDelayUsec:Int){
         let mmapped = dataGPIO.isMemoryMapped()
         if mmapped {
@@ -375,19 +375,19 @@ public struct VirtualSPI : SPIOutput{
             sendDataSysFS(values, order:order, clockDelayUsec:clockDelayUsec)
         }
     }
-
+    
     public func sendDataGPIOObj(_ values:[UInt8], order:ByteOrder, clockDelayUsec:Int){
-
+        
         var bit:Int = 0
-        for value in values {        
+        for value in values {
             for i in 0...7 {
                 switch order {
-                    case .LSBFIRST:
-                        bit = ((value & UInt8(1 << i)) == 0) ? 0 : 1
-                    case .MSBFIRST:
-                        bit = ((value & UInt8(1 << (7-i))) == 0) ? 0 : 1
+                case .LSBFIRST:
+                    bit = ((value & UInt8(1 << i)) == 0) ? 0 : 1
+                case .MSBFIRST:
+                    bit = ((value & UInt8(1 << (7-i))) == 0) ? 0 : 1
                 }
-            
+                
                 dataGPIO.value = bit
                 clockGPIO.value = 1
                 if clockDelayUsec>0 {
@@ -397,34 +397,34 @@ public struct VirtualSPI : SPIOutput{
             }
         }
     }
- 
+    
     public func sendDataSysFS(_ values:[UInt8], order:ByteOrder, clockDelayUsec:Int){
-
+        
         let mosipath = GPIOBASEPATH+"gpio"+String(self.dataGPIO.id)+"/value"
         let sclkpath = GPIOBASEPATH+"gpio"+String(self.clockGPIO.id)+"/value"
         let HIGH = "1"
         let LOW = "0"
-
+        
         let fpmosi: UnsafeMutablePointer<FILE>! = fopen(mosipath,"w")
         let fpsclk: UnsafeMutablePointer<FILE>! = fopen(sclkpath,"w")
-
+        
         guard (fpmosi != nil)&&(fpsclk != nil) else {
             perror("Error while opening gpio")
             abort()
         }
         setvbuf(fpmosi, nil, _IONBF, 0)
         setvbuf(fpsclk, nil, _IONBF, 0)
-
+        
         var bit:String = LOW
-        for value in values {        
+        for value in values {
             for i in 0...7 {
                 switch order {
-                    case .LSBFIRST:
-                        bit = ((value & UInt8(1 << i)) == 0) ? LOW : HIGH
-                    case .MSBFIRST:
-                        bit = ((value & UInt8(1 << (7-i))) == 0) ? LOW : HIGH
+                case .LSBFIRST:
+                    bit = ((value & UInt8(1 << i)) == 0) ? LOW : HIGH
+                case .MSBFIRST:
+                    bit = ((value & UInt8(1 << (7-i))) == 0) ? LOW : HIGH
                 }
-            
+                
                 writeToFP(fpmosi,value:bit)
                 writeToFP(fpsclk,value:HIGH)
                 if clockDelayUsec>0 {
@@ -436,73 +436,73 @@ public struct VirtualSPI : SPIOutput{
         fclose(fpmosi)
         fclose(fpsclk)
     }
-
+    
     private func writeToFP(_ fp: UnsafeMutablePointer<FILE>, value:String){
-       let ret = fwrite(value, strideof(CChar.self), 1, fp)
-       if ret<1 {
-           if ferror(fp) != 0 {
-               perror("Error while writing to file")
-               abort()
-           }
-       }
+        let ret = fwrite(value, strideof(CChar.self), 1, fp)
+        if ret<1 {
+            if ferror(fp) != 0 {
+                perror("Error while writing to file")
+                abort()
+            }
+        }
     }
- 
+    
     public func sendData(_ values:[UInt8]){
         self.sendData(values,order:.MSBFIRST,clockDelayUsec:0)
     }
-
+    
     public func isHardware()->Bool{
         return false
     }
-
+    
     public func isOut()->Bool{
         return true
     }
 }
 
-// MARK: - GPIOs Presets 
+// MARK: - GPIOs Presets
 
 public struct SwiftyGPIO {
-
+    
     public static func GPIOs(for board: SupportedBoard) -> [GPIOName: GPIO] {
         switch(board){
-            case .RaspberryPiRev1:
-                return GPIORPIRev1
-            case .RaspberryPiRev2:
-                return GPIORPIRev2
-            case .RaspberryPiPlusZero:
-                return GPIORPIPlusZERO
-            case .RaspberryPi2:
-                return GPIORPI2
-            case .CHIP:
-                return GPIOCHIP
-            case .BeagleBoneBlack:
-                return GPIOBEAGLEBONE
-            case .BananaPi:
-                return GPIOBANANAPI
-            case .OrangePi:
-                return GPIOORANGEPI
+        case .RaspberryPiRev1:
+            return GPIORPIRev1
+        case .RaspberryPiRev2:
+            return GPIORPIRev2
+        case .RaspberryPiPlusZero:
+            return GPIORPIPlusZERO
+        case .RaspberryPi2:
+            return GPIORPI2
+        case .CHIP:
+            return GPIOCHIP
+        case .BeagleBoneBlack:
+            return GPIOBEAGLEBONE
+        case .BananaPi:
+            return GPIOBANANAPI
+        case .OrangePi:
+            return GPIOORANGEPI
         }
     }
-
+    
     public static func hardwareSPIs(for board: SupportedBoard) -> [SPIOutput]? {
         switch(board){
-            case .RaspberryPiRev1:
-                fallthrough
-            case .RaspberryPiRev2:
-                fallthrough
-            case .RaspberryPiPlusZero:
-                return [SPIRPI[0]!,SPIRPI[1]!]
-            case .RaspberryPi2:
-                return [SPIRPI[0]!,SPIRPI[1]!]
-            case .BananaPi:
-                return [SPIBANANAPI[0]!,SPIBANANAPI[1]!]
-            default:
-                return nil
+        case .RaspberryPiRev1:
+            fallthrough
+        case .RaspberryPiRev2:
+            fallthrough
+        case .RaspberryPiPlusZero:
+            return [SPIRPI[0]!,SPIRPI[1]!]
+        case .RaspberryPi2:
+            return [SPIRPI[0]!,SPIRPI[1]!]
+        case .BananaPi:
+            return [SPIBANANAPI[0]!,SPIBANANAPI[1]!]
+        default:
+            return nil
         }
     }
-
-
+    
+    
     // RaspberryPi A and B Revision 1 (Before September 2012) - 26 pin header boards
     // 0, 1, 4, 7, 8, 9, 10, 11, 14, 15, 17, 18, 21, 22, 23, 24, 25
     static let GPIORPIRev1:[GPIOName:GPIO] = [
@@ -524,7 +524,7 @@ public struct SwiftyGPIO {
         .P24:RaspiGPIO(name:"GPIO24",id:24,baseAddr:0x20000000),
         .P25:RaspiGPIO(name:"GPIO25",id:25,baseAddr:0x20000000)
     ]
-
+    
     // RaspberryPi A and B Revision 2 (After September 2012) - 26 pin header boards
     //TODO: Additional GPIO from 28-31 ignored for now
     // 2, 3, 4, 7, 8, 9, 10, 11, 14, 15, 17, 18, 22, 23, 24, 25, 27
@@ -547,7 +547,7 @@ public struct SwiftyGPIO {
         .P25:RaspiGPIO(name:"GPIO25",id:25,baseAddr:0x20000000),
         .P27:RaspiGPIO(name:"GPIO27",id:27,baseAddr:0x20000000)
     ]
-
+    
     // RaspberryPi A+ and B+, Raspberry Zero - 40 pin header boards
     // 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
     static let GPIORPIPlusZERO:[GPIOName:GPIO] = [
@@ -578,7 +578,7 @@ public struct SwiftyGPIO {
         .P26:RaspiGPIO(name:"GPIO26",id:26,baseAddr:0x20000000),
         .P27:RaspiGPIO(name:"GPIO27",id:27,baseAddr:0x20000000)
     ]
- 
+    
     // RaspberryPi 2
     // 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
     static let GPIORPI2:[GPIOName:GPIO] = [
@@ -609,13 +609,13 @@ public struct SwiftyGPIO {
         .P26:RaspiGPIO(name:"GPIO26",id:26,baseAddr:0x3F000000),
         .P27:RaspiGPIO(name:"GPIO27",id:27,baseAddr:0x3F000000)
     ]
- 
+    
     // Raspberries w/raspbian
     static let SPIRPI:[Int:SPIOutput] = [
         0:HardwareSPI(spiId:"0.0",isOutput:true),
         1:HardwareSPI(spiId:"0.1",isOutput:false)
     ]
-
+    
     // CHIP
     // 408, 409, 410, 411, 412, 413, 414, 415, +undocumented LCD GPIOs
     static let GPIOCHIP:[GPIOName:GPIO] = [
@@ -628,7 +628,7 @@ public struct SwiftyGPIO {
         .P6:GPIO(name:"XIO-P6",id:414),
         .P7:GPIO(name:"XIO-P7",id:415)
     ]
-
+    
     //BeagleBoneBlack
     //
     //The gpio id is the sum of the related gpio controller base number
@@ -637,7 +637,7 @@ public struct SwiftyGPIO {
     //the pins, and i realize it could not be that useful(likely to change
     //in the future in favor of a better alternative).
     //
-    //Only the pins described as gpio in the official documentation are 
+    //Only the pins described as gpio in the official documentation are
     //included here: https://github.com/CircuitCo/BeagleBone-Black/blob/master/BBB_SRM.pdf?raw=true
     //Clearly this does not support mode change.
     //
@@ -715,9 +715,9 @@ public struct SwiftyGPIO {
         0:HardwareSPI(spiId:"0.0",isOutput:true),
         1:HardwareSPI(spiId:"0.1",isOutput:false)
     ]
-
+    
     // OrangePi
-    // The pins are ordered by name: A0-A21(P0-P16), C0-C7(P17-P22), D14(P23), G6-G9(P24-P27) 
+    // The pins are ordered by name: A0-A21(P0-P16), C0-C7(P17-P22), D14(P23), G6-G9(P24-P27)
     static let GPIOORANGEPI:[GPIOName:GPIO] = [
         .P0:GPIO(sunXi:SunXiGPIO(letter: .A,pin:0)),
         .P1:GPIO(sunXi:SunXiGPIO(letter:.A,pin:1)),
@@ -754,7 +754,7 @@ public struct SwiftyGPIO {
 
 public enum SupportedBoard {
     case RaspberryPiRev1   // Pi A,B Revision 1
-    case RaspberryPiRev2   // Pi A,B Revision 2 
+    case RaspberryPiRev2   // Pi A,B Revision 2
     case RaspberryPiPlusZero // Pi A+,B+,Zero with 40 pin header
     case RaspberryPi2 // Pi 2 with 40 pin header
     case CHIP
@@ -831,7 +831,7 @@ public enum ByteOrder{
     case LSBFIRST
 }
 
- 
+
 // MARK: - Darwin / Xcode Support
 
 #if os(OSX)
