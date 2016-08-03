@@ -320,8 +320,13 @@ public struct HardwareSPI : SPIOutput {
     public func sendData(_ values: [UInt8], order: ByteOrder, clockDelayUsec: Int){
         guard isOutput else {return}
         
+        let SPI_IOC_WR_MAX_SPEED_HZ: UInt = 0x40046b04
+        
         if clockDelayUsec > 0 {
-            //TODO: ioctl with new freq
+            //Try setting new frequency in Hz
+            var frq: CInt = CInt(1_000_000 / Double(clockDelayUsec))
+            let fp = open(SPIBASEPATH+spiId, O_WRONLY | O_SYNC)
+            _ = ioctl(fp, SPI_IOC_WR_MAX_SPEED_HZ, &frq)
         }
         
         writeToFile(SPIBASEPATH+spiId, values:values)
