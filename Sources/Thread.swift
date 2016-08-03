@@ -13,11 +13,11 @@ public final class Thread {
     
     // MARK: - Intialization
     
-    public init(_ closure: () -> ()) throws {
+    public init(_ closure: @escaping () -> ()) throws {
         
         let holder = Unmanaged.passRetained(Closure(closure: closure))
         
-        let pointer = UnsafeMutablePointer<Void>(holder.toOpaque())
+        let pointer = holder.toOpaque()
         
         #if os(Linux)
             var internalThread: pthread_t = 0
@@ -65,7 +65,7 @@ public final class Thread {
 
 // MARK: - Private
 
-private func ThreadPrivateMain(arg: UnsafeMutablePointer<Void>?) -> UnsafeMutablePointer<Void>? {
+private func ThreadPrivateMain(arg: UnsafeMutableRawPointer?) -> UnsafeMutableRawPointer? {
     
     let unmanaged = Unmanaged<Thread.Closure>.fromOpaque(arg!)
     
@@ -76,13 +76,13 @@ private func ThreadPrivateMain(arg: UnsafeMutablePointer<Void>?) -> UnsafeMutabl
     return nil
 }
 
-private extension Thread {
+fileprivate extension Thread {
     
-    private final class Closure {
+    final class Closure {
         
-        let closure: () -> ()
+        public let closure: () -> ()
         
-        init(closure: () -> ()) {
+        init(closure: @escaping () -> ()) {
             
             self.closure = closure
         }
