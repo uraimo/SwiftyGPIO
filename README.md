@@ -10,9 +10,9 @@
 
 ## Summary
 
-This library provides an easy way to interact external sensors and devices using digital GPIOs and SPI interfaces with Swift on Linux.
+This library provides an easy way to interact with external sensors and devices using digital GPIOs and SPI interfaces with Swift on Linux.
 
-You'll be able to configure port attributes (direction,edge,active low), read/write the current GPIO values and use the SPI interfaces provided by your board or a software big-banging SPI to drive external displays or more complex sensors.
+You'll be able to configure port attributes (direction,edge,active low), read/write the current GPIOs value and use the SPI interfaces provided by your board or a software big-banging SPI to drive external displays or more complex sensors.
 
 The library is built to run **exclusively on Linux ARM Boards** (RaspberryPis, BeagleBone Black, UDOO, Tegra, CHIP, etc...) with accessible GPIOs.
 
