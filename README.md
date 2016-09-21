@@ -10,9 +10,11 @@
 
 ## Summary
 
-This library provides an easy way to interact with digital GPIOs and use SPI interfaces with Swift on Linux. You'll be able to configure a port attributes (direction,edge,active low) and read/write the current GPIO value. And you will also be able to use the SPI interfaces provided by your board or a software big-banging SPI.
+This library provides an easy way to interact external sensors and devices using digital GPIOs and SPI interfaces with Swift on Linux.
 
-It's built to run **exclusively on Linux ARM Boards** (RaspberryPis, BeagleBone Black, UDOO, Tegra, CHIP, etc...) with accessible GPIOs.
+You'll be able to configure port attributes (direction,edge,active low), read/write the current GPIO values and use the SPI interfaces provided by your board or a software big-banging SPI to drive external displays or more complex sensors.
+
+The library is built to run **exclusively on Linux ARM Boards** (RaspberryPis, BeagleBone Black, UDOO, Tegra, CHIP, etc...) with accessible GPIOs.
 
 **Since version 0.8 SwiftyGPIO targets Swift 3.0, for Swift 2.x [refer to the specific branch](https://github.com/uraimo/SwiftyGPIO/tree/swift-2.2) for sources and documentation.**
 
