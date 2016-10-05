@@ -263,7 +263,7 @@ public final class RaspiGPIO : GPIO {
         
         close(mem_fd)
         
-        let gpioBasePointer = gpio_map.load(as: UnsafeMutablePointer<Int>.self)
+        let gpioBasePointer = gpio_map.assumingMemoryBound(to: Int.self)
         if (gpioBasePointer.pointee == -1) {    //MAP_FAILED not available, but its value is (void*)-1
             print("mmap error: " + "\(gpioBasePointer)")
             abort()
