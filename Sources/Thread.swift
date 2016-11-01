@@ -34,7 +34,7 @@ public final class Thread {
             self.internalThread = internalThread!
         #endif
         
-        pthread_detach(internalThread)
+        pthread_detach(self.internalThread)
     }
     
     // MARK: - Class Methods
@@ -65,9 +65,9 @@ public final class Thread {
 
 // MARK: - Private
 
-private func ThreadPrivateMain(arg: UnsafeMutableRawPointer?) -> UnsafeMutableRawPointer? {
+private func ThreadPrivateMain(arg: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer? {
     
-    let unmanaged = Unmanaged<Thread.Closure>.fromOpaque(arg!)
+    let unmanaged = Unmanaged<Thread.Closure>.fromOpaque(arg)
     
     unmanaged.takeUnretainedValue().closure()
     

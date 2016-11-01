@@ -1,0 +1,291 @@
+// !$*UTF8*$!
+{
+   archiveVersion = "1";
+   objectVersion = "46";
+   objects = {
+      OBJ_1 = {
+         isa = "PBXProject";
+         attributes = {
+            LastUpgradeCheck = "9999";
+         };
+         buildConfigurationList = OBJ_2;
+         compatibilityVersion = "Xcode 3.2";
+         developmentRegion = "English";
+         hasScannedForEncodings = "0";
+         knownRegions = (
+            "en",
+         );
+         mainGroup = OBJ_5;
+         productRefGroup = OBJ_15;
+         projectDirPath = ".";
+         targets = (
+            OBJ_17,
+         );
+      };
+      OBJ_10 = {
+         isa = "PBXFileReference";
+         path = "SunXi.swift";
+         sourceTree = "<group>";
+      };
+      OBJ_11 = {
+         isa = "PBXFileReference";
+         path = "SwiftyGPIO.swift";
+         sourceTree = "<group>";
+      };
+      OBJ_12 = {
+         isa = "PBXFileReference";
+         path = "Thread.swift";
+         sourceTree = "<group>";
+      };
+      OBJ_13 = {
+         isa = "PBXGroup";
+         children = (
+         );
+         path = "Tests";
+         sourceTree = "<group>";
+      };
+      OBJ_14 = {
+         isa = "PBXFileReference";
+         path = "Examples";
+         sourceTree = "SOURCE_ROOT";
+      };
+      OBJ_15 = {
+         isa = "PBXGroup";
+         children = (
+            OBJ_16,
+         );
+         name = "Products";
+         path = "";
+         sourceTree = "BUILT_PRODUCTS_DIR";
+      };
+      OBJ_16 = {
+         isa = "PBXFileReference";
+         path = "SwiftyGPIO.framework";
+         sourceTree = "BUILT_PRODUCTS_DIR";
+      };
+      OBJ_17 = {
+         isa = "PBXNativeTarget";
+         buildConfigurationList = OBJ_18;
+         buildPhases = (
+            OBJ_21,
+            OBJ_26,
+         );
+         dependencies = (
+         );
+         name = "SwiftyGPIO";
+         productName = "SwiftyGPIO";
+         productReference = OBJ_16;
+         productType = "com.apple.product-type.framework";
+      };
+      OBJ_18 = {
+         isa = "XCConfigurationList";
+         buildConfigurations = (
+            OBJ_19,
+            OBJ_20,
+         );
+         defaultConfigurationIsVisible = "0";
+         defaultConfigurationName = "Debug";
+      };
+      OBJ_19 = {
+         isa = "XCBuildConfiguration";
+         buildSettings = {
+            ENABLE_TESTABILITY = "YES";
+            FRAMEWORK_SEARCH_PATHS = (
+               "$(PLATFORM_DIR)/Developer/Library/Frameworks",
+            );
+            HEADER_SEARCH_PATHS = (
+            );
+            INFOPLIST_FILE = "SwiftyGPIO.xcodeproj/SwiftyGPIO_Info.plist";
+            LD_RUNPATH_SEARCH_PATHS = (
+               "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx",
+            );
+            OTHER_LDFLAGS = (
+               "$(inherited)",
+            );
+            OTHER_SWIFT_FLAGS = (
+               "$(inherited)",
+            );
+            PRODUCT_BUNDLE_IDENTIFIER = "SwiftyGPIO";
+            PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+            PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+            SUPPORTED_PLATFORMS = (
+               "macosx",
+            );
+            SWIFT_ACTIVE_COMPILATION_CONDITIONS = "SWIFT_PACKAGE";
+            SWIFT_VERSION = "3.0";
+            TARGET_NAME = "SwiftyGPIO";
+         };
+         name = "Debug";
+      };
+      OBJ_2 = {
+         isa = "XCConfigurationList";
+         buildConfigurations = (
+            OBJ_3,
+            OBJ_4,
+         );
+         defaultConfigurationIsVisible = "0";
+         defaultConfigurationName = "Debug";
+      };
+      OBJ_20 = {
+         isa = "XCBuildConfiguration";
+         buildSettings = {
+            ENABLE_TESTABILITY = "YES";
+            FRAMEWORK_SEARCH_PATHS = (
+               "$(PLATFORM_DIR)/Developer/Library/Frameworks",
+            );
+            HEADER_SEARCH_PATHS = (
+            );
+            INFOPLIST_FILE = "SwiftyGPIO.xcodeproj/SwiftyGPIO_Info.plist";
+            LD_RUNPATH_SEARCH_PATHS = (
+               "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx",
+            );
+            OTHER_LDFLAGS = (
+               "$(inherited)",
+            );
+            OTHER_SWIFT_FLAGS = (
+               "$(inherited)",
+            );
+            PRODUCT_BUNDLE_IDENTIFIER = "SwiftyGPIO";
+            PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+            PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+            SUPPORTED_PLATFORMS = (
+               "macosx",
+            );
+            SWIFT_ACTIVE_COMPILATION_CONDITIONS = "SWIFT_PACKAGE";
+            SWIFT_VERSION = "3.0";
+            TARGET_NAME = "SwiftyGPIO";
+         };
+         name = "Release";
+      };
+      OBJ_21 = {
+         isa = "PBXSourcesBuildPhase";
+         files = (
+            OBJ_22,
+            OBJ_23,
+            OBJ_24,
+            OBJ_25,
+         );
+      };
+      OBJ_22 = {
+         isa = "PBXBuildFile";
+         fileRef = OBJ_9;
+      };
+      OBJ_23 = {
+         isa = "PBXBuildFile";
+         fileRef = OBJ_10;
+      };
+      OBJ_24 = {
+         isa = "PBXBuildFile";
+         fileRef = OBJ_11;
+      };
+      OBJ_25 = {
+         isa = "PBXBuildFile";
+         fileRef = OBJ_12;
+      };
+      OBJ_26 = {
+         isa = "PBXFrameworksBuildPhase";
+         files = (
+         );
+      };
+      OBJ_3 = {
+         isa = "XCBuildConfiguration";
+         buildSettings = {
+            COMBINE_HIDPI_IMAGES = "YES";
+            COPY_PHASE_STRIP = "NO";
+            DEBUG_INFORMATION_FORMAT = "dwarf";
+            DYLIB_INSTALL_NAME_BASE = "@rpath";
+            ENABLE_NS_ASSERTIONS = "YES";
+            GCC_OPTIMIZATION_LEVEL = "0";
+            MACOSX_DEPLOYMENT_TARGET = "10.10";
+            ONLY_ACTIVE_ARCH = "YES";
+            OTHER_SWIFT_FLAGS = (
+               "-DXcode",
+            );
+            PRODUCT_NAME = "$(TARGET_NAME)";
+            SUPPORTED_PLATFORMS = (
+               "macosx",
+               "iphoneos",
+               "iphonesimulator",
+               "appletvos",
+               "appletvsimulator",
+               "watchos",
+               "watchsimulator",
+            );
+            SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+            USE_HEADERMAP = "NO";
+         };
+         name = "Debug";
+      };
+      OBJ_4 = {
+         isa = "XCBuildConfiguration";
+         buildSettings = {
+            COMBINE_HIDPI_IMAGES = "YES";
+            COPY_PHASE_STRIP = "YES";
+            DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+            DYLIB_INSTALL_NAME_BASE = "@rpath";
+            GCC_OPTIMIZATION_LEVEL = "s";
+            MACOSX_DEPLOYMENT_TARGET = "10.10";
+            OTHER_SWIFT_FLAGS = (
+               "-DXcode",
+            );
+            PRODUCT_NAME = "$(TARGET_NAME)";
+            SUPPORTED_PLATFORMS = (
+               "macosx",
+               "iphoneos",
+               "iphonesimulator",
+               "appletvos",
+               "appletvsimulator",
+               "watchos",
+               "watchsimulator",
+            );
+            SWIFT_OPTIMIZATION_LEVEL = "-O";
+            USE_HEADERMAP = "NO";
+         };
+         name = "Release";
+      };
+      OBJ_5 = {
+         isa = "PBXGroup";
+         children = (
+            OBJ_6,
+            OBJ_7,
+            OBJ_13,
+            OBJ_14,
+            OBJ_15,
+         );
+         path = "";
+         sourceTree = "<group>";
+      };
+      OBJ_6 = {
+         isa = "PBXFileReference";
+         explicitFileType = "sourcecode.swift";
+         path = "Package.swift";
+         sourceTree = "<group>";
+      };
+      OBJ_7 = {
+         isa = "PBXGroup";
+         children = (
+            OBJ_8,
+         );
+         path = "Sources";
+         sourceTree = "<group>";
+      };
+      OBJ_8 = {
+         isa = "PBXGroup";
+         children = (
+            OBJ_9,
+            OBJ_10,
+            OBJ_11,
+            OBJ_12,
+         );
+         name = "SwiftyGPIO";
+         path = "Sources";
+         sourceTree = "SOURCE_ROOT";
+      };
+      OBJ_9 = {
+         isa = "PBXFileReference";
+         path = "POSIXError.swift";
+         sourceTree = "<group>";
+      };
+   };
+   rootObject = OBJ_1;
+}
