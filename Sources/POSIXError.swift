@@ -9,8 +9,6 @@ public extension POSIXError {
     /// Creates error from C ```errno```.
     static var fromErrorNumber: POSIXError? { return self.init(rawValue: errno) }
 }
-
-#if os(Linux)
     
     /// Enumeration describing POSIX error codes.
     public enum POSIXError: Error, RawRepresentable {
@@ -30,7 +28,5 @@ public extension POSIXError {
             }
         }
     }
-    
-#endif
 
 
