@@ -1,4 +1,4 @@
-/// GPIO for SunXi (e.g. OrangePi) hardware. 
+/// GPIO for SunXi (e.g. OrangePi) hardware.
 ///
 /// - SeeAlso: [SunXi Wiki](http://linux-sunxi.org/GPIO)
 public struct SunXiGPIO: CustomStringConvertible, Equatable {
