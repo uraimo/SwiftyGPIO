@@ -34,7 +34,7 @@ public final class Thread {
             self.internalThread = internalThread!
         #endif
         
-        pthread_detach(internalThread)
+        pthread_detach(self.internalThread)
     }
     
     // MARK: - Class Methods
@@ -65,9 +65,10 @@ public final class Thread {
 
 // MARK: - Private
 
-private func ThreadPrivateMain(arg: UnsafeMutableRawPointer?) -> UnsafeMutableRawPointer? {
-    
-    let unmanaged = Unmanaged<Thread.Closure>.fromOpaque(arg!)
+// This double declaration is needed becaus of different `pthread_create` parameters requirements, between osx and linux (arm)
+#if os(OSX) || os(iOS) || os(watchOS) || os(tvOS)
+private func ThreadPrivateMain(arg: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer? {
+    let unmanaged = Unmanaged<Thread.Closure>.fromOpaque(arg)
     
     unmanaged.takeUnretainedValue().closure()
     
@@ -75,6 +76,17 @@ private func ThreadPrivateMain(arg: UnsafeMutableRawPointer?) -> UnsafeMutableRa
     
     return nil
 }
+#elseif os(Linux)
+private func ThreadPrivateMain(arg: UnsafeMutableRawPointer?) -> UnsafeMutableRawPointer? {
+    let unmanaged = Unmanaged<Thread.Closure>.fromOpaque(arg!)
+
+    unmanaged.takeUnretainedValue().closure()
+        
+    unmanaged.release()
+        
+    return nil
+}
+#endif
 
 fileprivate extension Thread {
     
