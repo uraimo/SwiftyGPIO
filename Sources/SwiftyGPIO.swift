@@ -246,9 +246,9 @@ public final class RaspiGPIO : GPIO {
     }
     
     private func initIO(_ id: Int){
-        let mem_fd = open("/dev/mem", O_RDWR | O_SYNC)
+        let mem_fd = open("/dev/gpiomem", O_RDWR | O_SYNC)
         guard (mem_fd > 0) else {
-            print("Can't open /dev/mem")
+            print("Can't open /dev/gpiomem")
             abort()
         }
         
