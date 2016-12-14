@@ -245,15 +245,22 @@ public final class RaspiGPIO : GPIO {
         return true
     }
     
-    private func initIO(_ id: Int){
-        let mem_fd = open("/dev/mem", O_RDWR | O_SYNC)
-        guard (mem_fd > 0) else {
-            print("Can't open /dev/mem")
-            abort()
-        }
-        
-        let gpio_map = mmap(
-            nil,                 //Any adddress in our space will do
+	private func initIO(_ id: Int){
+		var mem_fd=Int32(0)
+		for device in ["/dev/gpiomem","/dev/mem"] {
+			mem_fd=open(device, O_RDWR | O_SYNC)
+			if mem_fd>0 {
+				break
+			} else {
+				print("Can't open \(device)")
+			}
+		}
+		guard (mem_fd > 0) else {
+			abort()
+		}
+		
+		let gpio_map = mmap(
+			nil,                 //Any adddress in our space will do
             BLOCK_SIZE,          //Map length
             PROT_READ|PROT_WRITE,// Enable reading & writting to mapped memory
             MAP_SHARED,          //Shared with other processes
