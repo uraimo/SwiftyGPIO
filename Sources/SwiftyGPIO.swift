@@ -519,6 +519,8 @@ public struct SwiftyGPIO {
             return GPIOBANANAPI
         case .OrangePi:
             return GPIOORANGEPI
+        case .OrangePiZero:
+            return GPIOORANGEPIZERO
         }
     }
     
@@ -785,6 +787,27 @@ public struct SwiftyGPIO {
         .P26:GPIO(sunXi:SunXiGPIO(letter:.G,pin:8)),
         .P27:GPIO(sunXi:SunXiGPIO(letter:.G,pin:9))
     ]
+    
+    // OrangePiZero
+    static let GPIOORANGEPIZERO: [GPIOName:GPIO] = [
+        .P2:GPIO(sunXi:SunXiGPIO(letter:.A,pin:12)),
+        .P3:GPIO(sunXi:SunXiGPIO(letter:.A,pin:11)),
+        .P4:GPIO(sunXi:SunXiGPIO(letter:.A,pin:6)),
+        .P7:GPIO(sunXi:SunXiGPIO(letter:.A,pin:10)),
+        .P8:GPIO(sunXi:SunXiGPIO(letter:.A,pin:13)),
+        .P9:GPIO(sunXi:SunXiGPIO(letter:.A,pin:16)),
+        .P10:GPIO(sunXi:SunXiGPIO(letter:.A,pin:15)),
+        .P11:GPIO(sunXi:SunXiGPIO(letter:.A,pin:14)),
+        .P14:GPIO(sunXi:SunXiGPIO(letter:.G,pin:6)),
+        .P15:GPIO(sunXi:SunXiGPIO(letter:.G,pin:7)),
+        .P17:GPIO(sunXi:SunXiGPIO(letter:.A,pin:1)),
+        .P18:GPIO(sunXi:SunXiGPIO(letter:.A,pin:7)),
+        .P22:GPIO(sunXi:SunXiGPIO(letter:.A,pin:3)),
+        .P23:GPIO(sunXi:SunXiGPIO(letter:.A,pin:19)),
+        .P24:GPIO(sunXi:SunXiGPIO(letter:.A,pin:18)),
+        .P25:GPIO(sunXi:SunXiGPIO(letter:.A,pin:2)),
+        .P27:GPIO(sunXi:SunXiGPIO(letter:.A,pin:0))
+    ]
 }
 
 //MARK: - Global Enums
@@ -798,6 +821,7 @@ public enum SupportedBoard {
     case BeagleBoneBlack
     case BananaPi
     case OrangePi
+    case OrangePiZero
 }
 
 public enum GPIOName {
