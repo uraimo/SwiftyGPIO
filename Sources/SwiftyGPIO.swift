@@ -1,3 +1,28 @@
+//
+// SwiftyGPIO
+//
+// Copyright (c) 2016 Umberto Raimondi and contributors.
+// Licensed under the MIT license, as follows:
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.)
+//
+
 #if os(Linux)
     import Glibc
 #else
@@ -245,15 +270,22 @@ public final class RaspiGPIO : GPIO {
         return true
     }
     
-    private func initIO(_ id: Int){
-        let mem_fd = open("/dev/mem", O_RDWR | O_SYNC)
-        guard (mem_fd > 0) else {
-            print("Can't open /dev/mem")
-            abort()
-        }
-        
-        let gpio_map = mmap(
-            nil,                 //Any adddress in our space will do
+	private func initIO(_ id: Int){
+		var mem_fd=Int32(0)
+		for device in ["/dev/gpiomem","/dev/mem"] {
+			mem_fd=open(device, O_RDWR | O_SYNC)
+			if mem_fd>0 {
+				break
+			} else {
+				print("Can't open \(device)")
+			}
+		}
+		guard (mem_fd > 0) else {
+			abort()
+		}
+		
+		let gpio_map = mmap(
+			nil,                 //Any adddress in our space will do
             BLOCK_SIZE,          //Map length
             PROT_READ|PROT_WRITE,// Enable reading & writting to mapped memory
             MAP_SHARED,          //Shared with other processes
