@@ -42,6 +42,7 @@ Tested:
 * Raspberry Pi A,B Revision 2
 * Raspberry Pi A+, B+
 * OrangePi (Thanks to [@colemancda](https://github.com/colemancda))
+* OrangePi Zero (Thanks to [@eugeniobaglieri](https://github.com/eugeniobaglieri)) 
 * UDOOs
 
 Not tested but they should work(basically everything that has an ARMv7/Ubuntu14/Raspbian or an ARMv6/Raspbian):
