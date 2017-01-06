@@ -7,6 +7,7 @@
 <a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/swift3-compatible-orange.svg?style=flat" alt="Swift 3 compatible" /></a>
 <a href="https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/LICENSE"><img src="http://img.shields.io/badge/license-MIT-blue.svg?style=flat" alt="License: MIT" /></a>
 
+![](banner.jpg)
 
 ## Summary
 
@@ -26,8 +27,10 @@ The library is built to run **exclusively on Linux ARM Boards** (RaspberryPis, B
     - [GPIOs](#gpio)
     - [SPIs](#spis)
 - [Examples](#examples)
-- [Under the hood](#under-the-hood)
 - [Built with SwiftyGPIO](#built-with-swiftygpio)
+    - [Device Libraries](#libraries)
+    - [Awesome Projects](#awesome-projects)
+- [Under the hood](#under-the-hood)
 
 
 ## Supported Boards
@@ -285,6 +288,22 @@ Notice that we are converting the 0x9F `Int` using the constructor `UInt8(trunca
 Other examples for differen boards are available in the *Examples* directory.
 
 
+## Built with SwiftyGPIO
+
+A few projects and libraries built using SwiftyGPIO. Have you built something that you want to share? Let me know!
+
+### Libraries
+* [Nokia5110(PCD8544) LCD Library](http://github.com/uraimo/5110lcd_pcd8544.swift) - Show text and graphics on a Nokia 3110/5110 LCD display.
+* [HD44780U Character LCD Library](https://github.com/uraimo/HD44780CharacterLCD.swift) - Show text on character LCDs controlled by the HD44780 or one of its clones.
+* [DHTxx Temperature Sensor Library](https://github.com/pj4533/dhtxx) - Read temperature and humidity values from sensors of the DHT family (DHT11, DHT22, AM2303).
+
+### Awesome Projects 
+* [Portable Wifi Monitor in Swift](http://saygoodnight.com/2016/04/05/portable-wifimon-raspberrypi.html) - A battery powered wifi signal monitor to map your wifi coverage.
+* [Temperature & Humidity Monitor in Swift](http://saygoodnight.com/2016/04/13/swift-temperature-raspberrypi.html) - A temperature monitor with a Raspberry Pi and an AM2302.
+* [Motion Detector with Swift and a Beaglebone Black](http://myroboticadventure.blogspot.it/2016/04/beaglebone-black-motion-detector-with.html) - A motion detector built with a BBB using a HC-SR502 sensor.
+* [DS18B20 Temperature Sensor with Swift](http://mistercameron.com/2016/06/accessing-raspberry-pi-gpio-pins-with-swift/) - Step by step project to read temperature values from a DS18B20 sensor.
+ 
+
 ## Under the hood
 
 SwiftyGPIO interact with GPIOs through memory mapped gpio registers (if available, when sending data) and the sysfs file-based interface described [here](https://www.kernel.org/doc/Documentation/gpio/sysfs.txt).
@@ -297,20 +316,4 @@ Regarding the actual sending of the data, when available SwiftyGPIO will use a m
 
 At the moment the memory mapped interface is only available on all Raspberries.
 
-
-## Built with SwiftyGPIO
-
-A few projects and library built using SwiftyGPIO. Have you built something that you want to share? Let me know!
-
-### Libraries
-* [Nokia5110(PCD8544) LCD Library](http://github.com/uraimo/5110lcd_pcd8544.swift) - Show text and graphics on a Nokia 3110/5110 LCD display.
-* [HD44780U Character LCD Library](https://github.com/uraimo/HD44780CharacterLCD.swift) - Show text on character LCDs controlled by the HD44780 or one of its clones.
-* [DHTxx Temperature Sensor Library](https://github.com/pj4533/dhtxx) - Read temperature and humidity values from sensors of the DHT family (DHT11, DHT22, AM2303).
-
-### Awesome Projects 
-* [Portable Wifi Monitor in Swift](http://saygoodnight.com/2016/04/05/portable-wifimon-raspberrypi.html) - A battery powered wifi signal monitor to map your wifi coverage.
-* [Temperature & Humidity Monitor in Swift](http://saygoodnight.com/2016/04/13/swift-temperature-raspberrypi.html) - A temperature monitor with a Raspberry Pi and an AM2302.
-* [Motion Detector with Swift and a Beaglebone Black](http://myroboticadventure.blogspot.it/2016/04/beaglebone-black-motion-detector-with.html) - A motion detector built with a BBB using a HC-SR502 sensor.
-* [DS18B20 Temperature Sensor with Swift](http://mistercameron.com/2016/06/accessing-raspberry-pi-gpio-pins-with-swift/) - Step by step project to read temperature values from a DS18B20 sensor.
-* Your Project here
 
