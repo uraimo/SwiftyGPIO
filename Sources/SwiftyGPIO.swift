@@ -240,7 +240,6 @@ public final class RaspiGPIO : GPIO {
     
     let BCM2708_PERI_BASE: Int
     let GPIO_BASE: Int
-    let PAGE_SIZE = 4*1024
     let BLOCK_SIZE = 4*1024
     
     var gpioBasePointer: UnsafeMutablePointer<Int>!
@@ -290,7 +289,7 @@ public final class RaspiGPIO : GPIO {
             PROT_READ|PROT_WRITE,// Enable reading & writting to mapped memory
             MAP_SHARED,          //Shared with other processes
             mem_fd,              //File to map
-            off_t(GPIO_BASE)     //Offset to GPIO peripheral
+            off_t(GPIO_BASE)     //Offset to GPIO peripheral, i.e. GPFSEL0
             )!
         
         close(mem_fd)
@@ -301,22 +300,22 @@ public final class RaspiGPIO : GPIO {
             abort()
         }
         
-        gpioGetPointer = gpioBasePointer.advanced(by: 13)
-        gpioSetPointer = gpioBasePointer.advanced(by: 7)
-        gpioClearPointer = gpioBasePointer.advanced(by: 10)
+        gpioGetPointer = gpioBasePointer.advanced(by: 13)   // GPLEV0
+        gpioSetPointer = gpioBasePointer.advanced(by: 7)    // GPSET0
+        gpioClearPointer = gpioBasePointer.advanced(by: 10) // GPCLR0
         
         inited = true
     }
     
     private func gpioAsInput(){
-        let ptr = gpioBasePointer.advanced(by: id/10)
-        ptr.pointee &= ~(7<<((id%10)*3))
+        let ptr = gpioBasePointer.advanced(by: id/10)       // GPFSELn 0..5
+        ptr.pointee &= ~(7<<((id%10)*3))                    // SEL=000 input
     }
     
     private func gpioAsOutput(){
-        let ptr = gpioBasePointer.advanced(by: id/10)
+        let ptr = gpioBasePointer.advanced(by: id/10)       // GPFSELn 0..5
         ptr.pointee &= ~(7<<((id%10)*3))
-        ptr.pointee |=  (1<<((id%10)*3))
+        ptr.pointee |=  (1<<((id%10)*3))                    // SEL=001 output
     }
     
     private func gpioGet() -> Int{
