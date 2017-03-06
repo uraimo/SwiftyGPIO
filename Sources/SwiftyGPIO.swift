@@ -240,7 +240,7 @@ fileprivate extension GPIO {
 
 public final class RaspiGPIO : GPIO {
     
-    var setGetId = 0
+    var setGetId: UInt = 0
     var baseAddr: Int = 0
     var inited = false
     
@@ -248,13 +248,13 @@ public final class RaspiGPIO : GPIO {
     let GPIO_BASE: Int
     let BLOCK_SIZE = 4*1024
     
-    var gpioBasePointer: UnsafeMutablePointer<Int>!
-    var gpioGetPointer: UnsafeMutablePointer<Int>!
-    var gpioSetPointer: UnsafeMutablePointer<Int>!
-    var gpioClearPointer: UnsafeMutablePointer<Int>!
+    var gpioBasePointer: UnsafeMutablePointer<UInt>!
+    var gpioGetPointer: UnsafeMutablePointer<UInt>!
+    var gpioSetPointer: UnsafeMutablePointer<UInt>!
+    var gpioClearPointer: UnsafeMutablePointer<UInt>!
     
     public init(name: String, id: Int, baseAddr: Int) {
-        self.setGetId = 1<<id
+        self.setGetId = UInt(1<<id)
         self.BCM2708_PERI_BASE = baseAddr
         self.GPIO_BASE = BCM2708_PERI_BASE + 0x200000 /* GPIO controller */
         super.init(name:name,id:id)
@@ -262,18 +262,18 @@ public final class RaspiGPIO : GPIO {
     
     public override var value: Int{
         set(val){
-            if !inited {initIO(id)}
+            if !inited {initIO()}
             gpioSet(val)
         }
         get {
-            if !inited {initIO(id)}
+            if !inited {initIO()}
             return gpioGet()
         }
     }
    
     public override var direction: GPIODirection {
         set(dir){
-            if !inited {initIO(id)}
+            if !inited {initIO()}
             if dir == .IN {
                 gpioAsInput()
             }else{
@@ -281,7 +281,7 @@ public final class RaspiGPIO : GPIO {
             }
         }
         get {
-            if !inited {initIO(id)}
+            if !inited {initIO()}
             return gpioGetDirection()
         }
     }
@@ -290,7 +290,7 @@ public final class RaspiGPIO : GPIO {
         return true
     }
     
-	private func initIO(_ id: Int){
+	private func initIO(){
 		var mem_fd=Int32(0)
 
         //Try to open one of the mem devices
@@ -315,8 +315,8 @@ public final class RaspiGPIO : GPIO {
         
         close(mem_fd)
         
-        gpioBasePointer = gpio_map.assumingMemoryBound(to: Int.self)
-        if (gpioBasePointer.pointee == -1) {    //MAP_FAILED not available, but its value is (void*)-1
+        gpioBasePointer = gpio_map.assumingMemoryBound(to: UInt.self)
+        if (gpioBasePointer.pointee == UInt(bitPattern: -1)) {    //MAP_FAILED not available, but its value is (void*)-1
             print("mmap error: " + "\(gpioBasePointer)")
             abort()
         }
@@ -330,18 +330,18 @@ public final class RaspiGPIO : GPIO {
     
     private func gpioAsInput(){
         let ptr = gpioBasePointer.advanced(by: id/10)       // GPFSELn 0..5
-        ptr.pointee &= ~(7<<((id%10)*3))                    // SEL=000 input
+        ptr.pointee &= ~(7<<((UInt(id)%10)*3))                    // SEL=000 input
     }
     
     private func gpioAsOutput(){
         let ptr = gpioBasePointer.advanced(by: id/10)       // GPFSELn 0..5
-        ptr.pointee &= ~(7<<((id%10)*3))
-        ptr.pointee |=  (1<<((id%10)*3))                    // SEL=001 output
+        ptr.pointee &= ~(7<<((UInt(id)%10)*3))
+        ptr.pointee |=  (1<<((UInt(id)%10)*3))                    // SEL=001 output
     }
 
     private func gpioGetDirection() -> GPIODirection {
         let ptr = gpioBasePointer.advanced(by: id/10)       // GPFSELn 0..5
-        let d = (ptr.pointee & (7<<((id%10)*3)))
+        let d = (ptr.pointee & (7<<((UInt(id)%10)*3)))
         return (d == 0) ? .IN : .OUT
     }
     
