@@ -24,13 +24,13 @@ The library is built to run **exclusively on Linux ARM Boards** (RaspberryPis, B
 - [Installation](#installation)
 - [Your First Project: Blinking Leds And Sensors](#your-first-project-blinking-leds-and-sensors)
 - [Usage](#usage)
-    - [GPIOs](#gpio)
+    - [GPIOs](#gpios)
     - [SPIs](#spis)
 - [Examples](#examples)
 - [Built with SwiftyGPIO](#built-with-swiftygpio)
     - [Device Libraries](#libraries)
     - [Awesome Projects](#awesome-projects)
-- [Under the hood](#under-the-hood)
+- [Additional documentation](#additional-documentation)
 
 
 ## Supported Boards
@@ -60,21 +60,24 @@ Not tested but they should work(basically everything that has an ARMv7/Ubuntu14/
 
 To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with Swift 3.
 
-If you have a Raspberry Pi 2 or 3, you can either compile Swift yourself following [these instructions](http://morimori.tokyo/2016/02/09/compiling-swift-on-a-raspberry-pi-2-february-2016-update-and-a-script-to-clone-and-build-open-source-swift/) or use precompiled ARMv7 binaries available from various sources (check out [Joe build server](http://dev.iachieved.it/iachievedit/swift-for-arm-systems/) for the [latest binaries](http://swift-arm.ddns.net/job/Swift-3.0-Pi3-ARM-Incremental/lastSuccessfulBuild/artifact/) for Ubuntu 16.04 compiled from the master repo).
-The same binaries should work for BeagleBoneBlack, C.H.I.P. or one of the other ARMv7 boards too.
+If you have a RaspberryPi (A,B,A+,B+,Zero,ZeroW,2,3) with Ubuntu or Raspbian, get Swift 3.0.2 from [here](https://www.uraimo.com/2016/12/30/Swift-3-0-2-for-raspberrypi-zero-1-2-3/) or follow the instruction from the post and the linked build scripts repository (or these: [1](http://mistercameron.com/2016/06/compile-swift-3-0-on-your-arm-computer/), [2](https://medium.com/@MissionKao/how-to-compile-swift-on-raspberry-pi-ae33e417a61e#.dweiw55iu), [3](http://saygoodnight.com/2016/05/08/building-swift-for-armv6.html), [4](http://morimori.tokyo/2016/02/09/compiling-swift-on-a-raspberry-pi-2-february-2016-update-and-a-script-to-clone-and-build-open-source-swift/)) to build it yourself.
 
-If you have a ARMv6 RaspberryPi 1 (A,B,A+,B+) or a Zero, get the precompiled binaries or build them yourself following [this guide](http://saygoodnight.com/2016/05/08/building-swift-for-armv6.html). 
+Recent precompiled ARMv7 binaries are also available from [Joe build server](http://dev.iachieved.it/iachievedit/swift-for-arm-systems/) for the [latest binaries](http://swift-arm.ddns.net/job/Swift-3.0-Pi3-ARM-Incremental/lastSuccessfulBuild/artifact/), built for Ubuntu 16.04 from the master repo.
 
-Once done, if your version of Swift does not support the Swift Package Manager, just download all the needed files: 
+The same Ubuntu binaries could work for BeagleBoneBlack, C.H.I.P. or any other ARMv6/ARMv7 board too when used with the same release.
 
-    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Thread.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/POSIXError.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SunXi.swift
+Once done, if your version of Swift does not support the Swift Package Manager, download manually all the needed files: 
 
-Once downloaded, in the same directory create an additional file that will contain the code of your application named `main.swift`. 
+    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SunXi.swift
+
+And once downloaded, in the same directory create an additional file that will contain the code of your application named `main.swift`. 
 
 When your code is ready, compile it with:
 
     swiftc *.swift
     
+The compiler will create a **main** executable.
+
 If your version of Swift supports the SPM, you just need to add SwiftyGPIO as a dependency in your `Package.swift`:
 
 ```swift
@@ -89,9 +92,9 @@ let package = Package(
 ```
 And then build with `swift build`.
 
-The compiler will create a **main** executable.
+The compiler will create an executable under `.build/`.
 
-**IMPORTANT:** As everything interacting with GPIOs via sysfs/mmapped registers, if your OS does not come with a prefedined user group to access these functionalities, you'll need to run your application with root privileges using `sudo ./main`. If you are using a RaspberryPi with a recent Raspbian (post November 2016) or a recent Ubuntu (from 16.04 Xenial onward), this will be not required, just launch your application with `./main`.
+**IMPORTANT:** As everything interacting with GPIOs via sysfs/mmapped registers, if your OS does not come with a predefined user group to access these functionalities, you'll need to run your application with root privileges using `sudo ./main`. If you are using a RaspberryPi with a recent Raspbian (post November 2016) or a recent Ubuntu (from 16.04 Xenial onward), this will be not required, just launch your application with `./main`. On misconfigured systems, features like the listeners may require root privileges anyway.
 
 Alternatively, a specific user group for gpio access can be configured manually as shown [here](https://arcanesciencelab.wordpress.com/2016/03/31/running-rpi3-applications-that-use-gpio-without-being-root/) or in this [answer on stackoverflow](https://stackoverflow.com/questions/30938991/access-gpio-sys-class-gpio-as-non-root/30940526#30940526).
 After following those instruction, remember to add your user (e.g. pi) to the gpio group with `sudo usermod -aG gpio pi` and to reboot so that the changes you made are applied.
@@ -111,9 +114,9 @@ Additional tutorials are also available in [中文](http://swift.gg/2016/04/01/r
 
 Currently, SwiftyGPIO expose GPIOs and SPIs(if not available a bit-banging VirtualSPI can be created), let's see how to use them.
 
-#### GPIOs
+### GPIOs
 
-Let's suppose we are using a Raspberry 2 board and have a led connected between the GPIO pin P2 (possibly with a resistance of 1k or so) and GND and we want to turn it on.
+Let's suppose we are using a Raspberry 2 board and have a led connected between the GPIO pin P2 (possibly with a resistance of 1K Ohm or so) and GND and we want to turn it on.
 
 First, we need to retrieve the list of GPIOs available on the board and get a reference to the one we want to modify:
 
@@ -191,13 +194,13 @@ Calling `clearListeners()` removes all the closures listening for changes and di
 While GPIOs are checked for updates, the `direction` of the pin cannot be changed (and configured as `.IN`), but once the listeners have been cleared, either inside the closure or somewhere else, you are free to modify it.
  
 
-#### SPIs
+### SPIs
 
 If your board has SPI connections and SwiftyGPIO has them among its presets, a list of the available SPIs can be retrieved invoking `hardwareSPIs(for:)` (or `getHardwareSPIsForBoard` for Swift 2.x) with one of the predefined boards.
 
 On RaspberryPi and other boards the hardware SPI SysFS interface is not enabled by default, check out the setup guide on [wiki](https://github.com/uraimo/SwiftyGPIO/wiki/Enabling-SPI-on-RaspberryPi-and-others).
 
-Let's see some examples using a Raspberry2 that has one bidirectional SPI, managed by SwiftyGPIO as two mono-directional SPIObjects:
+Let's see some examples using a RaspberryPi 2 that has one bidirectional SPI, managed by SwiftyGPIO as two mono-directional SPIObjects:
  
 ```swift
 let spis = SwiftyGPIO.hardwareSPIs(for:.RaspberryPiPlus2Zero)
@@ -206,7 +209,7 @@ var spi = spis?[0]
 
 The first item returned is the output channel and this can be verified invoking the method `isOut` on the `SPIObject`.
 
-Alternatively, we can create a software SPI using two GPIOs, one that wil serve as clock pin and the other will be used to send the actual data. This kind of bit-banging SPI is slower than the hardware one, so, the recommended approach is to use hardware SPIs when available.
+Alternatively, we can create a software SPI using two GPIOs, one that will serve as clock pin and the other will be used to send the actual data. This kind of bit-banging SPI is slower than the hardware one, so, the recommended approach is to use hardware SPIs when available.
 
 To create a software SPI, just retrieve two pins and create a `VirtualSPI` object:
 ```swift
@@ -226,7 +229,7 @@ In its simplest form it just needs an array of UInt8 as parameter:
 spi?.sendData([UInt(42)])
 ```
 
-But for software SPIs (for now, these values are ignored when using a hardware SPI) you can also specify the preferred byte ordering (MSB,LSB) and the delay between two succesive bits (clock width, default 0):
+But for software SPIs (for now, these values are ignored when using a hardware SPI) you can also specify the preferred byte ordering (MSB,LSB) and the delay between two successive bits (clock width, default 0):
 
 ```swift
 spi?.sendData([UInt(42)], order:.LSBFIRST, clockDelayUsec:1000)
@@ -285,8 +288,7 @@ pi.sendData([UInt8(truncatingBitPattern:0x9F)])
 
 Notice that we are converting the 0x9F `Int` using the constructor `UInt8(truncatingBitPattern:)`, that in this case it's not actually needed, but it's recommended for every user-provided or calculated integer because Swift does not support implicit truncation for conversion to smaller integer types, it will just crash if the `Int` you are trying to convert does not fit in a `UInt8`.
 
-Other examples for differen boards are available in the *Examples* directory.
-
+Other examples for different boards are available in the *Examples* directory.
 
 ## Built with SwiftyGPIO
 
@@ -305,16 +307,6 @@ A few projects and libraries built using SwiftyGPIO. Have you built something th
 * [Swifty Buzz](https://github.com/DigitalTools/SwiftyBuzz) - Swifty tunes with a buzzer connected to a GPIO.
  
 
-## Under the hood
+## Additional documentation
 
-SwiftyGPIO interact with GPIOs through memory mapped gpio registers (if available, when sending data) and the sysfs file-based interface described [here](https://www.kernel.org/doc/Documentation/gpio/sysfs.txt).
-
-The GPIO is exported the first time one of the GPIO methods is invoked, using the GPIO id provided during the creation of the object (either provided manually or from the defaults). Most of the times that id will be different from the physical id of the pin. SysFS GPIO ids can usually be found in the board documentation, we provide a few presets for tested boards (do you have the complete list of ids for an unsupported board and want to help? Cool! Consider opening a PR).
-
-At the moment GPIOs are never unexported, let me know if you could find that useful. Multiple exporting when creating an already configured GPIO is not a problem, successive attempts to export a GPIO are simply ignored.
-
-Regarding the actual sending of the data, when available SwiftyGPIO will use a mmapped registers interface (max pulse when used directly on a Rpi2 12Mhz) and will use a fallback sysfs interface when no mmapped implementation exists (max pulse when used directly on a Rpi2 4Khz).
-
-At the moment the memory mapped interface is only available on all Raspberries.
-
-
+Additional documentation can be found in the `docs` directory.
