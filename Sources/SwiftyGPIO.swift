@@ -28,6 +28,7 @@
 #else
     import Darwin.C
 #endif
+import Foundation
 
 internal let GPIOBASEPATH="/sys/class/gpio/"
 internal let SPIBASEPATH="/dev/spidev"
@@ -103,6 +104,7 @@ public class GPIO {
         if intThread == nil {
             intThread = newInterruptThread()
             listening = true
+            intThread?.start()
         }
     }
     
@@ -111,6 +113,7 @@ public class GPIO {
         if intThread == nil {
             intThread = newInterruptThread()
             listening = true
+            intThread?.start()
         }
     }
     
@@ -119,6 +122,7 @@ public class GPIO {
         if intThread == nil {
             intThread = newInterruptThread()
             listening = true
+            intThread?.start()
         }
     }
     
@@ -192,9 +196,11 @@ fileprivate extension GPIO {
         return res
     }
     
-    func newInterruptThread() -> Thread {
-        
-        let thread = try! Thread {
+    func newInterruptThread() -> Thread? {
+        //Ignored by Linux
+        guard #available(iOS 10.0, macOS 10.12, *) else {return nil}
+
+        let thread = Thread {
             
             let gpath = GPIOBASEPATH+"gpio"+String(self.id)+"/value"
             self.direction = .IN
