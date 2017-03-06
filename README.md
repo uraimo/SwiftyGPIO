@@ -68,7 +68,7 @@ The same Ubuntu binaries could work for BeagleBoneBlack, C.H.I.P. or any other A
 
 Once done, if your version of Swift does not support the Swift Package Manager, download manually all the needed files: 
 
-    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SunXi.swift
+    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Presets.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SunXi.swift
 
 And once downloaded, in the same directory create an additional file that will contain the code of your application named `main.swift`. 
 
