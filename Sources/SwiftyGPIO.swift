@@ -102,7 +102,7 @@ public class GPIO {
     public func onFalling(_ closure: @escaping (GPIO)->Void){
         intFuncFalling = closure
         if intThread == nil {
-            intThread = newInterruptThread()
+            intThread = makeInterruptThread()
             listening = true
             intThread?.start()
         }
@@ -111,7 +111,7 @@ public class GPIO {
     public func onRaising(_ closure: @escaping (GPIO)->Void){
         intFuncRaising = closure
         if intThread == nil {
-            intThread = newInterruptThread()
+            intThread = makeInterruptThread()
             listening = true
             intThread?.start()
         }
@@ -120,7 +120,7 @@ public class GPIO {
     public func onChange(_ closure: @escaping (GPIO)->Void){
         intFuncChange = closure
         if intThread == nil {
-            intThread = newInterruptThread()
+            intThread = makeInterruptThread()
             listening = true
             intThread?.start()
         }
@@ -196,7 +196,7 @@ fileprivate extension GPIO {
         return res
     }
     
-    func newInterruptThread() -> Thread? {
+    func makeInterruptThread() -> Thread? {
         //Ignored by Linux
         guard #available(iOS 10.0, macOS 10.12, *) else {return nil}
 
@@ -270,7 +270,22 @@ public final class RaspiGPIO : GPIO {
             return gpioGet()
         }
     }
-    
+   
+    public override var direction: GPIODirection {
+        set(dir){
+            if !inited {initIO(id)}
+            if dir == .IN {
+                gpioAsInput()
+            }else{
+                gpioAsOutput()
+            }
+        }
+        get {
+            if !inited {initIO(id)}
+            return gpioGetDirection()
+        }
+    }
+
     public override func isMemoryMapped() -> Bool{
         return true
     }
@@ -288,7 +303,7 @@ public final class RaspiGPIO : GPIO {
 		guard (mem_fd > 0) else {
             fatalError("Can't open /dev/mem , use sudo!")
 		}
-		
+
 		let gpio_map = mmap(
 			nil,                 //Any adddress in our space will do
             BLOCK_SIZE,          //Map length
@@ -300,7 +315,7 @@ public final class RaspiGPIO : GPIO {
         
         close(mem_fd)
         
-        let gpioBasePointer = gpio_map.assumingMemoryBound(to: Int.self)
+        gpioBasePointer = gpio_map.assumingMemoryBound(to: Int.self)
         if (gpioBasePointer.pointee == -1) {    //MAP_FAILED not available, but its value is (void*)-1
             print("mmap error: " + "\(gpioBasePointer)")
             abort()
@@ -322,6 +337,12 @@ public final class RaspiGPIO : GPIO {
         let ptr = gpioBasePointer.advanced(by: id/10)       // GPFSELn 0..5
         ptr.pointee &= ~(7<<((id%10)*3))
         ptr.pointee |=  (1<<((id%10)*3))                    // SEL=001 output
+    }
+
+    private func gpioGetDirection() -> GPIODirection {
+        let ptr = gpioBasePointer.advanced(by: id/10)       // GPFSELn 0..5
+        let d = (ptr.pointee & (7<<((id%10)*3)))
+        return (d == 0) ? .IN : .OUT
     }
     
     private func gpioGet() -> Int{
