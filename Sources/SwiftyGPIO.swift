@@ -412,10 +412,8 @@ public struct HardwareSPI : SPIOutput {
             }
             fclose(fp)
         }
-    }
-    
+    }   
 }
-
 
 public struct VirtualSPI : SPIOutput{
     let dataGPIO,clockGPIO:GPIO
@@ -555,7 +553,7 @@ public struct SwiftyGPIO {
         case .RaspberryPiRev2:
             fallthrough
         case .RaspberryPiPlusZero:
-            return [SPIRPI[0]!,SPIRPI[1]!]
+            fallthrough
         case .RaspberryPi2:
             return [SPIRPI[0]!,SPIRPI[1]!]
         case .BananaPi:
