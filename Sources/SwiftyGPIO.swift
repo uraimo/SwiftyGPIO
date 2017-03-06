@@ -277,16 +277,16 @@ public final class RaspiGPIO : GPIO {
     
 	private func initIO(_ id: Int){
 		var mem_fd=Int32(0)
+        
+        //Try to open one of the mem devices
 		for device in ["/dev/gpiomem","/dev/mem"] {
 			mem_fd=open(device, O_RDWR | O_SYNC)
 			if mem_fd>0 {
 				break
-			} else {
-				print("Can't open \(device)")
 			}
 		}
 		guard (mem_fd > 0) else {
-			abort()
+            fatalError("Can't open /dev/mem , use sudo!")
 		}
 		
 		let gpio_map = mmap(
