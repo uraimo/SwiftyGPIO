@@ -203,7 +203,7 @@ On RaspberryPi and other boards the hardware SPI SysFS interface is not enabled 
 Let's see some examples using a RaspberryPi 2 that has one bidirectional SPI, managed by SwiftyGPIO as two mono-directional SPIObjects:
  
 ```swift
-let spis = SwiftyGPIO.hardwareSPIs(for:.RaspberryPiPlus2Zero)
+let spis = SwiftyGPIO.hardwareSPIs(for:.RaspberryPi2)
 var spi = spis?[0]
 ```
 
