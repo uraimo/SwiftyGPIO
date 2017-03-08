@@ -385,7 +385,7 @@ public class HardwarePWM : PWMOutput {
     var pwmBasePointer: UnsafeMutablePointer<UInt>!
     var clockBasePointer: UnsafeMutablePointer<UInt>!
 
-    public init(gpioId: UInt, alt: UInt,  baseAddr: Int){
+    public init(gpioId: UInt, alt: UInt, channel: Int, baseAddr: Int){
         self.gpioId = gpioId
         self.alt = alt
         BCM2708_PERI_BASE = baseAddr
@@ -589,7 +589,7 @@ public struct VirtualSPI : SPIOutput{
         }
     }
     
-    public func sendDataGPIOObj(_ values: [UInt8], order: ByteOrder, clockDelayUsec: Int){
+    private func sendDataGPIOObj(_ values: [UInt8], order: ByteOrder, clockDelayUsec: Int){
         
         var bit:Int = 0
         for value in values {
@@ -611,7 +611,7 @@ public struct VirtualSPI : SPIOutput{
         }
     }
     
-    public func sendDataSysFS(_ values: [UInt8], order: ByteOrder, clockDelayUsec: Int){
+    private func sendDataSysFS(_ values: [UInt8], order: ByteOrder, clockDelayUsec: Int){
         
         let mosipath = GPIOBASEPATH+"gpio"+String(self.dataGPIO.id)+"/value"
         let sclkpath = GPIOBASEPATH+"gpio"+String(self.clockGPIO.id)+"/value"
