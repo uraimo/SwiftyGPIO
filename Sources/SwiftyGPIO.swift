@@ -375,6 +375,7 @@ public struct PWMPattern {
 public class HardwarePWM : PWMOutput {
     let gpioId: UInt
     let alt: UInt
+    let channel: Int
 
     let BCM2708_PERI_BASE: Int
     let GPIO_BASE: Int  // GPIO Register
@@ -388,6 +389,7 @@ public class HardwarePWM : PWMOutput {
     public init(gpioId: UInt, alt: UInt, channel: Int, baseAddr: Int){
         self.gpioId = gpioId
         self.alt = alt
+        self.channel = channel
         BCM2708_PERI_BASE = baseAddr
         GPIO_BASE = BCM2708_PERI_BASE + 0x200000  // GPIO Register
         PWM_BASE =  BCM2708_PERI_BASE + 0x20C000  // PWM Register
@@ -432,7 +434,7 @@ public class HardwarePWM : PWMOutput {
         let highFreqSampleReduction: UInt = (ns < 750) ? 10 : 1
 
         let freq: UInt = (1_000_000_000/UInt(ns)) * 100 / highFreqSampleReduction
-        let (idiv, scale) = calculateDIVI(base: .PLLD, desired: freq)
+        let (idiv, scale) = calculateDIVI(base: .PLLD, desired: freq)                               //Using the faster (with known freq) available clock to reduce jitter
         
         // Configure the clock and divisor that will be used to generate the signal
         clockBasePointer.advanced(by: 41).pointee = CLKM_PASSWD | (idiv << CLKM_DIV_DIVI)            //CM CTL DIV register: Set DIVI value 
@@ -441,9 +443,13 @@ public class HardwarePWM : PWMOutput {
         usleep(10);
         
         // Configure the parameters for the M/S algorithm, S the number of total slots in RNG1 and M the number of slots with high value in DAT1
-        pwmBasePointer.advanced(by: 4).pointee = 100 * scale / highFreqSampleReduction                                    //RNG1 register
-        pwmBasePointer.advanced(by: 5).pointee = UInt((Float(percent) / Float(highFreqSampleReduction)) * Float(scale))   //DAT1 register
-        pwmBasePointer.pointee = PWMCTL_MSEN1 | PWMCTL_PWEN1                                                              //PWM CTL register, channel enabled, M/S mode
+        let RNG = (channel == 0) ? 4 : 8
+        let DAT = (channel == 0) ? 5 : 9
+        pwmBasePointer.advanced(by: RNG).pointee = 100 * scale / highFreqSampleReduction                                    //RNG1 register
+        pwmBasePointer.advanced(by: DAT).pointee = UInt((Float(percent) / Float(highFreqSampleReduction)) * Float(scale))   //DAT1 register
+        let PWMCTL_MSEN = (channel == 0) ? PWMCTL_MSEN1 : PWMCTL_MSEN2
+        let PWMCTL_PWEN = (channel == 0) ? PWMCTL_PWEN1 : PWMCTL_PWEN2
+        pwmBasePointer.pointee = PWMCTL_MSEN | PWMCTL_PWEN                                                              //PWM CTL register, channel enabled, M/S mode
     }
 
     public func stopPWM(){

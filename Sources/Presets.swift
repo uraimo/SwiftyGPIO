@@ -140,14 +140,14 @@ extension SwiftyGPIO {
 
     // RaspberryPis ARMv6 (all 1, Zero, Zero W) PWMs, only accessible ones, divided in channels (can use only one for each channel)
     static let PWMRPI1: [Int:[GPIOName:PWMOutput]] = [
-        0:[.P12:HardwarePWM(gpioId: 12, alt: 0, baseAddr: 0x20000000),.P18:HardwarePWM(gpioId: 18, alt: 5, baseAddr: 0x20000000)],
-        1:[.P13:HardwarePWM(gpioId: 13, alt: 0, baseAddr: 0x20000000),.P19:HardwarePWM(gpioId: 19, alt: 5, baseAddr: 0x20000000)]
+        0:[.P12:HardwarePWM(gpioId: 12, alt: 0, channel:0, baseAddr: 0x20000000),.P18:HardwarePWM(gpioId: 18, alt: 5, channel:0, baseAddr: 0x20000000)],
+        1:[.P13:HardwarePWM(gpioId: 13, alt: 0, channel:1, baseAddr: 0x20000000),.P19:HardwarePWM(gpioId: 19, alt: 5, channel:1, baseAddr: 0x20000000)]
     ]
 
     // RaspberryPis ARMv7 (2-3) PWMs, only accessible ones, divided in channels (can use only one for each channel)
     static let PWMRPI23: [Int:[GPIOName:PWMOutput]] = [
-        0:[.P12:HardwarePWM(gpioId: 12, alt: 0, baseAddr: 0x3F000000),.P18:HardwarePWM(gpioId: 18, alt: 5, baseAddr: 0x3F000000)],
-        1:[.P13:HardwarePWM(gpioId: 13, alt: 0, baseAddr: 0x3F000000),.P19:HardwarePWM(gpioId: 19, alt: 5, baseAddr: 0x3F000000)]
+        0:[.P12:HardwarePWM(gpioId: 12, alt: 0, channel:0, baseAddr: 0x3F000000),.P18:HardwarePWM(gpioId: 18, alt: 5, channel:0, baseAddr: 0x3F000000)],
+        1:[.P13:HardwarePWM(gpioId: 13, alt: 0, channel:1, baseAddr: 0x3F000000),.P19:HardwarePWM(gpioId: 19, alt: 5, channel:1, baseAddr: 0x3F000000)]
     ]
     
     // CHIP
