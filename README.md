@@ -1,6 +1,6 @@
 ![SwiftyGPIO](https://github.com/uraimo/SwiftyGPIO/raw/master/logo.png)
 
-**A Swift library to interact with Linux GPIOs/SPI, turn on your leds and more!**
+**A Swift library to interact with Linux GPIOs/SPI/PWM, turn on your leds and more!**
 
 <p>
 <img src="https://img.shields.io/badge/os-linux-green.svg?style=flat" alt="Linux-only" />
@@ -24,8 +24,9 @@ The library is built to run **exclusively on Linux ARM Boards** (RaspberryPis, B
 - [Installation](#installation)
 - [Your First Project: Blinking Leds And Sensors](#your-first-project-blinking-leds-and-sensors)
 - [Usage](#usage)
-    - [GPIOs](#gpios)
-    - [SPIs](#spis)
+    - [GPIO](#gpio)
+    - [SPI](#spi)
+    - [PWM](#pwm)
 - [Examples](#examples)
 - [Built with SwiftyGPIO](#built-with-swiftygpio)
     - [Device Libraries](#libraries)
@@ -114,7 +115,7 @@ Additional tutorials are also available in [中文](http://swift.gg/2016/04/01/r
 
 Currently, SwiftyGPIO expose GPIOs and SPIs(if not available a bit-banging VirtualSPI can be created), let's see how to use them.
 
-### GPIOs
+### GPIO
 
 Let's suppose we are using a Raspberry 2 board and have a led connected between the GPIO pin P2 (possibly with a resistance of 1K Ohm or so) and GND and we want to turn it on.
 
@@ -194,7 +195,7 @@ Calling `clearListeners()` removes all the closures listening for changes and di
 While GPIOs are checked for updates, the `direction` of the pin cannot be changed (and configured as `.IN`), but once the listeners have been cleared, either inside the closure or somewhere else, you are free to modify it.
  
 
-### SPIs
+### SPI
 
 If your board has SPI connections and SwiftyGPIO has them among its presets, a list of the available SPIs can be retrieved invoking `hardwareSPIs(for:)` (or `getHardwareSPIsForBoard` for Swift 2.x) with one of the predefined boards.
 
@@ -235,10 +236,51 @@ But for software SPIs (for now, these values are ignored when using a hardware S
 spi?.sendData([UInt(42)], order:.LSBFIRST, clockDelayUsec:1000)
 ```
 
+### PWM
+
+PWM output signals can be used for example to drive servo motors, RGB leds and other devices, or more in general, to approximate analog output values when you only have digital GPIO ports.
+
+If your board has PWM ports and is supported (at the moment only RaspberryPi boards), retrieve the available `PWMOutput` objects with the `hardwarePWMs` factory method:
+
+```swift
+let pwms = SwiftyGPIO.hardwarePWMs(for:.RaspberryPi2)!
+let pwm = (pwms[0]?[.P18])!
+```
+
+This method returns all the ports that support the PWM function, grouped by the PWM channel that controls them. 
+
+You'll be able to use only one port per channel and considering that the Raspberries have two channels, you'll be able to use two PWM outputs at the same time, for example GPIO12 and GPIO13 or GPIO18 and GPIO19.
+
+Once you've retrieved the `PWMOutput` for the port you plan to use you need to initialize it to select the PWM function. On this kind of boards, each port can have more than one function (simple GPIO, SPI, PWM, etc...) and you can choose the function you want configuring dedicated registers.
+
+```swift
+pwm.initPWM()
+```
+
+To start the PWM signal call `startPWM` providing the period in nanoseconds (if you have the frequency convert it with 1/frequency) and the duty cycle as a percentage:
+
+```swift
+print("PWM from GPIO18 with 500ns period and 50% duty cycle")
+pwm.startPWM(period: 500, duty: 50)
+```
+
+Once you call this method, the PWM subsystem of the ARM SoC will start generating the signal, you don't need to do anything else and your program will continue to execute, you could insert a `sleep(seconds)` here if you just want to wait.
+
+And when you want to stop the PWM signal call the `stopPWM()` method:
+
+```swift
+pwm.stopPWM()
+```
+
+If you want to change the signal being generated, you don't need to stop the previous one, just call `startPWM` with different parameters.
+
+This feature uses the M/S algorithm and has been tested with signals with a period in a range from 300ns to 200ms, generating a signal outside of this range could lead to excessive jitter that could not be acceptable for some applications. If you need to generate a signal near to the extremes of that range and have an oscilloscope at hand, always verify if the resulting signal is good enough for what you need.
 
 ## Examples
 
-The following example, built to run on the $9 C.H.I.P., shows the current value of all the GPIO0 attributes, changes direction and value and then shows again a recap of the attributes:
+Examples for different boards are available in the *Examples* directory.
+
+The following example, built to run on the C.H.I.P. board, shows the current value of all the GPIO0 attributes, changes direction and value and then shows again a recap of the attributes:
 
 ```Swift
 let gpios = SwiftyGPIO.GPIOs(for:.CHIP)
@@ -287,8 +329,6 @@ pi.sendData([UInt8(truncatingBitPattern:0x9F)])
 ```
 
 Notice that we are converting the 0x9F `Int` using the constructor `UInt8(truncatingBitPattern:)`, that in this case it's not actually needed, but it's recommended for every user-provided or calculated integer because Swift does not support implicit truncation for conversion to smaller integer types, it will just crash if the `Int` you are trying to convert does not fit in a `UInt8`.
-
-Other examples for different boards are available in the *Examples* directory.
 
 ## Built with SwiftyGPIO
 
