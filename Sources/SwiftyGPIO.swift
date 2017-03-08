@@ -400,7 +400,7 @@ public class HardwarePWM : PWMOutput {
         var mem_fd: Int32 = 0
 
         //Try to open one of the mem devices
-        for device in [/*"/dev/gpiomem",*/"/dev/mem"] {
+        for device in ["/dev/gpiomem", "/dev/mem"] {
             mem_fd=open(device, O_RDWR | O_SYNC)
             if mem_fd>0 {
                 break
