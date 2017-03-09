@@ -1,6 +1,6 @@
 ![SwiftyGPIO](https://github.com/uraimo/SwiftyGPIO/raw/master/logo.png)
 
-**A Swift library to interact with Linux GPIOs/SPI/PWM, turn on your leds and more!**
+**A Swift library to interact with Linux GPIOs/SPI/PWM, blinking leds and much more!**
 
 <p>
 <img src="https://img.shields.io/badge/os-linux-green.svg?style=flat" alt="Linux-only" />
@@ -11,9 +11,9 @@
 
 ## Summary
 
-This library provides an easy way to interact with external sensors and devices using digital GPIOs and SPI interfaces with Swift on Linux.
+This library provides an easy way to interact with external sensors and devices using digital GPIOs, SPI interfaces and PWM signals with Swift on Linux.
 
-You'll be able to configure port attributes (direction,edge,active low), read/write the current GPIOs value and use the SPI interfaces provided by your board or a software big-banging SPI to drive external displays or more complex sensors.
+You'll be able to configure port attributes (direction,edge,active low), read/write the current GPIOs value, use the SPI interfaces (via hardware if your board provides them or using software big-banging SPI) and generate a PWM to drive external displays, servos, leds and more complex sensors.
 
 The library is built to run **exclusively on Linux ARM Boards** (RaspberryPis, BeagleBone Black, UDOO, Tegra, CHIP, etc...) with accessible GPIOs.
 
@@ -59,25 +59,13 @@ Not tested but they should work(basically everything that has an ARMv7/Ubuntu14/
 
 ## Installation
 
-To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with Swift 3.
+To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with Swift 3+.
 
 If you have a RaspberryPi (A,B,A+,B+,Zero,ZeroW,2,3) with Ubuntu or Raspbian, get Swift 3.0.2 from [here](https://www.uraimo.com/2016/12/30/Swift-3-0-2-for-raspberrypi-zero-1-2-3/) or follow the instruction from the post and the linked build scripts repository (or these: [1](http://mistercameron.com/2016/06/compile-swift-3-0-on-your-arm-computer/), [2](https://medium.com/@MissionKao/how-to-compile-swift-on-raspberry-pi-ae33e417a61e#.dweiw55iu), [3](http://saygoodnight.com/2016/05/08/building-swift-for-armv6.html), [4](http://morimori.tokyo/2016/02/09/compiling-swift-on-a-raspberry-pi-2-february-2016-update-and-a-script-to-clone-and-build-open-source-swift/)) to build it yourself.
 
-Recent precompiled ARMv7 binaries are also available from [Joe build server](http://dev.iachieved.it/iachievedit/swift-for-arm-systems/) for the [latest binaries](http://swift-arm.ddns.net/job/Swift-3.0-Pi3-ARM-Incremental/lastSuccessfulBuild/artifact/), built for Ubuntu 16.04 from the master repo.
+Recent precompiled ARMv7 binaries are also available from [Joe build server](http://dev.iachieved.it/iachievedit/swift-for-arm-systems/) and you can find them [here](http://swift-arm.ddns.net/job/Swift-3.0-Pi3-ARM-Incremental/lastSuccessfulBuild/artifact/), all built for Ubuntu 16.04 from the master repo.
 
 The same Ubuntu binaries could work for BeagleBoneBlack, C.H.I.P. or any other ARMv6/ARMv7 board too when used with the same release.
-
-Once done, if your version of Swift does not support the Swift Package Manager, download manually all the needed files: 
-
-    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Presets.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SunXi.swift
-
-And once downloaded, in the same directory create an additional file that will contain the code of your application named `main.swift`. 
-
-When your code is ready, compile it with:
-
-    swiftc *.swift
-    
-The compiler will create a **main** executable.
 
 If your version of Swift supports the SPM, you just need to add SwiftyGPIO as a dependency in your `Package.swift`:
 
@@ -95,6 +83,18 @@ And then build with `swift build`.
 
 The compiler will create an executable under `.build/`.
 
+If your version of Swift does not support the Swift Package Manager, download manually all the needed files: 
+
+    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Presets.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SunXi.swift
+
+And once downloaded, in the same directory create an additional file that will contain the code of your application named `main.swift`. 
+
+When your code is ready, compile it with:
+
+    swiftc *.swift
+    
+The compiler will create a **main** executable.
+
 **IMPORTANT:** As everything interacting with GPIOs via sysfs/mmapped registers, if your OS does not come with a predefined user group to access these functionalities, you'll need to run your application with root privileges using `sudo ./main`. If you are using a RaspberryPi with a recent Raspbian (post November 2016) or a recent Ubuntu (from 16.04 Xenial onward), this will be not required, just launch your application with `./main`. On misconfigured systems, features like the listeners may require root privileges anyway.
 
 Alternatively, a specific user group for gpio access can be configured manually as shown [here](https://arcanesciencelab.wordpress.com/2016/03/31/running-rpi3-applications-that-use-gpio-without-being-root/) or in this [answer on stackoverflow](https://stackoverflow.com/questions/30938991/access-gpio-sys-class-gpio-as-non-root/30940526#30940526).
@@ -105,15 +105,15 @@ After following those instruction, remember to add your user (e.g. pi) to the gp
 
 If you prefer starting with a real project instead of just reading documentation, more than a few tutorials are available online.
 
-If you are using Swift 3.0 and the latest version of SwiftyGPIO, [Cameron Perry has a great step by step guide](http://mistercameron.com/2016/06/accessing-raspberry-pi-gpio-pins-with-swift/) on how to setup a Raspberry Pi for Swift and using a land and a temperature sensor. 
+If you are using Swift 3.0 and the latest version of SwiftyGPIO, [Cameron Perry has a great step by step guide](http://mistercameron.com/2016/06/accessing-raspberry-pi-gpio-pins-with-swift/) on how to setup a Raspberry Pi for Swift and using a led and a temperature sensor. 
 
-And if you need instead a practical example of how to use SwiftyGPIO with Swift 2.x (get it from [the specific branch](https://github.com/uraimo/SwiftyGPIO/tree/swift-2.2)), Joe from iachievedit has written a [fantastic tutorial](http://dev.iachieved.it/iachievedit/raspberry-pi-2-gpio-with-swiftygpio/) that will explain everything you need to know.
+If you are still using Swift 2.x and need a practical example of how to use SwiftyGPIO (get it from [the specific 2.x branch](https://github.com/uraimo/SwiftyGPIO/tree/swift-2.2)), Joe from iachievedit has written a [fantastic tutorial](http://dev.iachieved.it/iachievedit/raspberry-pi-2-gpio-with-swiftygpio/) that will explain everything you need to know.
 
 Additional tutorials are also available in [中文](http://swift.gg/2016/04/01/raspberry-pi-2-gpio-with-swiftygpio/) and [日本語](https://ja.ngs.io/2016/06/01/swifty-gpio/).
 
 ## Usage
 
-Currently, SwiftyGPIO expose GPIOs and SPIs(if not available a bit-banging VirtualSPI can be created), let's see how to use them.
+Currently, SwiftyGPIO expose GPIOs, SPIs(if not available a bit-banging VirtualSPI can be created) and PWMs, let's see how to use them.
 
 ### GPIO
 
@@ -278,7 +278,7 @@ This feature uses the M/S algorithm and has been tested with signals with a peri
 
 ## Examples
 
-Examples for different boards are available in the *Examples* directory.
+Examples for different boards are available in the *Examples* directory, you can just start from there modifying one of those.
 
 The following example, built to run on the C.H.I.P. board, shows the current value of all the GPIO0 attributes, changes direction and value and then shows again a recap of the attributes:
 
@@ -338,6 +338,7 @@ A few projects and libraries built using SwiftyGPIO. Have you built something th
 * [Nokia5110(PCD8544) LCD Library](http://github.com/uraimo/5110lcd_pcd8544.swift) - Show text and graphics on a Nokia 3110/5110 LCD display.
 * [HD44780U Character LCD Library](https://github.com/uraimo/HD44780CharacterLCD.swift) - Show text on character LCDs controlled by the HD44780 or one of its clones.
 * [DHTxx Temperature Sensor Library](https://github.com/pj4533/dhtxx) - Read temperature and humidity values from sensors of the DHT family (DHT11, DHT22, AM2303).
+* [SG90 Servo Motor Library](https://github.com/uraimo/SG90Servo.swift) - Drives a SG90 servo motor via PWM but can be easily modified to use other kind of servos.
 
 ### Awesome Projects 
 * [Portable Wifi Monitor in Swift](http://saygoodnight.com/2016/04/05/portable-wifimon-raspberrypi.html) - A battery powered wifi signal monitor to map your wifi coverage.
