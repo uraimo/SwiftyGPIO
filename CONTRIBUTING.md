@@ -4,13 +4,13 @@ Thank you for considering to contribute to SwiftyGPIO!
 
 You can contribute to the development of SwiftyGPIO in various ways, reporting or resolving [issues](https://github.com/uraimo/SwiftyGPIO/issues) or implementing missing features and fixing bugs opening a [pull request](https://github.com/uraimo/SwiftyGPIO/pulls).
 
-If you are planning to introduce a new feature or you are thinking about major modifications to the code base, please open an [issue](https://github.com/uraimo/SwiftyGPIO/issues) first and descrive what you want to do. This gives time to discuss your idea and signals to the community that you are working on this specific feature.
+If you are planning to introduce a new feature or you are thinking about major modifications to the code base, please open an [issue](https://github.com/uraimo/SwiftyGPIO/issues) first and descrive what you want to do. This gives us time to discuss your idea and tells the community that you are working on this specific feature.
 
 If you are reporting a bug please specify which board you are using and which OS, some bugs could affect only specific boards or OS releases.
 
-Testing SwiftyGPIO on new boards or verify that it still works on less common boards is also highly appreciated (I can't test them all). If the board you are using is not on those supported but you've verified that SwiftyGPIO works (at least the GPIO feature), please consider opening a pull request to add the board to the readme.
+Testing SwiftyGPIO on new boards or verify that it still works on less common boards is also highly appreciated (I can't test them all). If the board you are using is not listed in the readme as supported but you've verified that SwiftyGPIO works (at least the GPIO feature), please consider opening a pull request to add the board to the readme.
 
-If you want to include your project or a device library in the readme, just open a pull request. Building a library for a device is another great way to contribute to the project!
+If you want to include your project or a device library in the readme, just open a pull request. Building a library for a new device or sensor is another great way to contribute to the project!
 
 ## Developer's Certificate of Origin 1.1
 
