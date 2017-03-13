@@ -1,27 +1,27 @@
-//
-// SwiftyGPIO
-//
-// Copyright (c) 2016 Umberto Raimondi and contributors.
-// Licensed under the MIT license, as follows:
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.)
-//
+/*
+   SwiftyGPIO
+
+   Copyright (c) 2016 Umberto Raimondi and contributors.
+   Licensed under the MIT license, as follows:
+
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+
+   The above copyright notice and this permission notice shall be included in all
+   copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.)
+*/
 
 #if os(Linux)
     import Glibc
@@ -315,12 +315,12 @@ public final class RaspiGPIO : GPIO {
             )!
         
         close(mem_fd)
-        
-        gpioBasePointer = gpio_map.assumingMemoryBound(to: UInt.self)
-        if (gpioBasePointer.pointee == UInt(bitPattern: -1)) {    //MAP_FAILED not available, but its value is (void*)-1
-            print("mmap error: " + "\(gpioBasePointer)")
+
+        if (unsafeBitCast(gpio_map, to: Int.self) == -1) {    //MAP_FAILED not available, but its value is (void*)-1
+            perror("mmap error")
             abort()
         }
+        gpioBasePointer = gpio_map.assumingMemoryBound(to: UInt.self)
         
         gpioGetPointer = gpioBasePointer.advanced(by: 13)   // GPLEV0
         gpioSetPointer = gpioBasePointer.advanced(by: 7)    // GPSET0
@@ -471,11 +471,12 @@ public class HardwarePWM : PWMOutput {
             off_t(offset)     //Offset to GPIO peripheral
             )!
 
-        let pointer = m.assumingMemoryBound(to: UInt.self)
-        if (pointer.pointee == UInt(bitPattern: -1)) {    //MAP_FAILED not available, but its value is (void*)-1
-            print("mmap error: " + "\(pointer.pointee)")
+        if (unsafeBitCast(m, to: Int.self) == -1) {    //MAP_FAILED not available, but its value is (void*)-1
+            perror("mmap error")
             abort()
         }
+        let pointer = m.assumingMemoryBound(to: UInt.self)
+
         return pointer
     }
 
