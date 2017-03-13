@@ -1,4 +1,4 @@
-## Under the hood
+## GPIO Internals
 
 SwiftyGPIO interact with GPIOs through memory mapped gpio registers (if available, when sending data) and the sysfs file-based interface described [here](https://www.kernel.org/doc/Documentation/gpio/sysfs.txt).
 
