@@ -1,27 +1,27 @@
-//
-// SwiftyGPIO
-//
-// Copyright (c) 2016 Umberto Raimondi and contributors.
-// Licensed under the MIT license, as follows:
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.)
-//
+/*
+   SwiftyGPIO
+
+   Copyright (c) 2016 Umberto Raimondi
+   Licensed under the MIT license, as follows:
+
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+
+   The above copyright notice and this permission notice shall be included in all
+   copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.)
+*/
 
 // MARK: - GPIOs Presets
 extension SwiftyGPIO {
@@ -132,24 +132,6 @@ extension SwiftyGPIO {
         .P27: RaspiGPIO(name:"GPIO27", id:27, baseAddr:0x3F000000)
     ]
 
-    // RaspberryPis SPIs
-    static let SPIRPI: [Int:SPIOutput] = [
-        0: HardwareSPI(spiId:"0.0", isOutput:true),
-        1: HardwareSPI(spiId:"0.1", isOutput:false)
-    ]
-
-    // RaspberryPis ARMv6 (all 1, Zero, Zero W) PWMs, only accessible ones, divided in channels (can use only one for each channel)
-    static let PWMRPI1: [Int:[GPIOName:PWMOutput]] = [
-        0: [.P12: HardwarePWM(gpioId: 12, alt: 0, channel:0, baseAddr: 0x20000000), .P18: HardwarePWM(gpioId: 18, alt: 5, channel:0, baseAddr: 0x20000000)],
-        1: [.P13: HardwarePWM(gpioId: 13, alt: 0, channel:1, baseAddr: 0x20000000), .P19: HardwarePWM(gpioId: 19, alt: 5, channel:1, baseAddr: 0x20000000)]
-    ]
-
-    // RaspberryPis ARMv7 (2-3) PWMs, only accessible ones, divided in channels (can use only one for each channel)
-    static let PWMRPI23: [Int:[GPIOName:PWMOutput]] = [
-        0: [.P12: HardwarePWM(gpioId: 12, alt: 0, channel:0, baseAddr: 0x3F000000), .P18: HardwarePWM(gpioId: 18, alt: 5, channel:0, baseAddr: 0x3F000000)],
-        1: [.P13: HardwarePWM(gpioId: 13, alt: 0, channel:1, baseAddr: 0x3F000000), .P19: HardwarePWM(gpioId: 19, alt: 5, channel:1, baseAddr: 0x3F000000)]
-    ]
-
     // CHIP
     // 408, 409, 410, 411, 412, 413, 414, 415, +undocumented LCD GPIOs
     static let GPIOCHIP: [GPIOName:GPIO] = [
@@ -242,12 +224,6 @@ extension SwiftyGPIO {
         .P25: GPIO(name:"GPIO25", id:25),
         .P26: GPIO(name:"GPIO26", id:26),
         .P27: GPIO(name:"GPIO27", id:27)
-    ]
-
-    // BananaPi
-    static let SPIBANANAPI: [Int:SPIOutput] = [
-        0: HardwareSPI(spiId:"0.0", isOutput:true),
-        1: HardwareSPI(spiId:"0.1", isOutput:false)
     ]
 
     // OrangePi

@@ -85,11 +85,11 @@ The compiler will create an executable under `.build/`.
 
 If your version of Swift does not support the Swift Package Manager, download manually all the needed files: 
 
-    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Presets.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SunXi.swift
+    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Presets.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SunXi.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SPI.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/PWM.swift
 
 And once downloaded, in the same directory create an additional file that will contain the code of your application named `main.swift`. 
 
-When your code is ready, compile it with:
+When your code is ready, compile it (the PWM and SPI files can be deleted if you don't need them) with:
 
     swiftc *.swift
     
