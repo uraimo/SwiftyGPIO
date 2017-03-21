@@ -187,7 +187,7 @@ public class HardwarePWM: PWMOutput {
     internal func memmap(from mem_fd: Int32, at offset: Int) -> UnsafeMutablePointer<UInt> {
         let m = mmap(
             nil,                 //Any adddress in our space will do
-            BLOCK_SIZE,          //Map length
+            PAGE_SIZE,          //Map length
             PROT_READ|PROT_WRITE,// Enable reading & writting to mapped memory
             MAP_SHARED,          //Shared with other processes
             mem_fd,              //File to map

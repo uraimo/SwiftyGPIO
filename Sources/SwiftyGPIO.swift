@@ -304,7 +304,7 @@ public final class RaspiGPIO: GPIO {
 
 		let gpio_map = mmap(
 			nil,                 //Any adddress in our space will do
-            BLOCK_SIZE,          //Map length
+            PAGE_SIZE,          //Map length
             PROT_READ|PROT_WRITE,// Enable reading & writting to mapped memory
             MAP_SHARED,          //Shared with other processes
             mem_fd,              //File to map
@@ -464,7 +464,6 @@ public enum ByteOrder {
 
 // MARK: - Constants
 
-let BLOCK_SIZE = 4*1024
 let PAGE_SIZE = (1 << 12)
 
 // MARK: - Darwin / Xcode Support
