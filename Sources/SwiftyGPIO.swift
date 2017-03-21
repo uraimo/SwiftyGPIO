@@ -465,6 +465,7 @@ public enum ByteOrder {
 // MARK: - Constants
 
 let BLOCK_SIZE = 4*1024
+let PAGE_SIZE = (1 << 12)
 
 // MARK: - Darwin / Xcode Support
 #if os(OSX)

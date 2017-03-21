@@ -68,12 +68,6 @@ public protocol PWMOutput {
     func initPWM()
     func startPWM(period ns: Int, duty percent: Int)
     func stopPWM()
-    func sendData(with zero: PWMPattern, and one: PWMPattern, values: [UInt8])
-}
-
-public struct PWMPattern {
-    let period: Int  //ns
-    let duty: Int    //percentage
 }
 
 public class HardwarePWM: PWMOutput {
@@ -85,12 +79,25 @@ public class HardwarePWM: PWMOutput {
     let GPIO_BASE: Int  // GPIO Register
     let PWM_BASE: Int   // PWM Register
     let CLOCK_BASE: Int // Clock Manager Register
+    let BCM2708_PHY_BASE: Int = 0x7e000000
+    let PWM_PHY_BASE: Int
+    let PWMDMA = 5
 
     var gpioBasePointer: UnsafeMutablePointer<UInt>!
     var pwmBasePointer: UnsafeMutablePointer<UInt>!
     var clockBasePointer: UnsafeMutablePointer<UInt>!
+    var dmaBasePointer: UnsafeMutablePointer<UInt>!
+    var dma_cb: UnsafeMutablePointer<DMACallback>! = nil
+    var pwm_raw: UnsafeMutablePointer<UInt>! = nil
+    var mailbox: MailBox! = nil
 
-    public init(gpioId: UInt, alt: UInt, channel: Int, baseAddr: Int) {
+    var zeroPattern: Int = 0
+    var onePattern: Int = 0
+    var symbolBits: Int = 0
+    var patternFrequency: Int = 0
+    var patternDelay: Int = 0
+
+    public init(gpioId: UInt, alt: UInt, channel: Int, baseAddr: Int, dmanum: Int = 5) { //PWMDMA
         self.gpioId = gpioId
         self.alt = alt
         self.channel = channel
@@ -98,6 +105,7 @@ public class HardwarePWM: PWMOutput {
         GPIO_BASE = BCM2708_PERI_BASE + 0x200000  // GPIO Register
         PWM_BASE =  BCM2708_PERI_BASE + 0x20C000  // PWM Register
         CLOCK_BASE = BCM2708_PERI_BASE + 0x101000 // Clock Manager Register
+        PWM_PHY_BASE = BCM2708_PHY_BASE + 0x20C000 // PWM controller physical address
     }
 
     /// Init PWM on this pin, set alternative function
@@ -118,6 +126,23 @@ public class HardwarePWM: PWMOutput {
         gpioBasePointer = memmap(from: mem_fd, at: GPIO_BASE)
         pwmBasePointer = memmap(from: mem_fd, at: PWM_BASE)
         clockBasePointer = memmap(from: mem_fd, at: CLOCK_BASE)
+
+        let DMAOffsets: [Int] = [0x00007000, 0x00007100, 0x00007200, 0x00007300,
+                         0x00007400, 0x00007500, 0x00007600, 0x00007700,
+                         0x00007800, 0x00007900, 0x00007a00, 0x00007b00,
+                         0x00007c00, 0x00007d00, 0x00007e00, 0x00e05000]
+
+        func dmanumToPhysicalAddress(_ dmanum: Int) -> Int {
+            guard dmanum < DMAOffsets.count else { return 0 }
+            return BCM2708_PERI_BASE + DMAOffsets[dmanum]
+        }
+
+        var dma_addr = dmanumToPhysicalAddress(PWMDMA) // Address of a specific DMA Channel registers set
+        let pageOffset = dma_addr % PAGE_SIZE
+        dma_addr -= pageOffset
+
+        let dma_map = UnsafeMutableRawPointer(memmap(from: mem_fd, at: dma_addr))
+        dmaBasePointer = (dma_map + pageOffset).assumingMemoryBound(to: UInt.self)
 
         close(mem_fd)
 
@@ -158,12 +183,8 @@ public class HardwarePWM: PWMOutput {
         pwmBasePointer.pointee = 0      //PWM CTL register, everything at 0, enable flag included
     }
 
-    public func sendData(with zero: PWMPattern, and one: PWMPattern, values: [UInt8]) {
-        //???
-    }
-
     /// Maps a block of memory and returns the pointer
-    private func memmap(from mem_fd: Int32, at offset: Int) -> UnsafeMutablePointer<UInt> {
+    internal func memmap(from mem_fd: Int32, at offset: Int) -> UnsafeMutablePointer<UInt> {
         let m = mmap(
             nil,                 //Any adddress in our space will do
             BLOCK_SIZE,          //Map length
@@ -183,7 +204,7 @@ public class HardwarePWM: PWMOutput {
     }
 
     /// Set the alternative function for this GPIO
-    private func setAlt() {
+    internal func setAlt() {
         let altid = (self.alt<=3) ? self.alt+4 : self.alt==4 ? 3 : 2
         let ptr = gpioBasePointer.advanced(by: Int(gpioId/10))       // GPFSELn 0..5
         ptr.pointee &= ~(7<<((gpioId%10)*3))
@@ -203,7 +224,7 @@ public class HardwarePWM: PWMOutput {
     ///
     /// - Returns: divi divisor value, and scale value as a multiple of ten
     ///
-    private func calculateDIVI(base: ClockSource, desired: UInt) -> (divi: UInt, scale: UInt) {
+    internal func calculateDIVI(base: ClockSource, desired: UInt) -> (divi: UInt, scale: UInt) {
         var divi: UInt = base.rawValue/desired
         var scale: UInt = 1
 
@@ -217,6 +238,262 @@ public class HardwarePWM: PWMOutput {
         }
         return (divi, scale)
     }
+
+    /// Calculate the unscaled DIVI value that will divide the selected base clock frequency to obtain the desired frequency.
+    /// The resulting divisor doesn't take advantage of a scaling factor, for higher DIVI values the resulting signal could
+    /// have high distortion.
+    ///
+    /// - Parameter base: base clock that will be used to generate the signal
+    ///
+    /// - Parameter desired: desired target frequency
+    ///
+    /// - Returns: divi divisor value
+    ///
+    internal func calculateUnscaledDIVI(base: ClockSource, desired: UInt) -> UInt{
+        var divi: UInt = base.rawValue/desired
+
+        if divi > 0x1000 {
+            // Divisor too high (greater then half the limit), would not be generated properly
+            divi = 0x1000
+        }
+
+        if divi < 1 {
+            divi = 1
+        }
+        return divi
+    }
+}
+
+/// Pattern base PWM
+extension HardwarePWM {
+
+    /// Start the DMA feeding the PWM FIFO.  This will stream the entire DMA buffer out of both PWM channels.
+    internal func dma_start(dmaCallback address: UInt) {
+        dmaBasePointer.pointee = DMACS_RESET
+        usleep(10)
+        dmaBasePointer.pointee = DMACS_INT | DMACS_END
+        dmaBasePointer.advanced(by: 1).pointee  = address    //CONBLK_AD
+        dmaBasePointer.advanced(by: 8).pointee = 7           //DEBUG: clear debug error flags
+        dmaBasePointer.pointee = DMACS_WAIT_OUTSTANDING_WRITES | (15 << DMACS_PANIC_PRIORITY) | (15 << DMACS_PRIORITY) | DMACS_ACTIVE
+    }
+
+    /// Wait for any executing DMA operation to complete before returning.
+    internal func dma_wait() {
+        while (dmaBasePointer.pointee & DMACS_ACTIVE > 0) && !(dmaBasePointer.pointee & DMACS_ERROR > 0) {
+            usleep(10)
+        }
+
+        if (dmaBasePointer.pointee & DMACS_ERROR)>0 {
+            fatalError("DMA Error: \(dmaBasePointer.advanced(by: 8).pointee)")
+        }
+    }
+
+    internal func waitOnSendData() {
+        dma_wait()
+    }
+
+    internal func clearPattern() {
+        dma_wait()
+        // Stop PWM and clock
+        pwmBasePointer.pointee = 0
+        usleep(10)
+        // stop clock and waiting for busy flag doesn't work, so kill clock
+        clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_KILL     //Set KILL flag
+        usleep(10)
+
+        mailbox.cleanup()
+    }
+
+    internal func initPWMPattern(bytes count: Int, at frequency: Int, with resetDelay: Int, dutyzero: Int, dutyone: Int) {
+
+        (zeroPattern,onePattern,symbolBits) = getRepresentation(zero: dutyzero, one: dutyone) 
+        guard symbolBits > 0 else {fatalError("Couldn't generate a valid pattern for the provided duty cycle values, try with more spaced values.")}
+        
+        patternFrequency = frequency
+        patternDelay = resetDelay
+
+        // Round to the next 32 bit size
+        let dataSize = (( ((count * 3 * 8 * symbolBits) + ((patternDelay * (patternFrequency * symbolBits)) / 1000000)) / 8) & ~0x3) + 4
+        let size = dataSize + MemoryLayout<DMACallback>.stride
+
+        // Round up to page size multiple
+        let mboxsize = (size + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1)
+        mailbox = MailBox(handle: -1, size: mboxsize, isRaspi2: BCM2708_PERI_BASE != 0x20000000)
+
+        guard let mailbox = mailbox else {fatalError("Could allocate mailbox.")}
+
+        dma_cb = mailbox.baseVirtualAddress.assumingMemoryBound(to: DMACallback.self)
+        pwm_raw = (mailbox.baseVirtualAddress + MemoryLayout<DMACallback>.stride).assumingMemoryBound(to: UInt.self)
+
+        // Fill PWM buffer with zeros
+        let rows = (mboxsize - MemoryLayout<DMACallback>.stride) / MemoryLayout<UInt>.stride
+        for pos in 0..<rows {
+            pwm_raw.advanced(by: pos).pointee = 0
+        }
+    }
+
+    internal func sendDataWithPattern(values: [UInt8]) {
+
+        guard symbolBits > 0 else {fatalError("Couldn't generate a valid pattern for the provided duty cycle values, try with more spaced values.")}
+
+        // Stop PWM and clock
+        pwmBasePointer.pointee = 0
+        usleep(10)
+        // stop clock and waiting for busy flag doesn't work, so kill clock
+        clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_KILL     //Set KILL flag
+        usleep(10)
+
+        //Configure clock
+        let idiv = calculateUnscaledDIVI(base: .Oscillator, desired: UInt(symbolBits * patternFrequency))
+        clockBasePointer.advanced(by: 41).pointee = CLKM_PASSWD | (idiv << CLKM_DIV_DIVI)            //Set DIVI value  
+        clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_ENAB | CLKM_CTL_SRC_OSC  //Enable clock, MASH 0, source PLLD /////////////0x16
+        usleep(10)
+
+        // Setup the PWM, use delays as the block is rumored to lock up without them.  Make
+        // sure to use a high enough priority to avoid any FIFO underruns, especially if
+        // the CPU is busy doing lots of memory accesses, or another DMA controller is
+        // busy.  The FIFO will clock out data at a much slower rate (2.6Mhz max), so
+        // the odds of a DMA priority boost are extremely low.
+
+        pwmBasePointer.advanced(by: 4).pointee = 32  // RNG1: 32-bits per word to serialize
+        usleep(10)
+        pwmBasePointer.pointee = PWMCTL_CLRF1 //Correct?
+        usleep(10)
+        pwmBasePointer.advanced(by: 2).pointee = PWMDMAC_ENAB | 7 << PWMDMAC_PANIC | 3 << PWMDMAC_DREQ
+        usleep(10)
+        pwmBasePointer.pointee = PWMCTL_USEF1 | PWMCTL_MODE1 //| PWMCTL_USEF2 | PWMCTL_MODE2 //??????
+        usleep(10)
+        pwmBasePointer.pointee |= PWMCTL_PWEN1 //| PWMCTL_PWEN2
+
+        // Initialize the DMA control block 
+        let transferSize = mailbox.size - MemoryLayout<DMACallback>.stride
+        dma_cb.pointee = DMACallback(
+                ti: DMATI_NO_WIDE_BURSTS |   // 32-bit transfers
+                     DMATI_WAIT_RESP |       // wait for write complete
+                     DMATI_DEST_DREQ |       // user peripheral flow control
+                     UInt32(0x5  << DMATI_PERMAP) |       // PWM peripheral
+                     DMATI_SRC_INC,          // Increment src addr
+                source_ad: UInt32(mailbox.virtualTobaseBusAddress(UnsafeMutableRawPointer(pwm_raw))),
+                dest_ad: UInt32(PWM_PHY_BASE + 0x18),         // PWM FIF1 Register, shared between channels
+                txfr_len: UInt32(transferSize),
+                stride: 0,
+                nextconbk: 0)
+
+        dmaBasePointer.pointee = 0              //0 CS
+        dmaBasePointer.advanced(by: 5).pointee = 0  //0 TXFR_LEN
+
+        let stream = dataToBitStream(data: values, zero: zeroPattern, one: onePattern, width: symbolBits)
+
+        func printBinary(_ value: UInt32) {
+            var res = ""
+            for i in (0...31).reversed() {
+                res += ((value & (1 << UInt32(i))) > 0) ? "1" : "0"
+            }
+            print(res)
+        }
+
+        for idx in 0..<stream.count {
+            printBinary(stream[idx])
+            pwm_raw[idx] = UInt(stream[idx])
+        }
+
+        // Wait for any previous DMA operation to complete.
+        dma_wait()
+        dma_start(dmaCallback: mailbox.virtualTobaseBusAddress(mailbox.baseVirtualAddress))
+    }
+
+    /// Calculate an approximated bit pattern representation n-bits wide and filled with ones from the left with the given % value.
+    /// The width of the pattern is calculated as the smaller one for which the representation of zero and one differ.
+    /// Possible width starting from 3 bits to 16, try to adjust your percentage levels to have the smaller possible patterns.
+    ///
+    /// Pattern at 33% with width 3 bits: 100
+    /// Pattern at 60% with width 3 bits: 110
+    /// Pattern at 10% with width 8 bits: 10000000
+    /// Pattern at 12% with width 8 bits: 10000000
+    /// Pattern at 20% with width 8 bits: 11000000
+    /// 
+    /// - Parameter zero: percentage of fill for the zero value
+    /// - Parameter one: percentage of fill for the one value
+    /// 
+    /// - Returns: patterns for zero and one and first acceptable bit width
+    ///
+    private func getRepresentation(zero: Int, one: Int) -> (zero: Int, one: Int, width: Int) {
+        for size in 3...16 {
+            let (z,o) = getRepresentation(zero: zero, one: one, bits: size)
+            if (z ^ o) > 0 {
+                return (z,o,size)
+            }
+        }
+        return (0,0,0)
+    }
+
+    /// Calculate an approximated bit pattern representation n-bits wide and filled with ones from the left with the given % value
+    ///
+    /// Pattern at 33% with width 3 bits: 100
+    /// Pattern at 60% with width 3 bits: 110
+    /// Pattern at 10% with width 8 bits: 10000000
+    /// Pattern at 12% with width 8 bits: 10000000
+    /// Pattern at 20% with width 8 bits: 11000000
+    /// 
+    /// - Parameter zero: percentage of fill for the zero value
+    /// - Parameter one: percentage of fill for the one value
+    /// - Parameter bits: number of bits that will be used to generate the bit pattern
+    /// 
+    /// - Returns: patterns for zero and one
+    ///
+    private func getRepresentation(zero: Int, one: Int, bits: Int) -> (zero: Int, one: Int) {
+        // Mask to extract only the n-bits value we want from the final result
+        let mask = (1 << bits) - 1
+
+        // How many bits must be at 1 for the zero and one bit pattern
+        var z = Int((Float(zero) * Float(bits)/100).rounded(.toNearestOrAwayFromZero))
+        z = (z == 0) ? 1 : z 
+        var o = Int((Float(one) * Float(bits)/100).rounded(.toNearestOrAwayFromZero))
+        o = (o == 0) ? 1 : o 
+
+        // To get the pattern we want:
+        // 1 << (bit_width - number_of_ones) , this gets us a 1 at the position number_of_ones+1, everything else unset
+        // the_above - 1 , this gets us the specular mask that we'll negate and than mask
+        z = ~((1 << (bits - z)) - 1) & mask
+        o = ~((1 << (bits - o)) - 1) & mask
+
+        return (z,o)
+    }
+
+    /// Convert each bit component of the data to a n bit representation
+    private func dataToBitStream(data: [UInt8], zero: Int, one: Int, width: Int ) -> [UInt32] {
+        var output = [UInt32]()
+        var buffer: UInt32 = 0
+        var bufferPos: UInt32 = 31
+
+        for byte in data {
+            // For each bit of the output, convert in signal bits
+            for i in (0...7).reversed() {
+                // Obtain the bit set that will be saved in appended to output, one bit at a time
+                let s: Int = ((byte & (1 << UInt8(i))) > 0) ? one : zero
+
+                // Add one bit at a time to the buffer, when it's full save it to the output and start from position 0
+                for b in (0..<width).reversed() {
+                    buffer &= ~(1 << bufferPos)
+                    buffer |= (UInt32((s & (1 << b))>0 ? 1 : 0) << bufferPos)
+                    if bufferPos == 0 {
+                        output.append(buffer)
+                        bufferPos = 31
+                        buffer = 0
+                    } else {
+                        bufferPos -= 1
+                    }
+                }
+            }
+        }
+        // Append the last partial element
+        if bufferPos < 31 {
+            output.append(buffer)
+        }
+
+        return output
+    }
+
 }
 
 // MARK: - PWM Contants
@@ -268,3 +545,44 @@ enum ClockSource: UInt {
     case PLLD = 500000000
     case HDMI = 216000000
 }
+
+// DMA Register
+let DMACS_RESET: UInt = (1 << 31)
+let DMACS_ABORT: UInt = (1 << 30)
+let DMACS_WAIT_OUTSTANDING_WRITES: UInt = (1 << 28)
+let DMACS_PANIC_PRIORITY: UInt = 20 // <<              
+let DMACS_PRIORITY: UInt = 16 // <<
+let DMACS_ERROR: UInt = (1 << 8)
+let DMACS_INT: UInt = (1 << 2)
+let DMACS_END: UInt = (1 << 1)
+let DMACS_ACTIVE: UInt = (1 << 0)
+
+/*
+ * DMA Control Block in Main Memory
+ *
+ * Note: Must start at a 256 byte aligned address.
+ *       Use corresponding register field definitions.
+ */
+struct DMACallback {
+    let ti: UInt32
+    let source_ad: UInt32
+    let dest_ad: UInt32
+    let txfr_len: UInt32
+    let stride: UInt32
+    let nextconbk: UInt32
+    let reserv1: UInt32 = 0
+    let reserv2: UInt32 = 0
+}
+
+// PWM DMAC Register
+let PWMDMAC_ENAB: UInt =  (1 << 31)
+let PWMDMAC_PANIC: UInt = 8
+let PWMDMAC_DREQ: UInt = 0
+
+// DMA Register
+let DMATI_NO_WIDE_BURSTS: UInt32 =  (1 << 26)
+let DMATI_PERMAP: UInt32 =  16
+let DMATI_SRC_INC: UInt32 = (1 << 8)
+let DMATI_DEST_DREQ: UInt32 = (1 << 6)
+let DMATI_WAIT_RESP: UInt32 = (1 << 3)
+
