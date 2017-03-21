@@ -68,6 +68,11 @@ public protocol PWMOutput {
     func initPWM()
     func startPWM(period ns: Int, duty percent: Int)
     func stopPWM()
+
+    func initPWMPattern(bytes count: Int, at frequency: Int, with resetDelay: Int, dutyzero: Int, dutyone: Int)
+    func sendDataWithPattern(values: [UInt8]) 
+    func waitOnSendData()
+    func cleanupPattern() 
 }
 
 public class HardwarePWM: PWMOutput {
@@ -87,8 +92,8 @@ public class HardwarePWM: PWMOutput {
     var pwmBasePointer: UnsafeMutablePointer<UInt>!
     var clockBasePointer: UnsafeMutablePointer<UInt>!
     var dmaBasePointer: UnsafeMutablePointer<UInt>!
-    var dma_cb: UnsafeMutablePointer<DMACallback>! = nil
-    var pwm_raw: UnsafeMutablePointer<UInt>! = nil
+    var dmaCallbackPointer: UnsafeMutablePointer<DMACallback>! = nil
+    var pwmRawPointer: UnsafeMutablePointer<UInt>! = nil
     var mailbox: MailBox! = nil
 
     var zeroPattern: Int = 0
@@ -96,6 +101,7 @@ public class HardwarePWM: PWMOutput {
     var symbolBits: Int = 0
     var patternFrequency: Int = 0
     var patternDelay: Int = 0
+    var dataLength: Int = 0
 
     public init(gpioId: UInt, alt: UInt, channel: Int, baseAddr: Int, dmanum: Int = 5) { //PWMDMA
         self.gpioId = gpioId
@@ -288,11 +294,11 @@ extension HardwarePWM {
         }
     }
 
-    internal func waitOnSendData() {
+    public func waitOnSendData() {
         dma_wait()
     }
 
-    internal func clearPattern() {
+    public func cleanupPattern() {
         dma_wait()
         // Stop PWM and clock
         pwmBasePointer.pointee = 0
@@ -304,16 +310,25 @@ extension HardwarePWM {
         mailbox.cleanup()
     }
 
-    internal func initPWMPattern(bytes count: Int, at frequency: Int, with resetDelay: Int, dutyzero: Int, dutyone: Int) {
+    /// Initiliazes the PWM signal generator
+    ///
+    /// - Parameter bytes: length of the data in bytes, fixed
+    /// - Parameter at: signal frequency
+    /// - Parameter with: length in us of the section with low signal that will be put at the end of the generated bit stream
+    /// - Parameter dutyzero: duty cycle of the pattern for zero
+    /// - Parameter dutyone: duty cycle of the pattern for one
+    ///
+    public func initPWMPattern(bytes count: Int, at frequency: Int, with resetDelay: Int, dutyzero: Int, dutyone: Int) {
 
         (zeroPattern,onePattern,symbolBits) = getRepresentation(zero: dutyzero, one: dutyone) 
         guard symbolBits > 0 else {fatalError("Couldn't generate a valid pattern for the provided duty cycle values, try with more spaced values.")}
         
         patternFrequency = frequency
         patternDelay = resetDelay
+        dataLength = count
 
         // Round to the next 32 bit size
-        let dataSize = (( ((count * 3 * 8 * symbolBits) + ((patternDelay * (patternFrequency * symbolBits)) / 1000000)) / 8) & ~0x3) + 4
+        let dataSize = (( ((dataLength * 8 * symbolBits) + ((patternDelay * (patternFrequency * symbolBits)) / 1000000)) / 8) & ~0x3) + 4
         let size = dataSize + MemoryLayout<DMACallback>.stride
 
         // Round up to page size multiple
@@ -322,19 +337,14 @@ extension HardwarePWM {
 
         guard let mailbox = mailbox else {fatalError("Could allocate mailbox.")}
 
-        dma_cb = mailbox.baseVirtualAddress.assumingMemoryBound(to: DMACallback.self)
-        pwm_raw = (mailbox.baseVirtualAddress + MemoryLayout<DMACallback>.stride).assumingMemoryBound(to: UInt.self)
+        dmaCallbackPointer = mailbox.baseVirtualAddress.assumingMemoryBound(to: DMACallback.self)
+        pwmRawPointer = (mailbox.baseVirtualAddress + MemoryLayout<DMACallback>.stride).assumingMemoryBound(to: UInt.self)
 
         // Fill PWM buffer with zeros
-        let rows = (mboxsize - MemoryLayout<DMACallback>.stride) / MemoryLayout<UInt>.stride
+        let rows = dataSize / MemoryLayout<UInt>.stride
         for pos in 0..<rows {
-            pwm_raw.advanced(by: pos).pointee = 0
+            pwmRawPointer.advanced(by: pos).pointee = 0
         }
-    }
-
-    internal func sendDataWithPattern(values: [UInt8]) {
-
-        guard symbolBits > 0 else {fatalError("Couldn't generate a valid pattern for the provided duty cycle values, try with more spaced values.")}
 
         // Stop PWM and clock
         pwmBasePointer.pointee = 0
@@ -343,45 +353,47 @@ extension HardwarePWM {
         clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_KILL     //Set KILL flag
         usleep(10)
 
-        //Configure clock
+        // Configure clock
         let idiv = calculateUnscaledDIVI(base: .Oscillator, desired: UInt(symbolBits * patternFrequency))
         clockBasePointer.advanced(by: 41).pointee = CLKM_PASSWD | (idiv << CLKM_DIV_DIVI)            //Set DIVI value  
-        clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_ENAB | CLKM_CTL_SRC_OSC  //Enable clock, MASH 0, source PLLD /////////////0x16
+        clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_ENAB | CLKM_CTL_SRC_OSC   //Enable clock, MASH 0, source OSC
         usleep(10)
 
-        // Setup the PWM, use delays as the block is rumored to lock up without them.  Make
-        // sure to use a high enough priority to avoid any FIFO underruns, especially if
-        // the CPU is busy doing lots of memory accesses, or another DMA controller is
-        // busy.  The FIFO will clock out data at a much slower rate (2.6Mhz max), so
-        // the odds of a DMA priority boost are extremely low.
-
-        pwmBasePointer.advanced(by: 4).pointee = 32  // RNG1: 32-bits per word to serialize
+        // Configure PWM 
+        pwmBasePointer.advanced(by: 4).pointee = 32         // RNG1: 32-bits per word to serialize
         usleep(10)
-        pwmBasePointer.pointee = PWMCTL_CLRF1 //Correct?
+        pwmBasePointer.pointee = PWMCTL_CLRF1
         usleep(10)
         pwmBasePointer.advanced(by: 2).pointee = PWMDMAC_ENAB | 7 << PWMDMAC_PANIC | 3 << PWMDMAC_DREQ
         usleep(10)
-        pwmBasePointer.pointee = PWMCTL_USEF1 | PWMCTL_MODE1 //| PWMCTL_USEF2 | PWMCTL_MODE2 //??????
+        pwmBasePointer.pointee = PWMCTL_USEF1 | PWMCTL_MODE1 //| PWMCTL_USEF2 | PWMCTL_MODE2 // For 2nd chan 
         usleep(10)
-        pwmBasePointer.pointee |= PWMCTL_PWEN1 //| PWMCTL_PWEN2
+        pwmBasePointer.pointee |= PWMCTL_PWEN1               //| PWMCTL_PWEN2 // For 2nd chan 
 
-        // Initialize the DMA control block 
-        let transferSize = mailbox.size - MemoryLayout<DMACallback>.stride
-        dma_cb.pointee = DMACallback(
-                ti: DMATI_NO_WIDE_BURSTS |   // 32-bit transfers
-                     DMATI_WAIT_RESP |       // wait for write complete
-                     DMATI_DEST_DREQ |       // user peripheral flow control
-                     UInt32(0x5  << DMATI_PERMAP) |       // PWM peripheral
-                     DMATI_SRC_INC,          // Increment src addr
-                source_ad: UInt32(mailbox.virtualTobaseBusAddress(UnsafeMutableRawPointer(pwm_raw))),
-                dest_ad: UInt32(PWM_PHY_BASE + 0x18),         // PWM FIF1 Register, shared between channels
-                txfr_len: UInt32(transferSize),
+        // Initialize the DMA control block
+        dmaCallbackPointer.pointee = DMACallback(
+                ti: DMATI_NO_WIDE_BURSTS |              // 32-bit transfers
+                     DMATI_WAIT_RESP |                  // wait for write complete
+                     DMATI_DEST_DREQ |                  // user peripheral flow control
+                     UInt32(0x5  << DMATI_PERMAP) |     // PWM peripheral
+                     DMATI_SRC_INC,                     // Increment src addr
+                source_ad: UInt32(mailbox.virtualTobaseBusAddress(UnsafeMutableRawPointer(pwmRawPointer))),
+                dest_ad: UInt32(PWM_PHY_BASE + 0x18),   // PWM FIF1 Register, shared between channels
+                txfr_len: UInt32(dataSize),
                 stride: 0,
                 nextconbk: 0)
 
-        dmaBasePointer.pointee = 0              //0 CS
+        dmaBasePointer.pointee = 0                  //0 CS
         dmaBasePointer.advanced(by: 5).pointee = 0  //0 TXFR_LEN
 
+    }
+
+    public func sendDataWithPattern(values: [UInt8]) {
+
+        guard symbolBits > 0 else {fatalError("Couldn't generate a valid pattern for the provided duty cycle values, try with more spaced values.")}
+
+        dma_wait()
+        
         let stream = dataToBitStream(data: values, zero: zeroPattern, one: onePattern, width: symbolBits)
 
         func printBinary(_ value: UInt32) {
@@ -394,7 +406,7 @@ extension HardwarePWM {
 
         for idx in 0..<stream.count {
             printBinary(stream[idx])
-            pwm_raw[idx] = UInt(stream[idx])
+            pwmRawPointer[idx] = UInt(stream[idx])
         }
 
         // Wait for any previous DMA operation to complete.
@@ -467,6 +479,8 @@ extension HardwarePWM {
         var bufferPos: UInt32 = 31
 
         for byte in data {
+            //TODO: Cut at dataLength
+
             // For each bit of the output, convert in signal bits
             for i in (0...7).reversed() {
                 // Obtain the bit set that will be saved in appended to output, one bit at a time
