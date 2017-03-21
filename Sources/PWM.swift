@@ -354,9 +354,9 @@ extension HardwarePWM {
         usleep(10)
 
         // Configure clock
-        let idiv = calculateUnscaledDIVI(base: .Oscillator, desired: UInt(symbolBits * patternFrequency))
+        let idiv = calculateUnscaledDIVI(base: .PLLD, desired: UInt(symbolBits * patternFrequency))
         clockBasePointer.advanced(by: 41).pointee = CLKM_PASSWD | (idiv << CLKM_DIV_DIVI)            //Set DIVI value  
-        clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_ENAB | CLKM_CTL_SRC_OSC   //Enable clock, MASH 0, source OSC
+        clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_ENAB | CLKM_CTL_SRC_PLLD   //Enable clock, MASH 0, source PLLD
         usleep(10)
 
         // Configure PWM 
