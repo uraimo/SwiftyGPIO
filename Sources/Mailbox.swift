@@ -69,7 +69,7 @@ public struct MailBox {
 
     private var mailboxFd: Int32 = 0
     private var memRef: UInt32 = 0
-    private var size: Int = 0
+    public var size: Int = 0
     private(set) var baseBusAddress: UInt32 = 0
     private(set) var baseVirtualAddress: UnsafeMutableRawPointer! = nil
 
