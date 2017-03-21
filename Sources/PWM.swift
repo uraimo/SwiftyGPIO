@@ -396,16 +396,7 @@ extension HardwarePWM {
         
         let stream = dataToBitStream(data: values, zero: zeroPattern, one: onePattern, width: symbolBits)
 
-        func printBinary(_ value: UInt32) {
-            var res = ""
-            for i in (0...31).reversed() {
-                res += ((value & (1 << UInt32(i))) > 0) ? "1" : "0"
-            }
-            print(res)
-        }
-
         for idx in 0..<stream.count {
-            printBinary(stream[idx])
             pwmRawPointer[idx] = UInt(stream[idx])
         }
 
@@ -506,6 +497,14 @@ extension HardwarePWM {
         }
 
         return output
+    }
+
+    private func printBinary(_ value: UInt32) {
+        var res = ""
+        for i in (0...31).reversed() {
+            res += ((value & (1 << UInt32(i))) > 0) ? "1" : "0"
+        }
+        print(res)
     }
 
 }
