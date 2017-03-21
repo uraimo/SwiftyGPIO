@@ -294,10 +294,12 @@ extension HardwarePWM {
         }
     }
 
+    /// Wait for the last signal to be completely generated
     public func waitOnSendData() {
         dma_wait()
     }
 
+    /// Stop the PWM and clean up any related structure
     public func cleanupPattern() {
         dma_wait()
         // Stop PWM and clock
@@ -388,20 +390,23 @@ extension HardwarePWM {
 
     }
 
+    /// Send data using the pattern information already provided
     public func sendDataWithPattern(values: [UInt8]) {
 
         guard symbolBits > 0 else {fatalError("Couldn't generate a valid pattern for the provided duty cycle values, try with more spaced values.")}
 
+        // Wait for the previous signal to end
         dma_wait()
         
+        // Convert from raw uint8 data to a sequence of patterns
         let stream = dataToBitStream(data: values, zero: zeroPattern, one: onePattern, width: symbolBits)
 
-        for idx in 0..<stream.count {
-            pwmRawPointer[idx] = UInt(stream[idx])
+        // Copy the pattern stream to the raw pwm buffer location
+        stream.withUnsafeBytes { (ptr: UnsafeRawBufferPointer) in
+            UnsafeMutableRawPointer(pwmRawPointer).copyBytes(from: ptr.baseAddress!, count: stream.count * MemoryLayout<UInt32>.stride)
         }
 
-        // Wait for any previous DMA operation to complete.
-        dma_wait()
+        // Start the DMA transfer toward the PWM FIFO
         dma_start(dmaCallback: mailbox.virtualTobaseBusAddress(mailbox.baseVirtualAddress))
     }
 
