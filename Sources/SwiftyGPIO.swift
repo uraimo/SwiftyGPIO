@@ -365,6 +365,8 @@ public struct SwiftyGPIO {
         case .RaspberryPiPlusZero:
             return GPIORPIPlusZERO
         case .RaspberryPi2:
+            fallthrough
+        case .RaspberryPi3:
             return GPIORPI2
         case .CHIP:
             return GPIOCHIP
@@ -387,6 +389,7 @@ public enum SupportedBoard {
     case RaspberryPiRev2   // Pi A,B Revision 2
     case RaspberryPiPlusZero // Pi A+,B+,Zero with 40 pin header
     case RaspberryPi2 // Pi 2 with 40 pin header
+    case RaspberryPi3 // Pi 3 with 40 pin header
     case CHIP
     case BeagleBoneBlack
     case BananaPi

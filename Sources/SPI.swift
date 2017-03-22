@@ -39,6 +39,8 @@ extension SwiftyGPIO {
         case .RaspberryPiPlusZero:
             fallthrough
         case .RaspberryPi2:
+            fallthrough
+        case .RaspberryPi3:
             return [SPIRPI[0]!, SPIRPI[1]!]
         case .BananaPi:
             return [SPIBANANAPI[0]!, SPIBANANAPI[1]!]

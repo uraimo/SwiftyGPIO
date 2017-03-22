@@ -39,6 +39,8 @@ extension SwiftyGPIO {
         case .RaspberryPiPlusZero:
             return PWMRPI1
         case .RaspberryPi2:
+            fallthrough
+        case .RaspberryPi3:
             return PWMRPI23
         default:
             return nil
