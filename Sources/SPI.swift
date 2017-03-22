@@ -54,14 +54,14 @@ extension SwiftyGPIO {
 extension SwiftyGPIO {
     // RaspberryPis SPIs
     static let SPIRPI: [Int:SPIOutput] = [
-        0: HardwareSPI(spiId:"0.0", isOutput:true),
-        1: HardwareSPI(spiId:"0.1", isOutput:false)
+        0: SysFSSPI(spiId:"0.0", isOutput:true),
+        1: SysFSSPI(spiId:"0.1", isOutput:false)
     ]
 
     // BananaPi
     static let SPIBANANAPI: [Int:SPIOutput] = [
-        0: HardwareSPI(spiId:"0.0", isOutput:true),
-        1: HardwareSPI(spiId:"0.1", isOutput:false)
+        0: SysFSSPI(spiId:"0.0", isOutput:true),
+        1: SysFSSPI(spiId:"0.1", isOutput:false)
     ]
 }
 
@@ -74,7 +74,7 @@ public protocol SPIOutput {
     func isOut() -> Bool
 }
 
-public struct HardwareSPI: SPIOutput {
+public struct SysFSSPI: SPIOutput {
     let spiId: String
     let isOutput: Bool
 

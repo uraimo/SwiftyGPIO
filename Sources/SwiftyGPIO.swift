@@ -237,7 +237,7 @@ fileprivate extension GPIO {
 
 // MARK: GPIO:Raspberry
 
-public final class RaspiGPIO: GPIO {
+public final class RaspberryGPIO: GPIO {
 
     var setGetId: UInt = 0
     var baseAddr: Int = 0
