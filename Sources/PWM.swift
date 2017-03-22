@@ -473,9 +473,12 @@ extension RaspberryPWM {
         var output = [UInt32]()
         var buffer: UInt32 = 0
         var bufferPos: UInt32 = 31
+        var count = 0
 
         for byte in data {
-            //TODO: Cut at dataLength
+            
+            guard count < dataLength else {break}
+            count += 1
 
             // For each bit of the output, convert in signal bits
             for i in (0...7).reversed() {
