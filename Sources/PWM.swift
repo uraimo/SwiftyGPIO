@@ -27,6 +27,7 @@
 #else
     import Darwin.C
 #endif
+import Foundation
 
 extension SwiftyGPIO {
 
@@ -470,39 +471,43 @@ extension RaspberryPWM {
 
     /// Convert each bit component of the data to a n bit representation
     private func dataToBitStream(data: [UInt8], zero: Int, one: Int, width: Int ) -> [UInt32] {
-        var output = [UInt32]()
-        var buffer: UInt32 = 0
-        var bufferPos: UInt32 = 31
+
+        var output = [UInt32](repeating:0, count: data.count * symbolBits / 4 + 1)
         var count = 0
 
-        for byte in data {
-            
-            guard count < dataLength else {break}
-            count += 1
+        output.withUnsafeMutableBytes { (bptr: UnsafeMutableRawBufferPointer) in
+            for byte in data {
+                for i in (0...7).reversed() {
+                    // Obtain the bit set that will be saved in appended to output, one bit at a time
+                    let s: UInt = ((byte & (1 << UInt8(i))) > 0) ? UInt(one) : UInt(zero)
+                    var startAt = count/8                           // The byte where the pattern starts
+                    var withOffset = count % 8                      // The offset within the byte for the start
+                    var shiftAmount = 8 - withOffset - symbolBits   // Of how many positions the pattern need to be shifted
+                                                                    // to position correctly within this byte (overlapping bits
+                                                                    // will be pushed to the right). Can be negative.
 
-            // For each bit of the output, convert in signal bits
-            for i in (0...7).reversed() {
-                // Obtain the bit set that will be saved in appended to output, one bit at a time
-                let s: Int = ((byte & (1 << UInt8(i))) > 0) ? one : zero
-
-                // Add one bit at a time to the buffer, when it's full save it to the output and start from position 0
-                for b in (0..<width).reversed() {
-                    buffer &= ~(1 << bufferPos)
-                    buffer |= (UInt32((s & (1 << b))>0 ? 1 : 0) << bufferPos)
-                    if bufferPos == 0 {
-                        output.append(buffer)
-                        bufferPos = 31
-                        buffer = 0
-                    } else {
-                        bufferPos -= 1
-                    }
+                    repeat {
+                        let setMask = (shiftAmount >= 0) ? (s << UInt(shiftAmount)) : (s >> UInt(-shiftAmount)) // Value to be set, shifted as needed
+                        // Calculate little endian id from startAt to fill the UInt32 with the right endianess
+                        let littleId = (startAt/4) * 4 + (3 - startAt%4)
+                        bptr[littleId] |= UInt8(setMask & 0xFF)     // Adds this bitmask to the current byte without touching the rest
+                        withOffset = 0                              // If the pattern overlaps in the next byte, we'll have offset=0
+                        startAt += 1                                // If the pattern overlaps, let's increment startAt to point to the next byte
+                        shiftAmount = 8 + shiftAmount               // If the pattern overlaps, this is the amount of shift needed to push stuff
+                                                                    // to the left (bits we already added in this byte) to eliminate it.
+                                                                    // Uncomment the two print function below to see what happens.
+                        // Print the current state of the byte of this iteration
+                        // printUInt8(bptr[littleId])
+                    } while shiftAmount < 8                         // If the amount is <8 there are still bit in the pattern to add to the stream
+                    count += symbolBits                             // Counts the number of bits successfully added to the stream
                 }
             }
         }
-        // Append the last partial element
-        if bufferPos < 31 {
-            output.append(buffer)
-        }
+
+        // Print the result of the conversion as it will be sent to the PWM (same endianess)
+        // for element in output {
+        //    printBinary(element)
+        // }
 
         return output
     }
@@ -511,6 +516,14 @@ extension RaspberryPWM {
         var res = ""
         for i in (0...31).reversed() {
             res += ((value & (1 << UInt32(i))) > 0) ? "1" : "0"
+        }
+        print(res)
+    }
+
+    private func printUInt8(_ value: UInt8) {
+        var res = ""
+        for i in (0...7).reversed() {
+            res += ((value & (1 << UInt8(i))) > 0) ? "1" : "0"
         }
         print(res)
     }
