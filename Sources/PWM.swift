@@ -118,13 +118,9 @@ public class HardwarePWM: PWMOutput {
     public func initPWM() {
         var mem_fd: Int32 = 0
 
-        //Try to open one of the mem devices
-        for device in ["/dev/gpiomem", "/dev/mem"] {
-            mem_fd=open(device, O_RDWR | O_SYNC)
-            if mem_fd>0 {
-                break
-            }
-        }
+        //The only mem device that support PWM is /dev/mem
+        mem_fd=open("/dev/mem", O_RDWR | O_SYNC)
+
         guard mem_fd > 0 else {
             fatalError("Can't open /dev/mem , use sudo!")
         }
@@ -354,12 +350,14 @@ extension HardwarePWM {
         // stop clock and waiting for busy flag doesn't work, so kill clock
         clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_KILL     //Set KILL flag
         usleep(10)
+        //while (clockBasePointer.advanced(by: 40).pointee & (1 << 7)) != 0 {} 
 
         // Configure clock
         let idiv = calculateUnscaledDIVI(base: .PLLD, desired: UInt(symbolBits * patternFrequency))
         clockBasePointer.advanced(by: 41).pointee = CLKM_PASSWD | (idiv << CLKM_DIV_DIVI)            //Set DIVI value  
         clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_ENAB | CLKM_CTL_SRC_PLLD   //Enable clock, MASH 0, source PLLD
         usleep(10)
+        //while (clockBasePointer.advanced(by: 40).pointee & (1 << 7)) != 0 {} 
 
         // Configure PWM 
         pwmBasePointer.advanced(by: 4).pointee = 32         // RNG1: 32-bits per word to serialize
