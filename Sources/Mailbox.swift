@@ -51,9 +51,9 @@
 */
 
 #if os(Linux)
-import Glibc
+    import Glibc
 #else
-import Darwin.C
+    import Darwin.C
 #endif
 
 // We use the mailbox interface to request memory from the VideoCore.
@@ -333,3 +333,12 @@ public struct MailBox {
         mailboxSetProperty(buf: &p)
     }
 }
+
+// MARK: - Darwin / Xcode Support
+#if os(OSX)
+    private var O_SYNC: CInt { fatalError("Linux only") }
+    
+    func gnu_dev_makedev(_ maj: UInt, _ min: UInt) -> Int32 {
+        fatalError("Linux only")
+    }
+#endif

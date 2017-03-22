@@ -229,3 +229,8 @@ public struct VirtualSPI: SPIOutput {
 
 internal let SPI_IOC_WR_MAX_SPEED_HZ: UInt = 0x40046b04
 internal let SPIBASEPATH="/dev/spidev"
+
+// MARK: - Darwin / Xcode Support
+#if os(OSX)
+    private var O_SYNC: CInt { fatalError("Linux only") }
+#endif
