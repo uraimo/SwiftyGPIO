@@ -286,6 +286,7 @@ This feature uses the M/S algorithm and has been tested with signals with a peri
 <p>
 <img src="https://github.com/uraimo/SwiftyGPIO/raw/master/images/led1.gif" />
 <img src="https://github.com/uraimo/SwiftyGPIO/raw/master/images/led2.gif" />
+<img src="https://github.com/uraimo/SwiftyGPIO/raw/master/images/led3.gif" />
 </p>
   
 This functionality leverages the PWM to generate digital signals based on two patterns representing a 0 or a 1 value through a variation of the duty cycle. Let's look at a practical example to better understand the use case and how to use this signal generator:
