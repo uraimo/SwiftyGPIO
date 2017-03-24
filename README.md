@@ -27,6 +27,7 @@ The library is built to run **exclusively on Linux ARM Boards** (RaspberryPis, B
     - [GPIO](#gpio)
     - [SPI](#spi)
     - [PWM](#pwm)
+    - [Pattern-based signal generator via PWM](#pattern-based-signal-generator-via-pwm)
 - [Examples](#examples)
 - [Built with SwiftyGPIO](#built-with-swiftygpio)
     - [Device Libraries](#libraries)
@@ -277,6 +278,82 @@ pwm.stopPWM()
 If you want to change the signal being generated, you don't need to stop the previous one, just call `startPWM` with different parameters.
 
 This feature uses the M/S algorithm and has been tested with signals with a period in a range from 300ns to 200ms, generating a signal outside of this range could lead to excessive jitter that could not be acceptable for some applications. If you need to generate a signal near to the extremes of that range and have an oscilloscope at hand, always verify if the resulting signal is good enough for what you need.
+
+### Pattern-based signal generator via PWM
+  
+This functionality leverages the PWM to generate digital signals based on two patterns representing a 0 or a 1 value through a variation of the duty cycle. Let's look at a practical example to better understand the use case and how to use this signal generator:
+
+Let's consider for example the WS2812, a led with integrated driver used in many led strips.
+
+This led is activated with a signal between 400Khz and 800Khz containing the encoded value of three bytes representing respectively the *Green*,*Blue* and *Red* color values. Each bit composing the byte of each one of the color components has to be encoded this way:
+
+* Bit value 0: _A 1250ns signal that stays, at least, high for 350ns(T0H) and then low for 900ns(T0L), with a tollerance of 150ns._
+* Bit value 1: _A 1250ns signal that stays,at least, high for 650ns(T1H) and then low for 600ns(T0L), with a tollerance of 150ns._
+
+For each byte you'll have to send a sequence of 8 bit encoded this way and three bytes will be needed to configure the color of every led. If you have more than one led connected to each other serially, you'll just need to send a series of 3 bytes values. Once the whole sequence of colors for your strip of leds has been sent, you need to keep the voltage at 0 for 50us, before you'll be able to transmit a new sequence.
+
+The bytes we'll send will configure the leds of the strip starting from the last one, going backwards to the first one.
+
+This diagram from the official documentation gives you a better idea of what those signals look like:
+
+![ws2812 timings](https://github.com/uraimo/SwiftyGPIO/raw/master/ws2812.png)
+  
+You could think to just send this signal based on those 0 and 1 pattern changing the values of a GPIO, but that's actually impossible for an ARM board to keep up with the rate required by devices like the WS2812 leds. Once the period of the pattern is lower than 100us or so, you need another way to send your signal. Ant this is what the pattern-based signal generator solves, leveraging PWM-capable outputs.
+
+You'll find a complete example under `Examples/PWMPattern`, but let's describe each one of the steps needed to use this feature. First of all let's retrieve a `PWMOutput` object and then initialize it:
+
+```swift
+let pwms = SwiftyGPIO.hardwarePWMs(for:.RaspberryPi2)!
+let pwm = (pwms[0]?[.P18])!
+
+// Initialize PWM
+pwm.initPWM()
+```
+
+We'll then configure the signal generator specifying the frequency we need (800KHz for a 1250ns pattern period), the number of leds in the sequence (I'm using and 8x8 led matrix here), and the duration of the reset time (55us). We'll call the `initPWMPattern` to configure these parameters. We specify the duty cycle (percentage of the period at which the pattern should have a high value) for the 0 and 1 values.
+
+```swift
+let NUM_ELEMENTS = 64
+let WS2812_FREQ = 800000 // 800Khz
+let WS2812_RESETDELAY = 55  // 55us reset
+
+pwm.initPWMPattern(bytes: NUM_ELEMENTS*3, at: WS2812_FREQ, with: WS2812_RESETDELAY, dutyzero: 33, dutyone: 66) 
+```
+
+Once this is done, we can start sending data, this time we are using a function that sets the colors and another function that turn them in a series of `UInt8` in the `GBR` format:
+
+```swift
+func toByteStream(_ values: [UInt32]) -> [UInt8]{
+    var byteStream = [UInt8]()
+    for led in values {
+        // Add as GRB
+        byteStream.append(UInt8((led >> UInt32(16))  & 0xff))
+        byteStream.append(UInt8((led >> UInt32(24)) & 0xff))
+        byteStream.append(UInt8((led >> UInt32(8))  & 0xff))
+    }
+    return byteStream
+}
+
+var initial = [UInt32](repeating:0x50000000, count:NUM_ELEMENTS)
+var byteStream: [UInt8] = toByteStream(initial)
+
+pwm.sendDataWithPattern(values: byteStream)
+```
+
+The method `sendDataWithPatter` will use the sequence of `UInt8` to produce a signal composed by the patterns described above.
+
+We can then wait until the signal is completely sent and then perform the necessary final cleanup:
+
+```swift
+// Wait for the transmission to end
+pwm.waitOnSendData()
+
+// Clean up once you are done with the generator
+pwm.cleanupPattern()
+```
+
+At this point you could configure a different signal calling again `initPWMPattern` if you want to.
+
 
 ## Examples
 
