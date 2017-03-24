@@ -1,4 +1,4 @@
-![SwiftyGPIO](https://github.com/uraimo/SwiftyGPIO/raw/master/logo.png)
+![SwiftyGPIO](https://github.com/uraimo/SwiftyGPIO/raw/master/images/logo.png)
 
 **A Swift library to interact with Linux GPIOs/SPI/PWM, blinking leds and much more!**
 
@@ -6,8 +6,9 @@
 <img src="https://img.shields.io/badge/os-linux-green.svg?style=flat" alt="Linux-only" />
 <a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/swift3-compatible-orange.svg?style=flat" alt="Swift 3 compatible" /></a>
 <a href="https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/LICENSE"><img src="http://img.shields.io/badge/license-MIT-blue.svg?style=flat" alt="License: MIT" /></a>
+</p>
 
-![](banner.jpg)
+![](images/banner.jpg)
 
 ## Summary
 
@@ -281,6 +282,11 @@ If you want to change the signal being generated, you don't need to stop the pre
 This feature uses the M/S algorithm and has been tested with signals with a period in a range from 300ns to 200ms, generating a signal outside of this range could lead to excessive jitter that could not be acceptable for some applications. If you need to generate a signal near to the extremes of that range and have an oscilloscope at hand, always verify if the resulting signal is good enough for what you need.
 
 ### Pattern-based signal generator via PWM
+
+<p>
+<img src="https://github.com/uraimo/SwiftyGPIO/raw/master/images/led1.gif" />
+<img src="https://github.com/uraimo/SwiftyGPIO/raw/master/images/led2.gif" />
+</p>
   
 This functionality leverages the PWM to generate digital signals based on two patterns representing a 0 or a 1 value through a variation of the duty cycle. Let's look at a practical example to better understand the use case and how to use this signal generator:
 
