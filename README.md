@@ -301,7 +301,11 @@ This diagram from the official documentation gives you a better idea of what tho
   
 You could think to just send this signal based on those 0 and 1 pattern changing the values of a GPIO, but that's actually impossible for an ARM board to keep up with the rate required by devices like the WS2812 leds. Once the period of the pattern is lower than 100us or so, you need another way to send your signal. Ant this is what the pattern-based signal generator solves, leveraging PWM-capable outputs.
 
-You'll find a complete example under `Examples/PWMPattern`, but let's describe each one of the steps needed to use this feature. First of all let's retrieve a `PWMOutput` object and then initialize it:
+You'll find a complete example under `Examples/PWMPattern`, but let's describe each one of the steps needed to use this feature. 
+
+In this brief guide I'm using an 8x8 led matrix with 64 WS2812 leds (these matrices are usually marketed as NeoPixel matrix, Nulsom Rainbow matrix, etc... and you can find one of these in some Pimoroni products like the UnicornHat).
+
+First of all let's retrieve a `PWMOutput` object and then initialize it:
 
 ```swift
 let pwms = SwiftyGPIO.hardwarePWMs(for:.RaspberryPi2)!
