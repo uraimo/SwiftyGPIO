@@ -3,8 +3,10 @@
 #else
     import Darwin.C
 #endif
+import Foundation
 
 
+// Xoroshiro random generator by @cocoawithlove
 // From: https://github.com/mattgallagher/CwlUtils/blob/master/Sources/CwlUtils/CwlRandom.swift
 public struct DevRandom {
     class FileDescriptor {
@@ -67,8 +69,11 @@ public struct Xoroshiro {
 }
 
 
-///////////////////////////////////////
-
+//////////////////////////////////////////////////////////////////////////////////////////
+//                                                                                      //
+//                                    WS2812 Leds                                       //
+//                                                                                      //
+//////////////////////////////////////////////////////////////////////////////////////////
 
 let pwms = SwiftyGPIO.hardwarePWMs(for:.RaspberryPi2)!
 let pwm = (pwms[0]?[.P18])!
@@ -76,100 +81,167 @@ let pwm = (pwms[0]?[.P18])!
 // Initialize PWM
 pwm.initPWM()
 
-/////////////Render to strip 
-// Possible color values: 16x16
-let ws281x_gamma: [UInt8] = [
-0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2,
-2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5,
-6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9, 10, 10, 11, 11,
-11, 12, 12, 13, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18,
-19, 19, 20, 21, 21, 22, 22, 23, 23, 24, 25, 25, 26, 27, 27, 28,
-29, 29, 30, 31, 31, 32, 33, 34, 34, 35, 36, 37, 37, 38, 39, 40,
-40, 41, 42, 43, 44, 45, 46, 46, 47, 48, 49, 50, 51, 52, 53, 54,
-55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70,
-71, 72, 73, 74, 76, 77, 78, 79, 80, 81, 83, 84, 85, 86, 88, 89,
-90, 91, 93, 94, 95, 96, 98, 99, 100, 102, 103, 104, 106, 107, 109, 110,
-111, 113, 114, 116, 117, 119, 120, 121, 123, 124, 126, 128, 129, 131, 132, 134,
-135, 137, 138, 140, 142, 143, 145, 146, 148, 150, 151, 153, 155, 157, 158, 160,
-162, 163, 165, 167, 169, 170, 172, 174, 176, 178, 179, 181, 183, 185, 187, 189,
-191, 193, 194, 196, 198, 200, 202, 204, 206, 208, 210, 212, 214, 216, 218, 220,
-222, 224, 227, 229, 231, 233, 235, 237, 239, 241, 244, 246, 248, 250, 252, 255]
-
 
 let PWM_CHANNELS = 1
-let NUM_ELEMENTS = 60
+let NUM_ELEMENTS = 64 //8x8 matrix, change this to what you want, but remember that different matrixes could have different connections between single leds
 let WS2812_FREQ = 800000 // 800Khz
 let WS2812_RESETDELAY = 55  // 55us reset
 
 var xoro = Xoroshiro()
 
-func ledsRandom() -> [UInt32] {
-    var a = [UInt32](repeating:0x0, count:NUM_ELEMENTS)
+func toByteStream(_ values: [UInt32]) -> [UInt8]{
+    var byteStream = [UInt8]()
+    for led in values {
+        //let scale: UInt8 = 1 //UInt8(led & 0xff) + 1
+        // Add as GRB
+        byteStream.append(UInt8((led >> UInt32(16))  & 0xff)) // * scale) >> 8)
+        byteStream.append(UInt8((led >> UInt32(24)) & 0xff)) // * scale) >> 8)
+        byteStream.append(UInt8((led >> UInt32(8))  & 0xff)) // * scale) >> 8)
+    }
+    return byteStream
+}
+
+func scroll(_ values: [UInt32]) -> [UInt32] {
+    var arr = Array(values[1..<values.count])
+    arr.append(values[0])
+    return arr
+}
+
+// Matrix effects
+
+func ledsRandom(_ values: [UInt32]) -> [UInt32] {
+    var values = values
     for i in 0..<NUM_ELEMENTS {
         let r = UInt32(xoro.random64() % 254 + 1)
         let g = UInt32(xoro.random64() % 254 + 1)
         let b = UInt32(xoro.random64() % 254 + 1)
-        a[i] = (r<<24) + (g<<16) + (b<<8) + UInt32(0x50) // R-G-B-L
+        values[i] = (r<<24) + (g<<16) + (b<<8) + UInt32(0x50) // R-G-B-L
     }
-    return a
+    return values
 }
 
-func ledsOne() -> [UInt32] {
-    var a = [UInt32](repeating:0x0, count:NUM_ELEMENTS)
+func ledsFill(_ values: [UInt32], color: UInt32) -> [UInt32] {
+    var values = values
     for i in 0..<NUM_ELEMENTS {
-        a[i] = 0x50505050 // R-G-B-L
+        values[i] = color // R-G-B-L
     }
-    return a
+    return values
 }
 
-func ledsHalf() -> [UInt32] {
-    var a = [UInt32](repeating:0x0, count:NUM_ELEMENTS)
+func ledsHalf(_ values: [UInt32], color: UInt32) -> [UInt32] {
+    var values = values
     for i in 0..<NUM_ELEMENTS {
-        a[i] = (i%2 == 0) ? 0x50505050 : 0// R-G-B-L
+        values[i] = (i%2 == 0) ? color : 0// R-G-B-L
     }
-    return a
+    return values
 }
 
-func ledsSnake() -> [UInt32] {
-    var a = [UInt32](repeating:0x0, count:NUM_ELEMENTS)
-    a[0] = 0x00606050
-    a[1] = 0x00404050
-    a[2] = 0x00202050
-    a[3] = 0x00002050
-    a[4] = 0x00002050
-    a[5] = 0x00002050
-    return a
+func ledsSnake(_ values: [UInt32]) -> [UInt32] {
+    var values = values
+    values[0] = 0x00606050
+    values[1] = 0x00404050
+    values[2] = 0x00202050
+    values[3] = 0x00002050
+    values[4] = 0x00002050
+    values[5] = 0x00002050
+    return values
 }
 
-var leds: [UInt32] = ledsSnake()
-
-var byteStream = [UInt8]()
-
-for led in leds {
-    let scale: UInt8 = 1 //UInt8(led & 0xff) + 1
-    // Add as GRB
-    byteStream.append(ws281x_gamma[Int(led >> UInt32(16))  & 0xff]) // * scale) >> 8)
-    byteStream.append(ws281x_gamma[Int(led >> UInt32(24)) & 0xff]) // * scale) >> 8)
-    byteStream.append(ws281x_gamma[Int(led >> UInt32(8))  & 0xff]) // * scale) >> 8)
+func ledsCosine(_ values: [UInt32], width: Int, time: Int) -> [UInt32] {
+    var values = values
+    for i in 0..<NUM_ELEMENTS {
+        let center = Double(width/2) * 0.9
+        let scale = 1.0 // Bigger = smaller period
+        var ix = Double(i%width) - center
+        ix *= scale
+        var iy = Double(i/width) - center
+        iy *= scale
+        let cosarg = (sqrt(ix*ix+iy*iy) - Double(time))
+        values[i] = UInt32( (cos(cosarg) + 1) * 100 + 10) << 8
+    }
+    return values
 }
 
-func scroll(_ values: [UInt8]) -> [UInt8] {
-    var arr = Array(values[3..<values.count])
-    arr.append(values[0])
-    arr.append(values[1])
-    arr.append(values[2])
-    return arr
+func ledsRipple(_ values: [UInt32], width: Int, time: Int) -> [UInt32] {
+    var values = values
+    let time = time % 50 // Repeat every 50 frames
+    for i in 0..<NUM_ELEMENTS {
+        let center = Double(width/2) * 0.9
+        let scale = 3.5 //Bigger = smaller initial drop and thinner ripple
+        var ix = Double(i%width) - center
+        ix *= scale
+        var iy = Double(i/width) - center
+        iy *= scale
+        let timeDiv = 0.7 //Smaller = slower
+        let cosarg = (sqrt(ix*ix+iy*iy) - Double(time)*timeDiv)
+        // Use the cardinal sine function sinc(x) -> sin(x)/x [0.2,1]
+        values[i] = UInt32( sin(cosarg)/cosarg * 180 + 50) << 8
+    }
+    return values
 }
 
+
+func ledsRainbow(_ values: [UInt32], width: Int, time: Int) -> [UInt32] {
+    let colors:[UInt32] = [0x20000000,0x20100000,0x20200000,0x00200000,0x00202000,0x00002000,0x10001000,0x20001000]
+    var values = values
+    for i in 0..<NUM_ELEMENTS {
+        values[i] = colors[(i%width + time)%colors.count]
+    }
+    return values
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Initialize the PWM bit-pattern signal generator
+// 3 bytes (GBR, yes, GBR), 55us reset time and 800khz frequency, 0= 33us, 1= 66us ... allowed by the led driver tollerance
 pwm.initPWMPattern(bytes: NUM_ELEMENTS*3, at: WS2812_FREQ, with: WS2812_RESETDELAY, dutyzero: 33, dutyone: 66) 
 
 // Send some data
-for i in 0...10000 {
+
+var initial = [UInt32](repeating:0x0, count:NUM_ELEMENTS)
+var byteStream: [UInt8] = toByteStream(initial)
+
+var leds: [UInt32] = ledsRandom(initial)
+for i in 0...100 {
     pwm.sendDataWithPattern(values: byteStream)
-    byteStream = scroll(byteStream)
+    leds = ledsRandom(leds)
+    byteStream = toByteStream(leds)
 }
+
+leds = ledsRainbow(initial, width: 8, time: 0)
+for i in 0...100 {
+    pwm.sendDataWithPattern(values: byteStream)
+    leds = ledsRainbow(leds, width: 8, time: i)
+    usleep(50_000)
+    byteStream = toByteStream(leds)
+}
+
+leds = ledsSnake(initial)
+for i in 0...200 {
+    pwm.sendDataWithPattern(values: byteStream)
+    leds = scroll(leds)
+    byteStream = toByteStream(leds)
+}
+
+leds = ledsCosine(initial, width: 8, time: 0)
+for i in 0...200 {
+    pwm.sendDataWithPattern(values: byteStream)
+    leds = ledsCosine(leds, width: 8, time: i)
+    usleep(50_000)
+    byteStream = toByteStream(leds)
+}
+
+leds = ledsRipple(initial, width: 8, time: 0)
+for i in 0...200 {
+    pwm.sendDataWithPattern(values: byteStream)
+    leds = ledsRipple(leds, width: 8, time: i)
+    byteStream = toByteStream(leds)
+}
+
+//Clear matrix
+byteStream = toByteStream(initial)
+pwm.sendDataWithPattern(values: byteStream)
+
 
 // Wait for the transmission to end
 pwm.waitOnSendData()
