@@ -1,4 +1,4 @@
-![SwiftyGPIO](https://github.com/uraimo/SwiftyGPIO/raw/master/images/logo.png)
+![SwiftyGPIO](https://github.com/uraimo/SwiftyGPIO/raw/master/logo.png)
 
 **A Swift library to interact with Linux GPIOs/SPI/PWM, blinking leds and much more!**
 
@@ -303,7 +303,7 @@ The bytes we'll send will configure the leds of the strip starting from the last
 
 This diagram from the official documentation gives you a better idea of what those signals look like:
 
-![ws2812 timings](https://github.com/uraimo/SwiftyGPIO/raw/master/ws2812.png)
+![ws2812 timings](https://github.com/uraimo/SwiftyGPIO/raw/master/images/ws2812.png)
   
 You could think to just send this signal based on those 0 and 1 pattern changing the values of a GPIO, but that's actually impossible for an ARM board to keep up with the rate required by devices like the WS2812 leds. Once the period of the pattern is lower than 100us or so, you need another way to send your signal. Ant this is what the pattern-based signal generator solves, leveraging PWM-capable outputs.
 
