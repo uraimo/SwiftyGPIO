@@ -123,6 +123,8 @@ Currently, SwiftyGPIO expose GPIOs, SPIs(if not available a bit-banging VirtualS
 
 Let's suppose we are using a Raspberry 2 board and have a led connected between the GPIO pin P2 (possibly with a resistance of 1K Ohm or so) and GND and we want to turn it on.
 
+Note that SwiftyGPIO uses the raw Broadcom numbering scheme ([described here](https://github.com/uraimo/SwiftyGPIO/wiki/GPIO-Pinout)) to assign a number to each pin.
+
 First, we need to retrieve the list of GPIOs available on the board and get a reference to the one we want to modify:
 
 ```swift
