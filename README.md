@@ -133,8 +133,9 @@ The following are the possible values for the predefined boards:
     
 * .RaspberryPiRev1 (Pi A,B Revision 1, pre-2012, 26 pin header)
 * .RaspberryPiRev2 (Pi A,B Revision 2, post-2012, 26 pin header) 
-* .RaspberryPiPlusZero (Raspberry Pi A+ and B+, Raspberry Zero, all with a 40 pin header)
-* .RaspberryPi2 (Raspberry Pi 2 or 3 with a 40 pin header)
+* .RaspberryPiPlusZero (Raspberry Pi A+ and B+, Raspberry Zero/W, all with a 40 pin header)
+* .RaspberryPi2 (Raspberry Pi 2 with a 40 pin header)
+* .RaspberryPi3 (Raspberry Pi 2 with a 40 pin header)
 * .BeagleBoneBlack (BeagleBone Black)
 * .CHIP (the $9 C.H.I.P. computer).
 * .BananaPi (RaspberryPi clone)
@@ -317,7 +318,10 @@ let NUM_ELEMENTS = 64
 let WS2812_FREQ = 800000 // 800Khz
 let WS2812_RESETDELAY = 55  // 55us reset
 
-pwm.initPWMPattern(bytes: NUM_ELEMENTS*3, at: WS2812_FREQ, with: WS2812_RESETDELAY, dutyzero: 33, dutyone: 66) 
+pwm.initPWMPattern(bytes: NUM_ELEMENTS*3, 
+                   at: WS2812_FREQ, 
+                   with: WS2812_RESETDELAY, 
+                   dutyzero: 33, dutyone: 66) 
 ```
 
 Once this is done, we can start sending data, this time we are using a function that sets the colors and another function that turn them in a series of `UInt8` in the `GBR` format:
@@ -326,7 +330,7 @@ Once this is done, we can start sending data, this time we are using a function 
 func toByteStream(_ values: [UInt32]) -> [UInt8]{
     var byteStream = [UInt8]()
     for led in values {
-        // Add as GRB
+        // Add as GRB, converted from RGB+0x00
         byteStream.append(UInt8((led >> UInt32(16))  & 0xff))
         byteStream.append(UInt8((led >> UInt32(24)) & 0xff))
         byteStream.append(UInt8((led >> UInt32(8))  & 0xff))
