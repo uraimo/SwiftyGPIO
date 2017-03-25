@@ -167,11 +167,11 @@ public class RaspberryPWM: PWMOutput {
         let highFreqSampleReduction: UInt = (ns < 750) ? 10 : 1
 
         let freq: UInt = (1_000_000_000/UInt(ns)) * 100 / highFreqSampleReduction
-        let (idiv, scale) = calculateDIVI(base: .PLLD, desired: freq)                               //Using the faster (with known freq) available clock to reduce jitter
+        let (idiv, scale) = calculateDIVI(base: .PLLD, desired: freq)                                //Using the faster (with known freq) available clock to reduce jitter
 
         // Configure the clock and divisor that will be used to generate the signal
         clockBasePointer.advanced(by: 41).pointee = CLKM_PASSWD | (idiv << CLKM_DIV_DIVI)            //CM CTL DIV register: Set DIVI value 
-        clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_ENAB | CLKM_CTL_SRC_PLLD  //CM CTL register: Enable clock, MASH 0, source PLLD /////////////0x16
+        clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_ENAB | CLKM_CTL_SRC_PLLD  //CM CTL register: Enable clock, MASH 0, source PLLD
         pwmBasePointer.pointee = 0                                                                   //PWM CTL register: Everything at 0, enable flag included, disables previous PWM
         usleep(10)
         // Configure the parameters for the M/S algorithm, S the number of total slots in RNG1 and M the number of slots with high value in DAT1
@@ -301,10 +301,10 @@ extension RaspberryPWM {
     /// Stop the PWM and clean up any related structure
     public func cleanupPattern() {
         dma_wait()
-        // Stop PWM and clock
+        // Stop the PWM
         pwmBasePointer.pointee = 0
         usleep(10)
-        // stop clock and waiting for busy flag doesn't work, so kill clock
+        // Stop the clock killing the clock
         clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_KILL     //Set KILL flag
         usleep(10)
 
@@ -347,19 +347,21 @@ extension RaspberryPWM {
             pwmRawPointer.advanced(by: pos).pointee = 0
         }
 
-        // Stop PWM and clock
+        // Stop the PWM
         pwmBasePointer.pointee = 0
         usleep(10)
-        // stop clock and waiting for busy flag doesn't work, so kill clock
+        // Stop the clock killing the clock
         clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_KILL     //Set KILL flag
         usleep(10)
+        // Check the BUSY flag, doesn't always work
         //while (clockBasePointer.advanced(by: 40).pointee & (1 << 7)) != 0 {} 
 
         // Configure clock
         let idiv = calculateUnscaledDIVI(base: .PLLD, desired: UInt(symbolBits * patternFrequency))
-        clockBasePointer.advanced(by: 41).pointee = CLKM_PASSWD | (idiv << CLKM_DIV_DIVI)            //Set DIVI value  
+        clockBasePointer.advanced(by: 41).pointee = CLKM_PASSWD | (idiv << CLKM_DIV_DIVI)             //Set DIVI value  
         clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_ENAB | CLKM_CTL_SRC_PLLD   //Enable clock, MASH 0, source PLLD
         usleep(10)
+        // Check the BUSY flag, doesn't always work
         //while (clockBasePointer.advanced(by: 40).pointee & (1 << 7)) != 0 {} 
 
         // Configure PWM 
@@ -478,28 +480,39 @@ extension RaspberryPWM {
         output.withUnsafeMutableBytes { (bptr: UnsafeMutableRawBufferPointer) in
             for byte in data {
                 for i in (0...7).reversed() {
-                    // Obtain the bit set that will be saved in appended to output, one bit at a time
+                    // Get the bitset for this bit value that will be appended to output
                     let s: UInt = ((byte & (1 << UInt8(i))) > 0) ? UInt(one) : UInt(zero)
-                    var startAt = count/8                           // The byte where the pattern starts
-                    var withOffset = count % 8                      // The offset within the byte for the start
-                    var shiftAmount = 8 - withOffset - symbolBits   // Of how many positions the pattern need to be shifted
-                                                                    // to position correctly within this byte (overlapping bits
-                                                                    // will be pushed to the right). Can be negative.
+                    // The byte where the pattern starts
+                    var startAt = count/8
+                    // The offset within the byte for the starting position
+                    var withOffset = count % 8
+                    // Of how many positions the pattern need to be shifted to be located correctly within this byte (overlapping bits
+                    // will be pushed to the right). Can be negative.
+                    var shiftAmount = 8 - withOffset - symbolBits
 
                     repeat {
-                        let setMask = (shiftAmount >= 0) ? (s << UInt(shiftAmount)) : (s >> UInt(-shiftAmount)) // Value to be set, shifted as needed
+                        // Value to be set, shifted as needed
+                        let setMask = (shiftAmount >= 0) ? (s << UInt(shiftAmount)) : (s >> UInt(-shiftAmount))
                         // Calculate little endian id from startAt to fill the UInt32 with the right endianess
                         let littleId = (startAt/4) * 4 + (3 - startAt%4)
-                        bptr[littleId] |= UInt8(setMask & 0xFF)     // Adds this bitmask to the current byte without touching the rest
-                        withOffset = 0                              // If the pattern overlaps in the next byte, we'll have offset=0
-                        startAt += 1                                // If the pattern overlaps, let's increment startAt to point to the next byte
-                        shiftAmount = 8 + shiftAmount               // If the pattern overlaps, this is the amount of shift needed to push stuff
-                                                                    // to the left (bits we already added in this byte) to eliminate it.
-                                                                    // Uncomment the two print function below to see what happens.
+                        // Adds this bitmask to the current byte without touching the rest
+                        bptr[littleId] |= UInt8(setMask & 0xFF)
+                        // If the pattern overlaps in the next byte, we'll have offset=0
+                        withOffset = 0
+                        // If the pattern overlaps, let's increment startAt to point to the next byte
+                        startAt += 1
+                        // If the pattern overlaps, this is the amount of shifting needed to push bits
+                        // to the left, bits that were already added in the previous iteration. 
+                        shiftAmount = 8 + shiftAmount
+                        
                         // Print the current state of the byte of this iteration
                         // printUInt8(bptr[littleId])
-                    } while shiftAmount < 8                         // If the amount is <8 there are still bit in the pattern to add to the stream
-                    count += symbolBits                             // Counts the number of bits successfully added to the stream
+
+                    // If the amount is <8 there are still bits in the pattern that need to be added to the stream
+                    } while shiftAmount < 8
+
+                    // Counts the number of bits successfully added to the stream
+                    count += symbolBits
                 }
             }
         }
