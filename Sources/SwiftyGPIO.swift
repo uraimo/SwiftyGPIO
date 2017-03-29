@@ -313,7 +313,7 @@ public final class RaspberryGPIO: GPIO {
 
         close(mem_fd)
 
-        if (unsafeBitCast(gpio_map, to: Int.self) == -1) {    //MAP_FAILED not available, but its value is (void*)-1
+        if (Int(bitPattern: gpio_map) == -1) {    //MAP_FAILED not available, but its value is (void*)-1
             perror("mmap error")
             abort()
         }

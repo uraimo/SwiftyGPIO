@@ -199,7 +199,7 @@ public class RaspberryPWM: PWMOutput {
             off_t(offset)     //Offset to GPIO peripheral
             )!
 
-        if (unsafeBitCast(m, to: Int.self) == -1) {    //MAP_FAILED not available, but its value is (void*)-1
+        if (Int(bitPattern: m) == -1) {    //MAP_FAILED not available, but its value is (void*)-1
             perror("mmap error")
             abort()
         }

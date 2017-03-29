@@ -146,7 +146,7 @@ public struct MailBox {
 
     /// Unmap the page aligned pointer
     private func unmapmem(_ pointer: UnsafeMutableRawPointer, size: Int) {
-        let address = unsafeBitCast(pointer, to:UInt.self)
+        let address = UInt(bitPattern: pointer)
         let offset = address % UInt(PAGE_SIZE)
         let alignedAddress = pointer - Int(offset)
         let res = munmap(alignedAddress, size)
