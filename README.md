@@ -204,7 +204,7 @@ While GPIOs are checked for updates, the `direction` of the pin cannot be change
 
 ### SPI
 
-If your board has SPI connections and SwiftyGPIO has them among its presets, a list of the available SPIs can be retrieved invoking `hardwareSPIs(for:)` (or `getHardwareSPIsForBoard` for Swift 2.x) with one of the predefined boards.
+If your board has a SPI connection and SwiftyGPIO has it among its presets, a list of the available SPI channels can be obrained calling `hardwareSPIs(for:)` with one of the predefined boards.
 
 On RaspberryPi and other boards the hardware SPI SysFS interface is not enabled by default, check out the setup guide on [wiki](https://github.com/uraimo/SwiftyGPIO/wiki/Enabling-SPI-on-RaspberryPi-and-others).
 
@@ -215,15 +215,16 @@ let spis = SwiftyGPIO.hardwareSPIs(for:.RaspberryPi2)
 var spi = spis?[0]
 ```
 
-The first item returned is the output channel and this can be verified invoking the method `isOut` on the `SPIObject`.
+The items returned refer to different devices addressable through the SPI bus, the number is equal to the number of CS(or CE) pins available on your board.
 
-Alternatively, we can create a software SPI using two GPIOs, one that will serve as clock pin and the other will be used to send the actual data. This kind of bit-banging SPI is slower than the hardware one, so, the recommended approach is to use hardware SPIs when available.
+Alternatively, we can create a software SPI using two GPIOs, one that will serve as clock pin and the other will be used to send the actual data (you'll need to connect the CS pin of your device to a 1 value). This kind of bit-banging SPI is slower than the hardware one, so, the recommended approach is to use hardware SPIs when available.
 
 To create a software SPI, just retrieve two pins and create a `VirtualSPI` object:
 ```swift
 let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi2)
 var sclk = gpios[.P2]!
 var dnmosi = gpios[.P3]!
+
 var spi = VirtualSPI(dataGPIO:dnmosi,clockGPIO:sclk) 
 ```
 
@@ -234,14 +235,20 @@ To send one or more byte over a SPI, use the `sendData` method.
 In its simplest form it just needs an array of UInt8 as parameter:
 
 ```swift
-spi?.sendData([UInt(42)])
+spi?.sendData([UInt(42)], frequencyHz: 500_000)
 ```
 
-But for software SPIs (for now, these values are ignored when using a hardware SPI) you can also specify the preferred byte ordering (MSB,LSB) and the delay between two successive bits (clock width, default 0):
+The frequency at which the data will be sent can be specified if needed (alternatively the default will be used, that is 500khz for hardware SPIs and the best available speed for virtual SPIs).
+
+Since the interface performs only full duplex transmissions, to read some data from the SPI you'll need to write the same amount of bits. For most devices you'll use this means that you'll need to send some dummy data depending on the protocol used by your device. Check the device reference for more information.
+
+Let's see a simple example, that reads 32 bytes from a device sending just 32 empty bytes:
 
 ```swift
-spi?.sendData([UInt(42)], order:.LSBFIRST, clockDelayUsec:1000)
+let data: [UInt8] = [UInt8](repeating:0, count: 32)
+let res = spi?.sendData(data)
 ```
+The `res` array will contain the raw data received from the device. Again, what to send and how the received data should be interpreted depends from the device or IC you are using, always read the reference manual.
 
 ### PWM
 
