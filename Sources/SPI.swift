@@ -54,14 +54,14 @@ extension SwiftyGPIO {
 extension SwiftyGPIO {
     // RaspberryPis SPIs
     static let SPIRPI: [Int:SPIOutput] = [
-        0: SysFSSPI(spiId:"0.0", isOutput:true),
-        1: SysFSSPI(spiId:"0.1", isOutput:false)
+        0: SysFSSPI(spiId:"0.0"),
+        1: SysFSSPI(spiId:"0.1")
     ]
 
     // BananaPi
     static let SPIBANANAPI: [Int:SPIOutput] = [
-        0: SysFSSPI(spiId:"0.0", isOutput:true),
-        1: SysFSSPI(spiId:"0.1", isOutput:false)
+        0: SysFSSPI(spiId:"0.0"),
+        1: SysFSSPI(spiId:"0.1")
     ]
 }
 
@@ -71,21 +71,17 @@ public protocol SPIOutput {
     func sendData(_ values: [UInt8], order: ByteOrder, clockDelayUsec: Int)
     func sendData(_ values: [UInt8])
     func isHardware() -> Bool
-    func isOut() -> Bool
 }
 
 public struct SysFSSPI: SPIOutput {
     let spiId: String
-    let isOutput: Bool
 
-    public init(spiId: String, isOutput: Bool) {
+    public init(spiId: String) {
         self.spiId=spiId
-        self.isOutput=isOutput
         //TODO: Check if available?
     }
 
     public func sendData(_ values: [UInt8], order: ByteOrder, clockDelayUsec: Int) {
-        guard isOutput else {return}
 
         if clockDelayUsec > 0 {
             //Try setting new frequency in Hz
@@ -101,10 +97,6 @@ public struct SysFSSPI: SPIOutput {
 
     public func isHardware() -> Bool {
         return true
-    }
-
-    public func isOut() -> Bool {
-        return isOutput
     }
 
     private func writeToFile(_ path: String, values: [UInt8]) {
@@ -220,10 +212,6 @@ public struct VirtualSPI: SPIOutput {
 
     public func isHardware() -> Bool {
         return false
-    }
-
-    public func isOut() -> Bool {
-        return true
     }
 }
 
