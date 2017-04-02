@@ -442,6 +442,7 @@ A few projects and libraries built using SwiftyGPIO. Have you built something th
 * [HD44780U Character LCD Library](https://github.com/uraimo/HD44780CharacterLCD.swift) - Show text on character LCDs controlled by the HD44780 or one of its clones.
 * [DHTxx Temperature Sensor Library](https://github.com/pj4533/dhtxx) - Read temperature and humidity values from sensors of the DHT family (DHT11, DHT22, AM2303).
 * [SG90 Servo Motor Library](https://github.com/uraimo/SG90Servo.swift) - Drives a SG90 servo motor via PWM but can be easily modified to use other kind of servos.
+* [MCP3008 10 bits ADC Library](https://github.com/uraimo/MCP3008.swift) - Convert analog values to integers with this SPI-driven ADC.
 
 ### Awesome Projects 
 * [Portable Wifi Monitor in Swift](http://saygoodnight.com/2016/04/05/portable-wifimon-raspberrypi.html) - A battery powered wifi signal monitor to map your wifi coverage.
