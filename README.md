@@ -217,15 +217,17 @@ var spi = spis?[0]
 
 The items returned refer to different devices addressable through the SPI bus, the number is equal to the number of CS(or CE) pins available on your board.
 
-Alternatively, we can create a software SPI using two GPIOs, one that will serve as clock pin and the other will be used to send the actual data (you'll need to connect the CS pin of your device to a 1 value). This kind of bit-banging SPI is slower than the hardware one, so, the recommended approach is to use hardware SPIs when available.
+Alternatively, we can create a software SPI using four GPIOs, one that will serve as clock pin (SCLK), one as chip-select (CS or CE) and the other two will be used to send and receive the actual data (MOSI and MISO). This kind of bit-banging SPI is slower than the hardware one, so, the recommended approach is to use hardware SPIs when available.
 
 To create a software SPI, just retrieve two pins and create a `VirtualSPI` object:
 ```swift
 let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi2)
-var sclk = gpios[.P2]!
-var dnmosi = gpios[.P3]!
+var cs = gpios[.P27]!
+var mosi = gpios[.P22]!
+var miso = gpios[.P4]!
+var clk = gpios[.P17]!
 
-var spi = VirtualSPI(dataGPIO:dnmosi,clockGPIO:sclk) 
+var spi = VirtualSPI(mosiGPIO: mosi, misoGPIO: miso, clockGPIO: clk, csGPIO: cs)
 ```
 
 Both objects implement the same `SPIObject` protocol and so provide the same methods.
