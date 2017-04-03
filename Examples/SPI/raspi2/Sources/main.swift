@@ -17,13 +17,14 @@ let d: [UInt8] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
 pi.sendData(d, frequencyHz: 1_000_000)
 
-// Now let's create a virtual SPI on pins P0 and P1
-
+// Now let's create a virtual SPI with pins P4,P17,P22,P27
+/*
 let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi2)
-var sclk = gpios[.P0]!
-var dnmosi = gpios[.P1]!
+var cs = gpios[.P27]!
+var mosi = gpios[.P22]!
+var miso = gpios[.P4]!
+var clk = gpios[.P17]!
 
-var spi = VirtualSPI(dataGPIO:dnmosi,clockGPIO:sclk) 
+var spi = VirtualSPI(mosiGPIO: mosi, misoGPIO: miso, clockGPIO: clk, csGPIO: cs)
 pi.sendData(d)
- 
-
+ */
