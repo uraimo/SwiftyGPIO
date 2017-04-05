@@ -15,7 +15,7 @@ var spi = spis?[0]
 // Send some bytes at 1Mhz
 let d: [UInt8] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
-pi.sendData(d, frequencyHz: 1_000_000)
+spi.sendData(d, frequencyHz: 1_000_000)
 
 // Now let's create a virtual SPI with pins P4,P17,P22,P27
 /*
