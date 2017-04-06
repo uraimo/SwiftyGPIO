@@ -7,8 +7,8 @@ import SwiftyGPIO //Remove this import if you are compiling manually with switfc
 import Foundation
 
 
-let uarts = SwiftyGPIO.UARTs(for:.RaspberryPi2)
-var uart = (uarts?[0])!
+let uarts = SwiftyGPIO.UARTs(for:.RaspberryPi2)!
+var uart = uarts[0]
 
 uart.configureInterface(speed: .S9600, bitsPerChar: .Eight, stopBits: .One, parity: .None)
 
