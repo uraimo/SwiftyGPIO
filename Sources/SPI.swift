@@ -30,7 +30,7 @@
 
 extension SwiftyGPIO {
 
-    public static func hardwareSPIs(for board: SupportedBoard) -> [SPIOutput]? {
+    public static func hardwareSPIs(for board: SupportedBoard) -> [SPIInterface]? {
         switch board {
         case .RaspberryPiRev1:
             fallthrough
@@ -53,13 +53,13 @@ extension SwiftyGPIO {
 // MARK: - SPI Presets
 extension SwiftyGPIO {
     // RaspberryPis SPIs
-    static let SPIRPI: [Int:SPIOutput] = [
+    static let SPIRPI: [Int:SPIInterface] = [
         0: SysFSSPI(spiId:"0.0"),
         1: SysFSSPI(spiId:"0.1")
     ]
 
     // BananaPi
-    static let SPIBANANAPI: [Int:SPIOutput] = [
+    static let SPIBANANAPI: [Int:SPIInterface] = [
         0: SysFSSPI(spiId:"0.0"),
         1: SysFSSPI(spiId:"0.1")
     ]
@@ -67,7 +67,7 @@ extension SwiftyGPIO {
 
 // MARK: SPI
 
-public protocol SPIOutput {
+public protocol SPIInterface {
     // Send data at the requested frequency (from 500Khz to 20 Mhz)
     func sendData(_ values: [UInt8], frequencyHz: UInt)
     // Send data at the default frequency
@@ -76,12 +76,12 @@ public protocol SPIOutput {
     func sendDataAndRead(_ values: [UInt8], frequencyHz: UInt) -> [UInt8]
     // Send data and then receive a chunck of data at the default frequency
     func sendDataAndRead(_ values: [UInt8]) -> [UInt8]
-    // Returns true if the SPIOutput is using a real SPI pin, false if performing bit-banging
+    // Returns true if the SPIInterface is using a real SPI pin, false if performing bit-banging
     func isHardware() -> Bool
 }
 
 /// Hardware SPI via SysFS
-public final class SysFSSPI: SPIOutput {
+public final class SysFSSPI: SPIInterface {
 
     struct spi_ioc_transfer {
         var tx_buf: UInt64
@@ -258,7 +258,7 @@ public final class SysFSSPI: SPIOutput {
 }
 
 /// Bit-banging virtual SPI implementation, output only
-public final class VirtualSPI: SPIOutput {
+public final class VirtualSPI: SPIInterface {
     let mosiGPIO, misoGPIO, clockGPIO, csGPIO: GPIO
 
     public init(mosiGPIO: GPIO, misoGPIO: GPIO, clockGPIO: GPIO, csGPIO: GPIO) {
