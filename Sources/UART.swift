@@ -178,7 +178,6 @@ public final class SysFSUART: UARTInterface {
 		tty.c_lflag =  0    				// no signaling chars, no echo,
 			                         		// no canonical processing -> read bytes as they come without waiting for LF
         tty.c_oflag = 0                     // no remapping, no delays
-        //tty.c_lflag = UInt32(ICANON)
 
         withUnsafeMutableBytes(of: &tty.c_cc){$0[Int(VMIN)] = UInt8(1); return}
 		withUnsafeMutableBytes(of: &tty.c_cc){$0[Int(VTIME)] = UInt8(5); return} // 5 10th of second read timeout

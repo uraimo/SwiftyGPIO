@@ -1,6 +1,6 @@
 ![SwiftyGPIO](https://github.com/uraimo/SwiftyGPIO/raw/master/logo.png)
 
-**A Swift library to interact with Linux GPIOs/SPI/PWM, blinking leds and much more!**
+**A Swift library to interact with Linux GPIOs/SPI/PWM/UART, blinking leds and much more!**
 
 <p>
 <img src="https://img.shields.io/badge/os-linux-green.svg?style=flat" alt="Linux-only" />
@@ -12,7 +12,7 @@
 
 ## Summary
 
-This library provides an easy way to interact with external sensors and devices using digital GPIOs, SPI interfaces and PWM signals with Swift on Linux.
+This library provides an easy way to interact with external sensors and devices using digital GPIOs, SPI interfaces, PWM signals and serial ports with Swift on Linux.
 
 You'll be able to configure port attributes (direction,edge,active low), read/write the current GPIOs value, use the SPI interfaces (via hardware if your board provides them or using software big-banging SPI) and generate a PWM to drive external displays, servos, leds and more complex sensors.
 
@@ -29,6 +29,7 @@ The library is built to run **exclusively on Linux ARM Boards** (RaspberryPis, B
     - [SPI](#spi)
     - [PWM](#pwm)
     - [Pattern-based signal generator via PWM](#pattern-based-signal-generator-via-pwm)
+    - [UART](#uart)
 - [Examples](#examples)
 - [Built with SwiftyGPIO](#built-with-swiftygpio)
     - [Device Libraries](#libraries)
@@ -380,12 +381,40 @@ pwm.cleanupPattern()
 
 At this point you could configure a different signal calling again `initPWMPattern` if you want to.
 
+### UART
+
+If your board support the UART serial ports feature (disable the login on serial with `raspi-config` for RaspberryPi boards), you can retrieve the list of available `UARTInterface` with `SwiftyGPIO.UARTs(for:)`:
+
+```swift
+let uarts = SwiftyGPIO.UARTs(for:.RaspberryPi2)!
+var uart = uarts[0]
+```
+
+Before we can start trasmitting data, you need to configure the serial port, specifying: the speed (from 9600bps to 115200bps), the character size (6,7 or 8 bits per character), the number of stop bits (1 or 2) and the parity of your signal (no parity, odd or even). Software and hardware flow control are both disabled when using this library.
+
+```swift
+uart.configureInterface(speed: .S9600, bitsPerChar: .Eight, stopBits: .One, parity: .None)
+```
+
+Once the port is configured you can start reading or writing strings of sequence of `UInt8` with one of the specific methods of `UARTInterface`:
+
+```swift
+func readString() -> String
+func readData() -> [CChar]
+func writeString(_ value: String)
+func writeData(_ values: [CChar])
+
+func readLine() -> String
+```
+
+A specific method that reads lines of text (`\n` is used as line terminator, the serial read is still non-canonical) is also provided.
+
 
 ## Examples
 
-Examples for different boards are available in the *Examples* directory, you can just start from there modifying one of those.
+Examples for different boards and functionalities are available in the *Examples* directory, you can just start from there modifying one of those.
 
-The following example, built to run on the C.H.I.P. board, shows the current value of all the GPIO0 attributes, changes direction and value and then shows again a recap of the attributes:
+The following example, built to run on the C.H.I.P. board, shows the current value of all the attributes of a single GPIO port, changes direction and value and then shows again a recap of the attributes:
 
 ```Swift
 let gpios = SwiftyGPIO.GPIOs(for:.CHIP)
