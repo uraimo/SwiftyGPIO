@@ -47,12 +47,13 @@ Tested:
 * Raspberry Pi 2 (Thanks to [@iachievedit](https://twitter.com/iachievedit))
 * Raspberry Pi 3
 * Raspberry Pi Zero (Thanks to [@MacmeDan](https://twitter.com/MacmeDan))
+* Raspberry Pi Zero W
 * Raspberry Pi A,B Revision 1
 * Raspberry Pi A,B Revision 2
 * Raspberry Pi A+, B+
 * OrangePi (Thanks to [@colemancda](https://github.com/colemancda))
 * OrangePi Zero (Thanks to [@eugeniobaglieri](https://github.com/eugeniobaglieri)) 
-* UDOOs
+* UDOOs (Thanks to [@estebansannin](https://github.com/estebansannin))
 
 Not tested but they should work(basically everything that has an ARMv7/Ubuntu14/Raspbian or an ARMv6/Raspbian):
 * BananaPi
