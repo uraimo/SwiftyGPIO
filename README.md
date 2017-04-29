@@ -1,18 +1,24 @@
 ![SwiftyGPIO](https://github.com/uraimo/SwiftyGPIO/raw/master/logo.png)
 
-**A Swift library to interact with Linux GPIOs/SPI, turn on your leds and more!**
+**A Swift library to interact with Linux GPIOs/SPI/PWM/UART, blinking leds and much more!**
 
-<p>
-<img src="https://img.shields.io/badge/os-linux-green.svg?style=flat" alt="Linux-only" />
-<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/swift3-compatible-orange.svg?style=flat" alt="Swift 3 compatible" /></a>
-<a href="https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/LICENSE"><img src="http://img.shields.io/badge/license-MIT-blue.svg?style=flat" alt="License: MIT" /></a>
 
+[![Linux-only](https://img.shields.io/badge/OS-linux-green.svg?style=flat)](#) 
+[![License: MIT](http://img.shields.io/badge/License-MIT-blue.svg?style=flat)](https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/LICENSE) 
+[![Swift 3.x](https://img.shields.io/badge/Swift-3.x-orange.svg?style=flat)](https://developer.apple.com/swift) 
+[![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
+[![Join the slack channel](https://img.shields.io/badge/Slack-swift/arm-red.svg?style=flat)](https://slackpass.io/swift-arm)
+
+
+![](images/banner.jpg)
 
 ## Summary
 
-This library provides an easy way to interact with digital GPIOs and use SPI interfaces with Swift on Linux. You'll be able to configure a port attributes (direction,edge,active low) and read/write the current GPIO value. And you will also be able to use the SPI interfaces provided by your board or a software big-banging SPI.
+This library provides an easy way to interact with external sensors and devices using digital GPIOs, SPI interfaces, PWM signals and serial ports with Swift on Linux.
 
-It's built to run **exclusively on Linux ARM Boards** (RaspberryPis, BeagleBone Black, UDOO, Tegra, CHIP, etc...) with accessible GPIOs.
+You'll be able to configure port attributes (direction,edge,active low), read/write the current GPIOs value, use the SPI interfaces (via hardware if your board provides them or using software big-banging SPI), generate a PWM to drive external displays, servos, leds and more complex sensors, and finally interact with devices that expose UART serial connections using AT commands or custom protocols. See the *[libraries](#libraries)* for some device libraries built using SwiftyGPIO.
+
+The library is built to run **exclusively on Linux ARM Boards** (RaspberryPis, BeagleBone Black, CHIP, etc...) with accessible GPIOs.
 
 **Since version 0.8 SwiftyGPIO targets Swift 3.0, for Swift 2.x [refer to the specific branch](https://github.com/uraimo/SwiftyGPIO/tree/swift-2.2) for sources and documentation.**
 
@@ -21,11 +27,16 @@ It's built to run **exclusively on Linux ARM Boards** (RaspberryPis, BeagleBone 
 - [Installation](#installation)
 - [Your First Project: Blinking Leds And Sensors](#your-first-project-blinking-leds-and-sensors)
 - [Usage](#usage)
-    - [GPIOs](#gpio)
-    - [SPIs](#spis)
+    - [GPIO](#gpio)
+    - [SPI](#spi)
+    - [PWM](#pwm)
+    - [Pattern-based signal generator via PWM](#pattern-based-signal-generator-via-pwm)
+    - [UART](#uart)
 - [Examples](#examples)
-- [Under the hood](#under-the-hood)
 - [Built with SwiftyGPIO](#built-with-swiftygpio)
+    - [Device Libraries](#libraries)
+    - [Awesome Projects](#awesome-projects)
+- [Additional documentation](#additional-documentation)
 
 
 ## Supported Boards
@@ -36,11 +47,13 @@ Tested:
 * Raspberry Pi 2 (Thanks to [@iachievedit](https://twitter.com/iachievedit))
 * Raspberry Pi 3
 * Raspberry Pi Zero (Thanks to [@MacmeDan](https://twitter.com/MacmeDan))
+* Raspberry Pi Zero W
 * Raspberry Pi A,B Revision 1
 * Raspberry Pi A,B Revision 2
 * Raspberry Pi A+, B+
 * OrangePi (Thanks to [@colemancda](https://github.com/colemancda))
-* UDOOs
+* OrangePi Zero (Thanks to [@eugeniobaglieri](https://github.com/eugeniobaglieri)) 
+* UDOOs (Thanks to [@estebansannin](https://github.com/estebansannin))
 
 Not tested but they should work(basically everything that has an ARMv7/Ubuntu14/Raspbian or an ARMv6/Raspbian):
 * BananaPi
@@ -52,23 +65,14 @@ Not tested but they should work(basically everything that has an ARMv7/Ubuntu14/
 
 ## Installation
 
-To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with Swift 3.
+To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with Swift 3+.
 
-If you have a Raspberry Pi 2 or 3, you can either compile Swift yourself following [these instructions](http://morimori.tokyo/2016/02/09/compiling-swift-on-a-raspberry-pi-2-february-2016-update-and-a-script-to-clone-and-build-open-source-swift/) or use precompiled ARMv7 binaries available from various sources (check out [Joe build server](http://dev.iachieved.it/iachievedit/swift-for-arm-systems/) for the [latest binaries](http://swift-arm.ddns.net/job/Swift-3.0-ARM-Incremental/lastSuccessfulBuild/artifact/) compiled from the master repo).
-The same binaries should work for BeagleBoneBlack, C.H.I.P. or one of the other ARMv7 boards too.
+If you have a RaspberryPi (A,B,A+,B+,Zero,ZeroW,2,3) with Ubuntu or Raspbian, get Swift 3.0.2 from [here](https://www.uraimo.com/2016/12/30/Swift-3-0-2-for-raspberrypi-zero-1-2-3/) or follow the instruction from the post and the linked build scripts repository (or these: [1](http://mistercameron.com/2016/06/compile-swift-3-0-on-your-arm-computer/), [2](https://medium.com/@MissionKao/how-to-compile-swift-on-raspberry-pi-ae33e417a61e#.dweiw55iu), [3](http://saygoodnight.com/2016/05/08/building-swift-for-armv6.html), [4](http://morimori.tokyo/2016/02/09/compiling-swift-on-a-raspberry-pi-2-february-2016-update-and-a-script-to-clone-and-build-open-source-swift/)) to build it yourself.
 
-If you have a ARMv6 RaspberryPi 1 (A,B,A+,B+) or a Zero, get the precompiled binaries or build them yourself following [this guide](http://saygoodnight.com/2016/05/08/building-swift-for-armv6.html). 
+Recent precompiled ARMv7 binaries are also available from [Joe build server](http://dev.iachieved.it/iachievedit/swift-for-arm-systems/) and you can find them [here](http://swift-arm.ddns.net/job/Swift-3.0-Pi3-ARM-Incremental/lastSuccessfulBuild/artifact/), all built for Ubuntu 16.04 from the master repo.
 
-Once done, if your version of Swift does not support the Swift Package Manager, just download all the needed files: 
+The same Ubuntu binaries could work for BeagleBoneBlack, C.H.I.P. or any other ARMv6/ARMv7 board too when used with the same release.
 
-    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Thread.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/POSIXError.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SunXi.swift
-
-Once downloaded, in the same directory create an additional file that will contain the code of your application named `main.swift`. 
-
-When your code is ready, compile it with:
-
-    swiftc *.swift
-    
 If your version of Swift supports the SPM, you just need to add SwiftyGPIO as a dependency in your `Package.swift`:
 
 ```swift
@@ -83,10 +87,25 @@ let package = Package(
 ```
 And then build with `swift build`.
 
-The compiler will create a **main** executable.
-As everything interacting with GPIOs via sysfs/mmapped registers, if you are not already root, you will need to run that binary with `sudo ./main`.
+The compiler will create an executable under `.build/`.
 
-If you prefer an alternative approach that does not require to use sudo every time check out this [answer on stackoverflow](https://stackoverflow.com/questions/30938991/access-gpio-sys-class-gpio-as-non-root/30940526#30940526).
+If your version of Swift does not support the Swift Package Manager, download manually all the needed files: 
+
+    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Presets.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SunXi.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SPI.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/PWM.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Mailbox.swift
+
+And once downloaded, in the same directory create an additional file that will contain the code of your application named `main.swift`. 
+
+When your code is ready, compile it (the PWM and SPI files can be deleted if you don't need them) with:
+
+    swiftc *.swift
+    
+The compiler will create a **main** executable.
+
+**IMPORTANT:** As everything interacting with GPIOs via sysfs/mmapped registers, if your OS does not come with a predefined user group to access these functionalities, you'll need to run your application with root privileges using `sudo ./main`. If you are using a RaspberryPi with a recent Raspbian (post November 2016) or a recent Ubuntu (from 16.04 Xenial onward) implementing /dev/gpiomem, this will be not required to use basic GPIOs, just launch your application with `./main`.
+
+On misconfigured systems, features like the listeners may require root privileges anyway. Advanced features like PWM still require root privileges.
+
+Alternatively, a specific user group for gpio access can be configured manually as shown [here](https://arcanesciencelab.wordpress.com/2016/03/31/running-rpi3-applications-that-use-gpio-without-being-root/) or in this [answer on stackoverflow](https://stackoverflow.com/questions/30938991/access-gpio-sys-class-gpio-as-non-root/30940526#30940526).
 After following those instruction, remember to add your user (e.g. pi) to the gpio group with `sudo usermod -aG gpio pi` and to reboot so that the changes you made are applied.
 
 <a href="#first"></a>
@@ -94,19 +113,21 @@ After following those instruction, remember to add your user (e.g. pi) to the gp
 
 If you prefer starting with a real project instead of just reading documentation, more than a few tutorials are available online.
 
-If you are using Swift 3.0 and the latest version of SwiftyGPIO, [Cameron Perry has a great step by step guide](http://mistercameron.com/2016/06/accessing-raspberry-pi-gpio-pins-with-swift/) on how to setup a Raspberry Pi for Swift and using a land and a temperature sensor. 
+If you are using Swift 3.0 and the latest version of SwiftyGPIO, [Cameron Perry has a great step by step guide](http://mistercameron.com/2016/06/accessing-raspberry-pi-gpio-pins-with-swift/) on how to setup a Raspberry Pi for Swift and using a led and a temperature sensor. 
 
-And if you need instead a practical example of how to use SwiftyGPIO with Swift 2.x (get it from [the specific branch](https://github.com/uraimo/SwiftyGPIO/tree/swift-2.2)), Joe from iachievedit has written a [fantastic tutorial](http://dev.iachieved.it/iachievedit/raspberry-pi-2-gpio-with-swiftygpio/) that will explain everything you need to know.
+If you are still using Swift 2.x and need a practical example of how to use SwiftyGPIO (get it from [the specific 2.x branch](https://github.com/uraimo/SwiftyGPIO/tree/swift-2.2)), Joe from iachievedit has written a [fantastic tutorial](http://dev.iachieved.it/iachievedit/raspberry-pi-2-gpio-with-swiftygpio/) that will explain everything you need to know.
 
-Additional tutorials are also available in [中文](http://swift.gg/2016/04/01/raspberry-pi-2-gpio-with-swiftygpio/) and [日本語](https://ja.ngs.io/2016/06/01/swifty-gpio/).
+Additional tutorials are also available in [中文](http://swift.gg/2016/04/01/raspberry-pi-2-gpio-with-swiftygpio/), [日本語](https://ja.ngs.io/2016/06/01/swifty-gpio/) and [Tiếng Việt](https://techmaster.vn/posts/34237/lap-trinh-swift-tren-raspberry-pi).
 
 ## Usage
 
-Currently, SwiftyGPIO expose GPIOs and SPIs(if not available a bit-banging VirtualSPI can be created), let's see how to use them.
+Currently, SwiftyGPIO expose GPIOs, SPIs(if not available a bit-banging VirtualSPI can be created) and PWMs, let's see how to use them.
 
-#### GPIOs
+### GPIO
 
-Let's suppose we are using a Raspberry 2 board and have a led connected between the GPIO pin P2 (possibly with a resistance of 1k or so) and GND and we want to turn it on.
+Let's suppose we are using a Raspberry 2 board and have a led connected between the GPIO pin P2 (possibly with a resistance of 1K Ohm or so) and GND and we want to turn it on.
+
+Note that SwiftyGPIO uses the raw Broadcom numbering scheme ([described here](https://github.com/uraimo/SwiftyGPIO/wiki/GPIO-Pinout)) to assign a number to each pin.
 
 First, we need to retrieve the list of GPIOs available on the board and get a reference to the one we want to modify:
 
@@ -119,8 +140,9 @@ The following are the possible values for the predefined boards:
     
 * .RaspberryPiRev1 (Pi A,B Revision 1, pre-2012, 26 pin header)
 * .RaspberryPiRev2 (Pi A,B Revision 2, post-2012, 26 pin header) 
-* .RaspberryPiPlusZero (Raspberry Pi A+ and B+, Raspberry Zero, all with a 40 pin header)
-* .RaspberryPi2 (Raspberry Pi 2 or 3 with a 40 pin header)
+* .RaspberryPiPlusZero (Raspberry Pi A+ and B+, Raspberry Zero/W, all with a 40 pin header)
+* .RaspberryPi2 (Raspberry Pi 2 with a 40 pin header)
+* .RaspberryPi3 (Raspberry Pi 2 with a 40 pin header)
 * .BeagleBoneBlack (BeagleBone Black)
 * .CHIP (the $9 C.H.I.P. computer).
 * .BananaPi (RaspberryPi clone)
@@ -184,29 +206,32 @@ Calling `clearListeners()` removes all the closures listening for changes and di
 While GPIOs are checked for updates, the `direction` of the pin cannot be changed (and configured as `.IN`), but once the listeners have been cleared, either inside the closure or somewhere else, you are free to modify it.
  
 
-#### SPIs
+### SPI
 
-If your board has SPI connections and SwiftyGPIO has them among its presets, a list of the available SPIs can be retrieved invoking `hardwareSPIs(for:)` (or `getHardwareSPIsForBoard` for Swift 2.x) with one of the predefined boards.
+If your board has a SPI connection and SwiftyGPIO has it among its presets, a list of the available SPI channels can be obrained calling `hardwareSPIs(for:)` with one of the predefined boards.
 
 On RaspberryPi and other boards the hardware SPI SysFS interface is not enabled by default, check out the setup guide on [wiki](https://github.com/uraimo/SwiftyGPIO/wiki/Enabling-SPI-on-RaspberryPi-and-others).
 
-Let's see some examples using a Raspberry2 that has one bidirectional SPI, managed by SwiftyGPIO as two mono-directional SPIObjects:
+Let's see some examples using a RaspberryPi 2 that has one bidirectional SPI, managed by SwiftyGPIO as two mono-directional SPIObjects:
  
 ```swift
-let spis = SwiftyGPIO.hardwareSPIs(for:.RaspberryPiPlus2Zero)
+let spis = SwiftyGPIO.hardwareSPIs(for:.RaspberryPi2)
 var spi = spis?[0]
 ```
 
-The first item returned is the output channel and this can be verified invoking the method `isOut` on the `SPIObject`.
+The items returned refer to different devices addressable through the SPI bus, the number is equal to the number of CS(or CE) pins available on your board.
 
-Alternatively, we can create a software SPI using two GPIOs, one that wil serve as clock pin and the other will be used to send the actual data. This kind of bit-banging SPI is slower than the hardware one, so, the recommended approach is to use hardware SPIs when available.
+Alternatively, we can create a software SPI using four GPIOs, one that will serve as clock pin (SCLK), one as chip-select (CS or CE) and the other two will be used to send and receive the actual data (MOSI and MISO). This kind of bit-banging SPI is slower than the hardware one, so, the recommended approach is to use hardware SPIs when available.
 
 To create a software SPI, just retrieve two pins and create a `VirtualSPI` object:
 ```swift
 let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi2)
-var sclk = gpios[.P2]!
-var dnmosi = gpios[.P3]!
-var spi = VirtualSPI(dataGPIO:dnmosi,clockGPIO:sclk) 
+var cs = gpios[.P27]!
+var mosi = gpios[.P22]!
+var miso = gpios[.P4]!
+var clk = gpios[.P17]!
+
+var spi = VirtualSPI(mosiGPIO: mosi, misoGPIO: miso, clockGPIO: clk, csGPIO: cs)
 ```
 
 Both objects implement the same `SPIObject` protocol and so provide the same methods.
@@ -216,19 +241,183 @@ To send one or more byte over a SPI, use the `sendData` method.
 In its simplest form it just needs an array of UInt8 as parameter:
 
 ```swift
-spi?.sendData([UInt(42)])
+spi?.sendData([UInt(42)], frequencyHz: 500_000)
 ```
 
-But for software SPIs (for now, these values are ignored when using a hardware SPI) you can also specify the preferred byte ordering (MSB,LSB) and the delay between two succesive bits (clock width, default 0):
+The frequency at which the data will be sent can be specified if needed (alternatively the default will be used, that is 500khz for hardware SPIs and the best available speed for virtual SPIs).
+
+Since the interface performs only full duplex transmissions, to read some data from the SPI you'll need to write the same amount of bits. For most devices you'll use this means that you'll need to send some dummy data depending on the protocol used by your device. Check the device reference for more information.
+
+Let's see a simple example, that reads 32 bytes from a device sending just 32 empty bytes:
 
 ```swift
-spi?.sendData([UInt(42)], order:.LSBFIRST, clockDelayUsec:1000)
+let data: [UInt8] = [UInt8](repeating:0, count: 32)
+let res = spi?.sendData(data)
 ```
+The `res` array will contain the raw data received from the device. Again, what to send and how the received data should be interpreted depends from the device or IC you are using, always read the reference manual.
+
+### PWM
+
+PWM output signals can be used for example to drive servo motors, RGB leds and other devices, or more in general, to approximate analog output values when you only have digital GPIO ports.
+
+If your board has PWM ports and is supported (at the moment only RaspberryPi boards), retrieve the available `PWMOutput` objects with the `hardwarePWMs` factory method:
+
+```swift
+let pwms = SwiftyGPIO.hardwarePWMs(for:.RaspberryPi2)!
+let pwm = (pwms[0]?[.P18])!
+```
+
+This method returns all the ports that support the PWM function, grouped by the PWM channel that controls them. 
+
+You'll be able to use only one port per channel and considering that the Raspberries have two channels, you'll be able to use two PWM outputs at the same time, for example GPIO12 and GPIO13 or GPIO18 and GPIO19.
+
+Once you've retrieved the `PWMOutput` for the port you plan to use you need to initialize it to select the PWM function. On this kind of boards, each port can have more than one function (simple GPIO, SPI, PWM, etc...) and you can choose the function you want configuring dedicated registers.
+
+```swift
+pwm.initPWM()
+```
+
+To start the PWM signal call `startPWM` providing the period in nanoseconds (if you have the frequency convert it with 1/frequency) and the duty cycle as a percentage:
+
+```swift
+print("PWM from GPIO18 with 500ns period and 50% duty cycle")
+pwm.startPWM(period: 500, duty: 50)
+```
+
+Once you call this method, the PWM subsystem of the ARM SoC will start generating the signal, you don't need to do anything else and your program will continue to execute, you could insert a `sleep(seconds)` here if you just want to wait.
+
+And when you want to stop the PWM signal call the `stopPWM()` method:
+
+```swift
+pwm.stopPWM()
+```
+
+If you want to change the signal being generated, you don't need to stop the previous one, just call `startPWM` with different parameters.
+
+This feature uses the M/S algorithm and has been tested with signals with a period in a range from 300ns to 200ms, generating a signal outside of this range could lead to excessive jitter that could not be acceptable for some applications. If you need to generate a signal near to the extremes of that range and have an oscilloscope at hand, always verify if the resulting signal is good enough for what you need.
+
+### Pattern-based signal generator via PWM
+
+<p>
+<img src="https://github.com/uraimo/SwiftyGPIO/raw/master/images/led1.gif" />
+<img src="https://github.com/uraimo/SwiftyGPIO/raw/master/images/led2.gif" />
+<img src="https://github.com/uraimo/SwiftyGPIO/raw/master/images/led3.gif" />
+</p>
+  
+This functionality leverages the PWM to generate digital signals based on two patterns representing a 0 or a 1 value through a variation of the duty cycle. Let's look at a practical example to better understand the use case and how to use this signal generator:
+
+Let's consider for example the WS2812, a led with integrated driver used in many led strips.
+
+This led is activated with a signal between 400Khz and 800Khz containing the encoded value of three bytes representing respectively the *Green*,*Blue* and *Red* color values. Each bit composing the byte of each one of the color components has to be encoded this way:
+
+* Bit value 0: _A 1250ns signal that stays, at least, high for 350ns(T0H) and then low for 900ns(T0L), with a tollerance of 150ns._
+* Bit value 1: _A 1250ns signal that stays,at least, high for 650ns(T1H) and then low for 600ns(T0L), with a tollerance of 150ns._
+
+For each byte you'll have to send a sequence of 8 bit encoded this way and three bytes will be needed to configure the color of every led. If you have more than one led connected to each other serially, you'll just need to send a series of 3 bytes values. Once the whole sequence of colors for your strip of leds has been sent, you need to keep the voltage at 0 for 50us, before you'll be able to transmit a new sequence.
+
+The bytes we'll send will configure the leds of the strip starting from the last one, going backwards to the first one.
+
+This diagram from the official documentation gives you a better idea of what those signals look like:
+
+![ws2812 timings](https://github.com/uraimo/SwiftyGPIO/raw/master/images/ws2812.png)
+  
+You could think to just send this signal based on those 0 and 1 pattern changing the values of a GPIO, but that's actually impossible for an ARM board to keep up with the rate required by devices like the WS2812 leds. Once the period of the pattern is lower than 100us or so, you need another way to send your signal. Ant this is what the pattern-based signal generator solves, leveraging PWM-capable outputs.
+
+You'll find a complete example under `Examples/PWMPattern`, but let's describe each one of the steps needed to use this feature. 
+
+In this brief guide I'm using an 8x8 led matrix with 64 WS2812 leds (these matrices are usually marketed as NeoPixel matrix, Nulsom Rainbow matrix, etc... and you can find one of these in some Pimoroni products like the UnicornHat).
+
+First of all let's retrieve a `PWMOutput` object and then initialize it:
+
+```swift
+let pwms = SwiftyGPIO.hardwarePWMs(for:.RaspberryPi2)!
+let pwm = (pwms[0]?[.P18])!
+
+// Initialize PWM
+pwm.initPWM()
+```
+
+We'll then configure the signal generator specifying the frequency we need (800KHz for a 1250ns pattern period), the number of leds in the sequence (I'm using and 8x8 led matrix here), and the duration of the reset time (55us). We'll call the `initPWMPattern` to configure these parameters. We specify the duty cycle (percentage of the period at which the pattern should have a high value) for the 0 and 1 values.
+
+```swift
+let NUM_ELEMENTS = 64
+let WS2812_FREQ = 800000 // 800Khz
+let WS2812_RESETDELAY = 55  // 55us reset
+
+pwm.initPWMPattern(bytes: NUM_ELEMENTS*3, 
+                   at: WS2812_FREQ, 
+                   with: WS2812_RESETDELAY, 
+                   dutyzero: 33, dutyone: 66) 
+```
+
+Once this is done, we can start sending data, this time we are using a function that sets the colors and another function that turn them in a series of `UInt8` in the `GBR` format:
+
+```swift
+func toByteStream(_ values: [UInt32]) -> [UInt8]{
+    var byteStream = [UInt8]()
+    for led in values {
+        // Add as GRB, converted from RGB+0x00
+        byteStream.append(UInt8((led >> UInt32(16))  & 0xff))
+        byteStream.append(UInt8((led >> UInt32(24)) & 0xff))
+        byteStream.append(UInt8((led >> UInt32(8))  & 0xff))
+    }
+    return byteStream
+}
+
+var initial = [UInt32](repeating:0x50000000, count:NUM_ELEMENTS)
+var byteStream: [UInt8] = toByteStream(initial)
+
+pwm.sendDataWithPattern(values: byteStream)
+```
+
+The method `sendDataWithPatter` will use the sequence of `UInt8` to produce a signal composed by the patterns described above.
+
+We can then wait until the signal is completely sent and then perform the necessary final cleanup:
+
+```swift
+// Wait for the transmission to end
+pwm.waitOnSendData()
+
+// Clean up once you are done with the generator
+pwm.cleanupPattern()
+```
+
+At this point you could configure a different signal calling again `initPWMPattern` if you want to.
+
+### UART
+
+If your board support the UART serial ports feature (disable the login on serial with `raspi-config` for RaspberryPi boards), you can retrieve the list of available `UARTInterface` with `SwiftyGPIO.UARTs(for:)`:
+
+```swift
+let uarts = SwiftyGPIO.UARTs(for:.RaspberryPi2)!
+var uart = uarts[0]
+```
+
+Before we can start trasmitting data, you need to configure the serial port, specifying: the speed (from 9600bps to 115200bps), the character size (6,7 or 8 bits per character), the number of stop bits (1 or 2) and the parity of your signal (no parity, odd or even). Software and hardware flow control are both disabled when using this library.
+
+```swift
+uart.configureInterface(speed: .S9600, bitsPerChar: .Eight, stopBits: .One, parity: .None)
+```
+
+Once the port is configured you can start reading or writing strings of sequence of `UInt8` with one of the specific methods of `UARTInterface`:
+
+```swift
+func readString() -> String
+func readData() -> [CChar]
+func writeString(_ value: String)
+func writeData(_ values: [CChar])
+
+func readLine() -> String
+```
+
+A specific method that reads lines of text (`\n` is used as line terminator, the serial read is still non-canonical) is also provided.
 
 
 ## Examples
 
-The following example, built to run on the $9 C.H.I.P., shows the current value of all the GPIO0 attributes, changes direction and value and then shows again a recap of the attributes:
+Examples for different boards and functionalities are available in the *Examples* directory, you can just start from there modifying one of those.
+
+The following example, built to run on the C.H.I.P. board, shows the current value of all the attributes of a single GPIO port, changes direction and value and then shows again a recap of the attributes:
 
 ```Swift
 let gpios = SwiftyGPIO.GPIOs(for:.CHIP)
@@ -278,35 +467,30 @@ pi.sendData([UInt8(truncatingBitPattern:0x9F)])
 
 Notice that we are converting the 0x9F `Int` using the constructor `UInt8(truncatingBitPattern:)`, that in this case it's not actually needed, but it's recommended for every user-provided or calculated integer because Swift does not support implicit truncation for conversion to smaller integer types, it will just crash if the `Int` you are trying to convert does not fit in a `UInt8`.
 
-Other examples for differen boards are available in the *Examples* directory.
-
-
-## Under the hood
-
-SwiftyGPIO interact with GPIOs through memory mapped gpio registers (if available, when sending data) and the sysfs file-based interface described [here](https://www.kernel.org/doc/Documentation/gpio/sysfs.txt).
-
-The GPIO is exported the first time one of the GPIO methods is invoked, using the GPIO id provided during the creation of the object (either provided manually or from the defaults). Most of the times that id will be different from the physical id of the pin. SysFS GPIO ids can usually be found in the board documentation, we provide a few presets for tested boards (do you have the complete list of ids for an unsupported board and want to help? Cool! Consider opening a PR).
-
-At the moment GPIOs are never unexported, let me know if you could find that useful. Multiple exporting when creating an already configured GPIO is not a problem, successive attempts to export a GPIO are simply ignored.
-
-Regarding the actual sending of the data, when available SwiftyGPIO will use a mmapped registers interface (max pulse when used directly on a Rpi2 12Mhz) and will use a fallback sysfs interface when no mmapped implementation exists (max pulse when used directly on a Rpi2 4Khz).
-
-At the moment the memory mapped interface is only available on all Raspberries.
-
-
 ## Built with SwiftyGPIO
 
-A few projects and library built using SwiftyGPIO. Have you built something that you want to share? Let me know!
+A few projects and libraries built using SwiftyGPIO. Have you built something that you want to share? Let me know!
 
 ### Libraries
 * [Nokia5110(PCD8544) LCD Library](http://github.com/uraimo/5110lcd_pcd8544.swift) - Show text and graphics on a Nokia 3110/5110 LCD display.
 * [HD44780U Character LCD Library](https://github.com/uraimo/HD44780CharacterLCD.swift) - Show text on character LCDs controlled by the HD44780 or one of its clones.
 * [DHTxx Temperature Sensor Library](https://github.com/pj4533/dhtxx) - Read temperature and humidity values from sensors of the DHT family (DHT11, DHT22, AM2303).
+* [SG90 Servo Motor Library](https://github.com/uraimo/SG90Servo.swift) - Drives a SG90 servo motor via PWM but can be easily modified to use other kind of servos.
+* [MCP3008 10 bits ADC Library](https://github.com/uraimo/MCP3008.swift) - Convert analog values to integers with this SPI-driven ADC.
+* [WS281x Library](https://github.com/uraimo/WS281x.swift) - A library for WS2812x (WS2811,WS2812,WS2812B) RGB led strips, rings, sticks, matrices, etc...
+* [u-Blox GPS Receivers Library](https://github.com/uraimo/UBloxGPS.swift) - Get location data from boards with the u-Blox 6/7/8 family of A-GPS receivers with an UART serial connection (e.g. NEO6M).
+
+
 
 ### Awesome Projects 
 * [Portable Wifi Monitor in Swift](http://saygoodnight.com/2016/04/05/portable-wifimon-raspberrypi.html) - A battery powered wifi signal monitor to map your wifi coverage.
 * [Temperature & Humidity Monitor in Swift](http://saygoodnight.com/2016/04/13/swift-temperature-raspberrypi.html) - A temperature monitor with a Raspberry Pi and an AM2302.
 * [Motion Detector with Swift and a Beaglebone Black](http://myroboticadventure.blogspot.it/2016/04/beaglebone-black-motion-detector-with.html) - A motion detector built with a BBB using a HC-SR502 sensor.
 * [DS18B20 Temperature Sensor with Swift](http://mistercameron.com/2016/06/accessing-raspberry-pi-gpio-pins-with-swift/) - Step by step project to read temperature values from a DS18B20 sensor.
-* Your Project here
+* [Swifty Buzz](https://github.com/DigitalTools/SwiftyBuzz) - Swifty tunes with a buzzer connected to a GPIO.
+* [Swift... Swift Everywhere](https://medium.com/@darthpelo/swift-swift-everywhere-eba445ef2bcd) - A tutorial that builds a complete platform, an iOS app controlling leds through a Vapor-based REST service.
+ 
 
+## Additional documentation
+
+Additional documentation can be found in the `docs` directory.
