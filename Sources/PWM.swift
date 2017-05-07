@@ -69,7 +69,7 @@ extension SwiftyGPIO {
 
 public protocol PWMOutput {
     func initPWM()
-    func startPWM(period ns: Int, duty percent: Int)
+    func startPWM(period ns: Int, duty percent: Double)
     func stopPWM()
 
     func initPWMPattern(bytes count: Int, at frequency: Int, with resetDelay: Int, dutyzero: Int, dutyone: Int)
@@ -158,7 +158,7 @@ public class RaspberryPWM: PWMOutput {
     /// Start a PWM signal with specific period in ns and duty cycle from 0 to 100.
     /// The signal starts, asynchronously(manged by a device external to the CPU), once this method is called and 
     /// needs to be stopped manually calling `stopPWM()`.
-    public func startPWM(period ns: Int, duty percent: Int) {
+    public func startPWM(period ns: Int, duty percent: Double) {
         // Kill the clock
         clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_KILL     //CM CTL register: Set KILL flag
         usleep(10)
