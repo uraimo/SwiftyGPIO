@@ -69,7 +69,7 @@ extension SwiftyGPIO {
 
 public protocol PWMOutput {
     func initPWM()
-    func startPWM(period ns: Int, duty percent: Int)
+    func startPWM(period ns: Int, duty percent: Float)
     func stopPWM()
 
     func initPWMPattern(bytes count: Int, at frequency: Int, with resetDelay: Int, dutyzero: Int, dutyone: Int)
@@ -158,7 +158,7 @@ public class RaspberryPWM: PWMOutput {
     /// Start a PWM signal with specific period in ns and duty cycle from 0 to 100.
     /// The signal starts, asynchronously(manged by a device external to the CPU), once this method is called and 
     /// needs to be stopped manually calling `stopPWM()`.
-    public func startPWM(period ns: Int, duty percent: Int) {
+    public func startPWM(period ns: Int, duty percent: Float) {
         // Kill the clock
         clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_KILL     //CM CTL register: Set KILL flag
         usleep(10)
@@ -178,7 +178,7 @@ public class RaspberryPWM: PWMOutput {
         let RNG = (channel == 0) ? 4 : 8
         let DAT = (channel == 0) ? 5 : 9
         pwmBasePointer.advanced(by: RNG).pointee = 100 * scale / highFreqSampleReduction                                    //RNG1 register
-        pwmBasePointer.advanced(by: DAT).pointee = UInt((Float(percent) / Float(highFreqSampleReduction)) * Float(scale))   //DAT1 register
+        pwmBasePointer.advanced(by: DAT).pointee = UInt((percent / Float(highFreqSampleReduction)) * Float(scale))   //DAT1 register
         let PWMCTL_MSEN = (channel == 0) ? PWMCTL_MSEN1 : PWMCTL_MSEN2
         let PWMCTL_PWEN = (channel == 0) ? PWMCTL_PWEN1 : PWMCTL_PWEN2
         pwmBasePointer.pointee = PWMCTL_MSEN | PWMCTL_PWEN                                                              //PWM CTL register, channel enabled, M/S mode
