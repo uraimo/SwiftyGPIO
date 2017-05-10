@@ -64,12 +64,11 @@ extension SwiftyGPIO {
 public protocol I2CInterface {
     func isReachable(_ address: Int) -> Bool
     func setPEC(_ address: Int, enabled: Bool)
-    func isHardware() -> Bool
     func readByte(_ address: Int) -> UInt8
     func readByte(_ address: Int, command: UInt8) -> UInt8
     func readWord(_ address: Int, command: UInt8) -> UInt16
     func readData(_ address: Int, command: UInt8) -> [UInt8]
-    func writeQuick(_ address: Int, value: UInt8)
+    func writeQuick(_ address: Int)
     func writeByte(_ address: Int, value: UInt8)
     func writeByte(_ address: Int, command: UInt8, value: UInt8)
     func writeWord(_ address: Int, command: UInt8, value: UInt16)
@@ -92,10 +91,6 @@ public final class SysFSI2C: I2CInterface {
 
     deinit {
         closeI2C()
-    }
-
-    public func isHardware() -> Bool {
-        return true
     }
 
     public func readByte(_ address: Int) -> UInt8 {
@@ -148,10 +143,10 @@ public final class SysFSI2C: I2CInterface {
         return buf
     }
 
-    public func writeQuick(_ address: Int, value: UInt8) {
+    public func writeQuick(_ address: Int) {
         setSlaveAddress(address)
 
-        let r =  i2c_smbus_write_quick(value: value)
+        let r =  i2c_smbus_write_quick(value: I2C_SMBUS_WRITE)
 
         if r < 0 {
             perror("I2C write failed")
