@@ -1,6 +1,6 @@
 ![SwiftyGPIO](https://github.com/uraimo/SwiftyGPIO/raw/master/logo.png)
 
-**A Swift library to interact with Linux GPIOs/SPI/PWM/UART, blinking leds and much more!**
+**A Swift library to interact with Linux GPIOs/SPI/I2C/PWM/UART, blinking leds and much more!**
 
 
 [![Linux-only](https://img.shields.io/badge/OS-linux-green.svg?style=flat)](#) 
@@ -16,11 +16,9 @@
 
 This library provides an easy way to interact with external sensors and devices using digital GPIOs, SPI interfaces, PWM signals and serial ports with Swift on Linux.
 
-You'll be able to configure port attributes (direction,edge,active low), read/write the current GPIOs value, use the SPI interfaces (via hardware if your board provides them or using software big-banging SPI), generate a PWM to drive external displays, servos, leds and more complex sensors, and finally interact with devices that expose UART serial connections using AT commands or custom protocols. See the *[libraries](#libraries)* for some device libraries built using SwiftyGPIO.
+You'll be able to configure port attributes (direction,edge,active low), read/write the current GPIOs value, use the SPI interfaces (via hardware if your board provides them or using software big-banging SPI), comunicate over a bus with I2C, generate a PWM to drive external displays, servos, leds and more complex sensors, and finally interact with devices that expose UART serial connections using AT commands or custom protocols. See the *[libraries](#libraries)* for some device libraries built using SwiftyGPIO.
 
 The library is built to run **exclusively on Linux ARM Boards** (RaspberryPis, BeagleBone Black, CHIP, etc...) with accessible GPIOs.
-
-**Since version 0.8 SwiftyGPIO targets Swift 3.0, for Swift 2.x [refer to the specific branch](https://github.com/uraimo/SwiftyGPIO/tree/swift-2.2) for sources and documentation.**
 
 ##### Content:
 - [Supported Boards](#supported-boards)
@@ -29,6 +27,7 @@ The library is built to run **exclusively on Linux ARM Boards** (RaspberryPis, B
 - [Usage](#usage)
     - [GPIO](#gpio)
     - [SPI](#spi)
+    - [I2C](#i2c)
     - [PWM](#pwm)
     - [Pattern-based signal generator via PWM](#pattern-based-signal-generator-via-pwm)
     - [UART](#uart)
@@ -67,9 +66,7 @@ Not tested but they should work(basically everything that has an ARMv7/Ubuntu14/
 
 To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with Swift 3+.
 
-If you have a RaspberryPi (A,B,A+,B+,Zero,ZeroW,2,3) with Ubuntu or Raspbian, get Swift 3.0.2 from [here](https://www.uraimo.com/2016/12/30/Swift-3-0-2-for-raspberrypi-zero-1-2-3/) or follow the instruction from the post and the linked build scripts repository (or these: [1](http://mistercameron.com/2016/06/compile-swift-3-0-on-your-arm-computer/), [2](https://medium.com/@MissionKao/how-to-compile-swift-on-raspberry-pi-ae33e417a61e#.dweiw55iu), [3](http://saygoodnight.com/2016/05/08/building-swift-for-armv6.html), [4](http://morimori.tokyo/2016/02/09/compiling-swift-on-a-raspberry-pi-2-february-2016-update-and-a-script-to-clone-and-build-open-source-swift/)) to build it yourself.
-
-Recent precompiled ARMv7 binaries are also available from [Joe build server](http://dev.iachieved.it/iachievedit/swift-for-arm-systems/) and you can find them [here](http://swift-arm.ddns.net/job/Swift-3.0-Pi3-ARM-Incremental/lastSuccessfulBuild/artifact/), all built for Ubuntu 16.04 from the master repo.
+If you have a RaspberryPi (A,B,A+,B+,Zero,ZeroW,2,3) with Ubuntu or Raspbian, get Swift 3.1.1 from [here](https://www.uraimo.com/2017/05/01/An-update-on-Swift-3-1-1-for-raspberry-pi-zero-1-2-3/) or follow the instruction from the post and the linked [build scripts repository](https://github.com/uraimo/buildSwiftOnARM) to build it yourself.
 
 The same Ubuntu binaries could work for BeagleBoneBlack, C.H.I.P. or any other ARMv6/ARMv7 board too when used with the same release.
 
@@ -91,11 +88,11 @@ The compiler will create an executable under `.build/`.
 
 If your version of Swift does not support the Swift Package Manager, download manually all the needed files: 
 
-    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Presets.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SunXi.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SPI.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/PWM.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Mailbox.swift
+    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Presets.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SunXi.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SPI.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/PWM.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Mailbox.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/I2C.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/UART.swift
 
 And once downloaded, in the same directory create an additional file that will contain the code of your application named `main.swift`. 
 
-When your code is ready, compile it (the PWM and SPI files can be deleted if you don't need them) with:
+When your code is ready, compile it (every functionality is modularized in a different file, so that the PWM, SPI, I2C, UART files can be deleted if you don't need them) with:
 
     swiftc *.swift
     
@@ -121,7 +118,7 @@ Additional tutorials are also available in [中文](http://swift.gg/2016/04/01/r
 
 ## Usage
 
-Currently, SwiftyGPIO expose GPIOs, SPIs(if not available a bit-banging VirtualSPI can be created) and PWMs, let's see how to use them.
+Currently, SwiftyGPIO expose GPIOs, SPIs(if not available a bit-banging VirtualSPI can be created), I2Cs, PWMs and UART ports, let's see how to use them.
 
 ### GPIO
 
@@ -255,6 +252,56 @@ let data: [UInt8] = [UInt8](repeating:0, count: 32)
 let res = spi?.sendData(data)
 ```
 The `res` array will contain the raw data received from the device. Again, what to send and how the received data should be interpreted depends from the device or IC you are using, always read the reference manual.
+
+### I2C
+
+The I2C interface can be used to communicate using the SMBus protocol on a I2C bus, reading or writing registers on devices identified by a numerical address. This interface needs just two wires (clock and data) and unlike SPI, it does not need a dedicated chip select/enable wire to select which device will receive the signal being sent, since the address of the destination of the protocol's messages is contained in the message itself, quite an improvement.
+
+To obtain a reference to the `I2CInterface` object, call the `hardwareI2Cs(for:)` utility method of the SwiftyGPIO class:
+
+```swift
+let i2cs = SwiftyGPIO.hardwareI2Cs(for:.RaspberryPi2)!
+let i2c = i2cs?[1]!
+```
+
+This object provide methods to read and write registers of different sizes and to verify that a device at a certain address is reachable or to enable a CRC on the protocol's messages:
+
+```swift
+func isReachable(_ address: Int) -> Bool
+func setPEC(_ address: Int, enabled: Bool)
+```
+
+You should choose the read method to use depending on the fact that your device supports multiple registers (`command` in SMBus parlance) and depending of the size of the register you are going to read from:
+
+```swift
+func readByte(_ address: Int) -> UInt8
+func readByte(_ address: Int, command: UInt8) -> UInt8
+func readWord(_ address: Int, command: UInt8) -> UInt16
+func readData(_ address: Int, command: UInt8) -> [UInt8]
+```
+
+Let's suppose that we want to read the seconds register (id 0) from a DS1307 RTC clock, that has an I2C address of 0x68:
+
+```swift
+print(i2c.readByte(0x68, command: 0)) //Prints the value of the 8bit register
+```
+
+You should choose the same way one of the write functions available, just note that `writeQuick` is used to perform quick commands and does not perform a normal write. SMBus's quick commands are usually used to turn on/off devices or perform similar tasks that don't require additional parameters.
+
+```swift
+func writeQuick(_ address: Int)
+
+func writeByte(_ address: Int, value: UInt8)
+func writeByte(_ address: Int, command: UInt8, value: UInt8)
+func writeWord(_ address: Int, command: UInt8, value: UInt16)
+func writeData(_ address: Int, command: UInt8, values: [UInt8])
+```
+
+While using the I2C functionality doesn't require additional software to function, the tools contained in `i2c-tools` are useful to perform I2C transactions manually to verify that everything is working correctly.
+
+For example, I recommend to always check if your device has been connected correctly running `i2cdetect -y 1`. More information on I2C, and configuration instruction for the Raspberry Pi, are available [on Sparkfun](https://learn.sparkfun.com/tutorials/raspberry-pi-spi-and-i2c-tutorial).  
+
+The `Example/` directory contains a Swift implementation of *i2cdetect* and could be a good place to start experimenting.
 
 ### PWM
 
