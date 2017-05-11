@@ -212,8 +212,8 @@ On RaspberryPi and other boards the hardware SPI SysFS interface is not enabled 
 Let's see some examples using a RaspberryPi 2 that has one bidirectional SPI, managed by SwiftyGPIO as two mono-directional SPIObjects:
  
 ```swift
-let spis = SwiftyGPIO.hardwareSPIs(for:.RaspberryPi2)
-var spi = spis?[0]
+let spis = SwiftyGPIO.hardwareSPIs(for:.RaspberryPi2)!
+var spi = spis[0]
 ```
 
 The items returned refer to different devices addressable through the SPI bus, the number is equal to the number of CS(or CE) pins available on your board.
@@ -261,7 +261,7 @@ To obtain a reference to the `I2CInterface` object, call the `hardwareI2Cs(for:)
 
 ```swift
 let i2cs = SwiftyGPIO.hardwareI2Cs(for:.RaspberryPi2)!
-let i2c = i2cs?[1]!
+let i2c = i2cs[1]
 ```
 
 This object provide methods to read and write registers of different sizes and to verify that a device at a certain address is reachable or to enable a CRC on the protocol's messages:
