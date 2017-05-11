@@ -86,11 +86,12 @@ public final class SysFSI2C: I2CInterface {
 
     public init(i2cId: Int) {
         self.i2cId=i2cId
-        openI2C()
     }
 
     deinit {
-        closeI2C()
+        if fd != -1 {
+            closeI2C()
+        }
     }
 
     public func readByte(_ address: Int) -> UInt8 {
@@ -221,6 +222,10 @@ public final class SysFSI2C: I2CInterface {
 
     private func setSlaveAddress(_ to: Int) {
 
+        if fd == -1 {
+            openI2C()
+        }
+
         guard currentSlave != to else {return}
 
         let r = ioctl(fd, I2C_SLAVE_FORCE, CInt(to))
@@ -257,6 +262,10 @@ public final class SysFSI2C: I2CInterface {
     }
 
     private func smbus_ioctl(rw: UInt8, command: UInt8, size: Int32, data: UnsafeMutablePointer<UInt8>) -> Int32 {
+        if fd == -1 {
+            openI2C()
+        }
+
         var args = i2c_smbus_ioctl_data(read_write: rw,
                                         command: command,
                                         size: size, 
