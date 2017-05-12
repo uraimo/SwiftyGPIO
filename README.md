@@ -68,6 +68,8 @@ To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with Swift 3+
 
 If you have a RaspberryPi (A,B,A+,B+,Zero,ZeroW,2,3) with Ubuntu or Raspbian, get Swift 3.1.1 from [here](https://www.uraimo.com/2017/05/01/An-update-on-Swift-3-1-1-for-raspberry-pi-zero-1-2-3/) or follow the instruction from the post and the linked [build scripts repository](https://github.com/uraimo/buildSwiftOnARM) to build it yourself.
 
+And alternatively, you can setup a cross-compiling toolchain and build ARM binaries (Ubuntu/Raspbian) from a Mac, thanks again to the work of Helge Heß (and Johannes Weiß for implementing it in SPM), read more about that [here](https://github.com/helje5/dockSwiftOnARM/blob/master/toolchain/README.md). The toolchain supports SPM.
+
 The same Ubuntu binaries could work for BeagleBoneBlack, C.H.I.P. or any other ARMv6/ARMv7 board too when used with the same release.
 
 If your version of Swift supports the SPM, you just need to add SwiftyGPIO as a dependency in your `Package.swift`:
