@@ -521,13 +521,16 @@ Notice that we are converting the 0x9F `Int` using the constructor `UInt8(trunca
 A few projects and libraries built using SwiftyGPIO. Have you built something that you want to share? Let me know!
 
 ### Libraries
-* [Nokia5110(PCD8544) LCD Library](http://github.com/uraimo/5110lcd_pcd8544.swift) - Show text and graphics on a Nokia 3110/5110 LCD display.
-* [HD44780U Character LCD Library](https://github.com/uraimo/HD44780CharacterLCD.swift) - Show text on character LCDs controlled by the HD44780 or one of its clones.
-* [DHTxx Temperature Sensor Library](https://github.com/pj4533/dhtxx) - Read temperature and humidity values from sensors of the DHT family (DHT11, DHT22, AM2303).
-* [SG90 Servo Motor Library](https://github.com/uraimo/SG90Servo.swift) - Drives a SG90 servo motor via PWM but can be easily modified to use other kind of servos.
-* [MCP3008 10 bits ADC Library](https://github.com/uraimo/MCP3008.swift) - Convert analog values to integers with this SPI-driven ADC.
-* [WS281x Library](https://github.com/uraimo/WS281x.swift) - A library for WS2812x (WS2811,WS2812,WS2812B) RGB led strips, rings, sticks, matrices, etc...
-* [u-Blox GPS Receivers Library](https://github.com/uraimo/UBloxGPS.swift) - Get location data from boards with the u-Blox 6/7/8 family of A-GPS receivers with an UART serial connection (e.g. NEO6M).
+* [Nokia5110(PCD8544) 128x64 LCD](http://github.com/uraimo/5110lcd_pcd8544.swift) - Show text and graphics on a Nokia 3110/5110 LCD display.
+* [HD44780U Character LCD](https://github.com/uraimo/HD44780CharacterLCD.swift) - Show text on character LCDs controlled by the HD44780 or one of its clones.
+* [DHTxx Temperature Sensor](https://github.com/pj4533/dhtxx) - Read temperature and humidity values from sensors of the DHT family (DHT11, DHT22, AM2303).
+* [SG90 Servo Motor](https://github.com/uraimo/SG90Servo.swift) - Drives a SG90 servo motor via PWM but can be easily modified to use other kind of servos.
+* [MCP3008 10 bits ADC](https://github.com/uraimo/MCP3008.swift) - Convert analog values to integers with this SPI-driven ADC.
+* [WS281x Leds](https://github.com/uraimo/WS281x.swift) - A library for WS2812x (WS2811,WS2812,WS2812B) RGB led strips, rings, sticks, matrices, etc...
+* [u-Blox GPS Receivers](https://github.com/uraimo/UBloxGPS.swift) - Get location data from boards with the u-Blox 6/7/8 family of A-GPS receivers with an UART serial connection (e.g. NEO6M).
+* [MPU-6050 Accelerometer/Gyro](https://github.com/uraimo/MPU-6050.swift) - A library for the MPU-6050 (and MPU-6000 family) Accelerometer and Gyroscope.
+* [DS1307 RTC](https://github.com/uraimo/DS1307.swift) - A library for the DS1307 (DS1302, DS3231) I2C Real-Time Clock.
+* [Wii Nunchuck](https://github.com/uraimo/Nunchuck.swift) - A Library for the Wii Nunchuck controller.
 
 
 
@@ -538,7 +541,7 @@ A few projects and libraries built using SwiftyGPIO. Have you built something th
 * [DS18B20 Temperature Sensor with Swift](http://mistercameron.com/2016/06/accessing-raspberry-pi-gpio-pins-with-swift/) - Step by step project to read temperature values from a DS18B20 sensor.
 * [Swifty Buzz](https://github.com/DigitalTools/SwiftyBuzz) - Swifty tunes with a buzzer connected to a GPIO.
 * [Swift... Swift Everywhere](https://medium.com/@darthpelo/swift-swift-everywhere-eba445ef2bcd) - A tutorial that builds a complete platform, an iOS app controlling leds through a Vapor-based REST service.
-* [Smart Lock](https://github.com/colemancda/Lock) - A smart lock controller with companion iOS app that unlocks 12v solenoid locks via Bluetooth.
+* [Bluetooth Smart Lock](https://github.com/colemancda/Lock) - A smart lock controller with companion iOS app that unlocks 12v solenoid locks via Bluetooth.
 * [Experimental Swift on the Raspberry Pi](https://medium.com/@piotr.gorzelany/experimental-swift-8c9131b62a9d) [(GH)](https://github.com/pgorzelany/experimental-swift-server) - Experimenting with Swift and a few different devices.
  
 
