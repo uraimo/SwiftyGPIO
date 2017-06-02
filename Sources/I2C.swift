@@ -28,7 +28,6 @@
     import Darwin.C
 #endif
 
-
 extension SwiftyGPIO {
 
     public static func hardwareI2Cs(for board: SupportedBoard) -> [I2CInterface]? {
@@ -58,7 +57,6 @@ extension SwiftyGPIO {
     ]
 }
 
-
 // MARK: I2C
 
 public protocol I2CInterface {
@@ -82,7 +80,6 @@ public final class SysFSI2C: I2CInterface {
     let i2cId: Int
     var fd: Int32 = -1
     var currentSlave: Int = -1
-
 
     public init(i2cId: Int) {
         self.i2cId=i2cId
@@ -135,7 +132,7 @@ public final class SysFSI2C: I2CInterface {
 
         setSlaveAddress(address)
 
-        let r =  i2c_smbus_read_block_data(command: command, values: &buf) 
+        let r =  i2c_smbus_read_block_data(command: command, values: &buf)
 
         if r < 0 {
             perror("I2C read failed")
@@ -250,7 +247,6 @@ public final class SysFSI2C: I2CInterface {
         close(fd)
     }
 
-
     // Private functions
     // Swift implementation of the smbus functions provided by i2c-dev
 
@@ -268,7 +264,7 @@ public final class SysFSI2C: I2CInterface {
 
         var args = i2c_smbus_ioctl_data(read_write: rw,
                                         command: command,
-                                        size: size, 
+                                        size: size,
                                         data: data)
         return ioctl(fd, I2C_SMBUS, &args)
     }
@@ -282,7 +278,7 @@ public final class SysFSI2C: I2CInterface {
 
         let r = smbus_ioctl(rw: I2C_SMBUS_READ,
                             command: 0,
-                            size: I2C_SMBUS_BYTE, 
+                            size: I2C_SMBUS_BYTE,
                             data: &data)
         if r >= 0 {
             return Int32(data[0])
@@ -293,7 +289,7 @@ public final class SysFSI2C: I2CInterface {
 
     private func i2c_smbus_read_byte_data(command: UInt8) -> Int32 {
         var data = [UInt8](repeating:0, count: I2C_MAX_LENGTH+1)
-        
+
         let r = smbus_ioctl(rw: I2C_SMBUS_READ,
                             command: command,
                             size: I2C_SMBUS_BYTE_DATA,
@@ -361,7 +357,7 @@ public final class SysFSI2C: I2CInterface {
 
         return smbus_ioctl(rw: I2C_SMBUS_WRITE,
                             command: command,
-                            size: I2C_SMBUS_BYTE_DATA, 
+                            size: I2C_SMBUS_BYTE_DATA,
                             data: &data)
     }
 
@@ -373,7 +369,7 @@ public final class SysFSI2C: I2CInterface {
 
         return smbus_ioctl(rw: I2C_SMBUS_WRITE,
                             command: command,
-                            size: I2C_SMBUS_WORD_DATA, 
+                            size: I2C_SMBUS_WORD_DATA,
                             data: &data)
     }
 
@@ -382,17 +378,16 @@ public final class SysFSI2C: I2CInterface {
 
         for i in 1..<values.count {
             data[i] = values[i-1]
-        }    
+        }
         data[0] = UInt8(values.count)
 
         return smbus_ioctl(rw: I2C_SMBUS_WRITE,
                             command: command,
-                            size: I2C_SMBUS_BLOCK_DATA, 
+                            size: I2C_SMBUS_BLOCK_DATA,
                             data: &data)
     }
 
 }
-
 
 // MARK: - I2C/SMBUS Constants
 internal let I2C_SMBUS_READ: UInt8 =   1
@@ -400,7 +395,7 @@ internal let I2C_SMBUS_WRITE: UInt8 =  0
 
 internal let I2C_SMBUS_QUICK: Int32 = 0
 internal let I2C_SMBUS_BYTE: Int32 = 1
-internal let I2C_SMBUS_BYTE_DATA: Int32 = 2 
+internal let I2C_SMBUS_BYTE_DATA: Int32 = 2
 internal let I2C_SMBUS_WORD_DATA: Int32 = 3
 internal let I2C_SMBUS_BLOCK_DATA: Int32 = 5
 
@@ -412,9 +407,7 @@ internal let I2C_SMBUS: UInt = 0x720
 internal let I2C_MAX_LENGTH: Int = 32
 internal let I2CBASEPATH="/dev/i2c-"
 
-
 // MARK: - Darwin / Xcode Support
 #if os(OSX)
     private var O_SYNC: CInt { fatalError("Linux only") }
 #endif
-

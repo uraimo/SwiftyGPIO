@@ -73,9 +73,9 @@ public protocol PWMOutput {
     func stopPWM()
 
     func initPWMPattern(bytes count: Int, at frequency: Int, with resetDelay: Int, dutyzero: Int, dutyone: Int)
-    func sendDataWithPattern(values: [UInt8]) 
+    func sendDataWithPattern(values: [UInt8])
     func waitOnSendData()
-    func cleanupPattern() 
+    func cleanupPattern()
 }
 
 public class RaspberryPWM: PWMOutput {
@@ -254,7 +254,7 @@ public class RaspberryPWM: PWMOutput {
     ///
     /// - Returns: divi divisor value
     ///
-    internal func calculateUnscaledDIVI(base: ClockSource, desired: UInt) -> UInt{
+    internal func calculateUnscaledDIVI(base: ClockSource, desired: UInt) -> UInt {
         var divi: UInt = base.rawValue/desired
 
         if divi > 0x1000 {
@@ -321,9 +321,9 @@ extension RaspberryPWM {
     ///
     public func initPWMPattern(bytes count: Int, at frequency: Int, with resetDelay: Int, dutyzero: Int, dutyone: Int) {
 
-        (zeroPattern,onePattern,symbolBits) = getRepresentation(zero: dutyzero, one: dutyone) 
+        (zeroPattern, onePattern, symbolBits) = getRepresentation(zero: dutyzero, one: dutyone)
         guard symbolBits > 0 else {fatalError("Couldn't generate a valid pattern for the provided duty cycle values, try with more spaced values.")}
-        
+
         patternFrequency = frequency
         patternDelay = resetDelay
         dataLength = count
@@ -430,12 +430,12 @@ extension RaspberryPWM {
     ///
     private func getRepresentation(zero: Int, one: Int) -> (zero: Int, one: Int, width: Int) {
         for size in 3...16 {
-            let (z,o) = getRepresentation(zero: zero, one: one, bits: size)
+            let (z, o) = getRepresentation(zero: zero, one: one, bits: size)
             if (z ^ o) > 0 {
-                return (z,o,size)
+                return (z, o, size)
             }
         }
-        return (0,0,0)
+        return (0, 0, 0)
     }
 
     /// Calculate an approximated bit pattern representation n-bits wide and filled with ones from the left with the given % value
@@ -458,9 +458,9 @@ extension RaspberryPWM {
 
         // How many bits must be at 1 for the zero and one bit pattern
         var z = Int((Float(zero) * Float(bits)/100).rounded(.toNearestOrAwayFromZero))
-        z = (z == 0) ? 1 : z 
+        z = (z == 0) ? 1 : z
         var o = Int((Float(one) * Float(bits)/100).rounded(.toNearestOrAwayFromZero))
-        o = (o == 0) ? 1 : o 
+        o = (o == 0) ? 1 : o
 
         // To get the pattern we want:
         // 1 << (bit_width - number_of_ones) , this gets us a 1 at the position number_of_ones+1, everything else unset
@@ -468,7 +468,7 @@ extension RaspberryPWM {
         z = ~((1 << (bits - z)) - 1) & mask
         o = ~((1 << (bits - o)) - 1) & mask
 
-        return (z,o)
+        return (z, o)
     }
 
     /// Convert each bit component of the data to a n bit representation
@@ -504,7 +504,7 @@ extension RaspberryPWM {
                         // If the pattern overlaps, this is the amount of shifting needed to push bits
                         // to the left, bits that were already added in the previous iteration. 
                         shiftAmount = 8 + shiftAmount
-                        
+
                         // Print the current state of the byte of this iteration
                         // printUInt8(bptr[littleId])
 

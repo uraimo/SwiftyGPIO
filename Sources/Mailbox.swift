@@ -337,7 +337,7 @@ public struct MailBox {
 // MARK: - Darwin / Xcode Support
 #if os(OSX)
     private var O_SYNC: CInt { fatalError("Linux only") }
-    
+
     func gnu_dev_makedev(_ maj: UInt, _ min: UInt) -> Int32 {
         fatalError("Linux only")
     }

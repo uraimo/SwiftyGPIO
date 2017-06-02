@@ -66,18 +66,17 @@ public protocol UARTInterface {
     func writeData(_ values: [CChar])
 }
 
-
 public enum ParityType {
 	case None
 	case Even
 	case Odd
 
-	public func configure(_ cfg: inout termios){
+	public func configure(_ cfg: inout termios) {
 		switch self {
 			case .None:
-				cfg.c_cflag &= ~UInt32(PARENB | PARODD)  
+				cfg.c_cflag &= ~UInt32(PARENB | PARODD)
 			case .Even:
-				cfg.c_cflag &= ~UInt32(PARENB | PARODD)  
+				cfg.c_cflag &= ~UInt32(PARENB | PARODD)
 				cfg.c_cflag |= UInt32(PARENB)
 			case .Odd:
 				cfg.c_cflag |= UInt32(PARENB | PARODD)
@@ -90,7 +89,7 @@ public enum CharSize {
 	case Seven
 	case Six
 
-	public func configure(_ cfg: inout termios){
+	public func configure(_ cfg: inout termios) {
 		cfg.c_cflag = (cfg.c_cflag & ~UInt32(CSIZE))
 		switch self {
 			case .Eight:
@@ -107,7 +106,7 @@ public enum StopBits {
 	case One
 	case Two
 
-	public func configure(_ cfg: inout termios){
+	public func configure(_ cfg: inout termios) {
 		switch self {
 			case .One:
 				cfg.c_cflag &= ~UInt32(CSTOPB)
@@ -123,7 +122,7 @@ public enum UARTSpeed {
 	case S38400
 	case S57600
 	case S115200
-	
+
 	public func configure(_ cfg: inout termios) {
 		switch self {
 			case .S9600:
@@ -145,14 +144,13 @@ public enum UARTSpeed {
 	}
 }
 
-
 /// UART via SysFS
 public final class SysFSUART: UARTInterface {
 	var device: String
 	var tty: termios
 	var fd: Int32
 
-	public init?(_ uartId: String){
+	public init?(_ uartId: String) {
 		device = "/dev/tty"+uartId
 		tty = termios()
 
@@ -170,7 +168,7 @@ public final class SysFSUART: UARTInterface {
 		}
 	}
 
-	public func configureInterface(speed: UARTSpeed, bitsPerChar: CharSize, stopBits: StopBits, parity: ParityType){
+	public func configureInterface(speed: UARTSpeed, bitsPerChar: CharSize, stopBits: StopBits, parity: ParityType) {
 		speed.configure(&tty)
 
 		bitsPerChar.configure(&tty)
@@ -179,8 +177,8 @@ public final class SysFSUART: UARTInterface {
 			                         		// no canonical processing -> read bytes as they come without waiting for LF
         tty.c_oflag = 0                     // no remapping, no delays
 
-        withUnsafeMutableBytes(of: &tty.c_cc){$0[Int(VMIN)] = UInt8(1); return}
-		withUnsafeMutableBytes(of: &tty.c_cc){$0[Int(VTIME)] = UInt8(5); return} // 5 10th of second read timeout
+        withUnsafeMutableBytes(of: &tty.c_cc) {$0[Int(VMIN)] = UInt8(1); return}
+		withUnsafeMutableBytes(of: &tty.c_cc) {$0[Int(VTIME)] = UInt8(5); return} // 5 10th of second read timeout
 		tty.c_iflag &= ~UInt32(IXON | IXOFF | IXANY) // Every kind of software flow control off
 		tty.c_cflag &= ~UInt32(CRTSCTS)  //No hw flow control
 		tty.c_cflag |= UInt32(CLOCAL | CREAD)        // Ignore modem controls, enable read
@@ -204,7 +202,7 @@ public final class SysFSUART: UARTInterface {
             ptr += 1
             pos += 1
         } while buf[pos-1] != CChar(UInt8(ascii: "\n"))
-		
+
         buf[pos] = 0
 		return String(cString: &buf)
 	}
@@ -217,7 +215,7 @@ public final class SysFSUART: UARTInterface {
 
 	public func readData() -> [CChar] {
 		var buf = [CChar](repeating:0, count: 4096) //4096 chars at max in canonical mode
-		
+
 		let n = read(fd, &buf, buf.count * MemoryLayout<CChar>.stride)
 		if n<0 {
 			perror("Error while reading from UART")
@@ -235,11 +233,11 @@ public final class SysFSUART: UARTInterface {
 	public func writeData(_ value: [CChar]) {
 		var value = value
 
-		let _ = write(fd, &value, value.count)
+		_ = write(fd, &value, value.count)
 		tcdrain(fd)
 	}
 
-	private func applyConfiguration(){
+	private func applyConfiguration() {
 		if tcsetattr (fd, TCSANOW, &tty) != 0 {
 			perror("Couldn't set terminal attributes")
 			abort()
@@ -252,31 +250,24 @@ public final class SysFSUART: UARTInterface {
 
 }
 
-
-
-
 // MARK: - Darwin / Xcode Support
 #if os(OSX)
     private var O_SYNC: CInt { fatalError("Linux only") }
     private var CRTSCTS: CInt { fatalError("Linux only") }
-    
+
     // Shadowing some declarations from termios.h just to get it to compile with Xcode
     // As the rest, not atually intended to be run.
-    public struct termios{
+    public struct termios {
         var c_iflag: UInt32 = 0
         var c_oflag: UInt32 = 0
         var c_cflag: UInt32 = 0
         var c_lflag: UInt32 = 0
         var c_cc = [UInt32]()
     }
-    
+
     func tcsetattr (_ fd: Int32, _ attr: Int32, _ tty: inout termios) -> Int { fatalError("Linux only") }
     func tcgetattr(_ fd: Int32, _ tty: inout termios) -> Int { fatalError("Linux only") }
     func cfsetispeed(_ tty: inout termios, _ speed: UInt) { fatalError("Linux only") }
     func cfsetospeed(_ tty: inout termios, _ speed: UInt) { fatalError("Linux only") }
-    
+
 #endif
-
-
-
-

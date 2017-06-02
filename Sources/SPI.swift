@@ -184,7 +184,7 @@ public final class SysFSSPI: SPIInterface {
             fatalError("Couldn't open the SPI device")
         }
 
-        let r = ioctl(fd, SPI_IOC_RD_MODE, &mode);
+        let r = ioctl(fd, SPI_IOC_RD_MODE, &mode)
         if r == -1 {
             fatalError("Couldn't get spi mode")
         }
@@ -195,7 +195,7 @@ public final class SysFSSPI: SPIInterface {
 
     public func setBitsPerWord(_ to: UInt8) {
         bits = to
-        
+
         let fd = open(SPIBASEPATH+spiId, O_RDWR)
         guard fd > 0 else {
             fatalError("Couldn't open the SPI device")
@@ -305,7 +305,7 @@ public final class VirtualSPI: SPIInterface {
     }
 
     @discardableResult
-    private func sendDataGPIOObj(_ values: [UInt8], frequencyHz: UInt,  read: Bool) -> [UInt8] {
+    private func sendDataGPIOObj(_ values: [UInt8], frequencyHz: UInt, read: Bool) -> [UInt8] {
         var rx: [UInt8] = [UInt8]()
 
         var bit: Int = 0
