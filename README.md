@@ -131,6 +131,8 @@ Note that SwiftyGPIO uses the raw Broadcom numbering scheme ([described here](ht
 First, we need to retrieve the list of GPIOs available on the board and get a reference to the one we want to modify:
 
 ```swift
+import SwiftyGPIO //Not needed when you compile via swiftc
+
 let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi2)
 var gp = gpios[.P2]!
 ```
