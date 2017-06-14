@@ -76,7 +76,7 @@ public protocol ADCInterface {
     func getSample() throws -> Int
 }
 
-/// Hardware I2C(SMBus) via SysFS using I2C_SMBUS ioctl
+/// Hardware ADC via SysFS
 public final class SysFSADC: ADCInterface {
     let adcPath: String
     public let id: Int
@@ -94,7 +94,6 @@ public final class SysFSADC: ADCInterface {
             throw ADCError.fileError
         }
         
-//        print("Sampling ADC at \(adcPath)")
         var returnData = [CChar].init(repeating: 0, count: 16)
         let count = read(fd, &returnData, 16)
 
@@ -110,7 +109,6 @@ public final class SysFSADC: ADCInterface {
         }
 
         if let sampleInt = Int(sampleString.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)) {
-//            print("Got value: \(sampleInt)")
             self.closeADC()
             return sampleInt
         } else {
@@ -127,19 +125,15 @@ public final class SysFSADC: ADCInterface {
     }
     
     private func openADC() {
-//        print("Attempting to open ADC")
         let fd  = open(adcPath, O_RDONLY)
         self.fd = fd
         
         if fd < 0 {
-            print("Failed: \(strerror(errno))")
-        } else {
-//            print("Succeeded")
+            fatalError("Couldn't open ADC device: \(strerror(errno))")
         }
     }
     
     private func closeADC() {
-//        print("Closing FD")
         close(fd)
         fd = -1
     }
