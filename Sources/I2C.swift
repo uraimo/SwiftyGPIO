@@ -254,10 +254,10 @@ public final class SysFSI2C: I2CInterface {
         var read_write: UInt8
         var command: UInt8
         var size: Int32
-        var data: UnsafeMutablePointer<UInt8> //union: UInt8, UInt16, [UInt8]33
+        var data: UnsafeMutablePointer<UInt8>? //union: UInt8, UInt16, [UInt8]33
     }
 
-    private func smbus_ioctl(rw: UInt8, command: UInt8, size: Int32, data: UnsafeMutablePointer<UInt8>) -> Int32 {
+    private func smbus_ioctl(rw: UInt8, command: UInt8, size: Int32, data: UnsafeMutablePointer<UInt8>?) -> Int32 {
         if fd == -1 {
             openI2C()
         }
@@ -340,14 +340,14 @@ public final class SysFSI2C: I2CInterface {
         return smbus_ioctl(rw: value,
                             command: 0,
                             size: I2C_SMBUS_QUICK,
-                            data: UnsafeMutablePointer<UInt8>(bitPattern: 0)!)
+                            data: nil)
     }
 
     private func i2c_smbus_write_byte(value: UInt8) -> Int32 {
         return smbus_ioctl(rw: I2C_SMBUS_WRITE,
                             command: value,
                             size: I2C_SMBUS_BYTE,
-                            data: UnsafeMutablePointer<UInt8>(bitPattern: 0)!)
+                            data: nil)
     }
 
     private func i2c_smbus_write_byte_data(command: UInt8, value: UInt8) -> Int32 {
