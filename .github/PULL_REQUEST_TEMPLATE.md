@@ -1,15 +1,15 @@
-*What's in this pull request?*
+### What's in this pull request?
 
-Describe the content of this pull request.
+_Describe the content of this pull request._
 
-Do you plan to extend it or to create additional PRs based on this one in the future?
+_Do you plan to extend it or to create additional PRs based on this one in the future?_
 
 
-*Is there something you want to discuss?*
+### Is there something you want to discuss?
 
 Is there something you are unsure of or something you'd like to discuss before merging the final version of this PR? Let's talk about this!
 
-*Pull Request Checklist*
+### Pull Request Checklist
 
 - [ ] I've added a copyright header to every new file.
 - [ ] Every new file has been correctly indented, no tabs, 4 spaces (you can use swiftlint).
