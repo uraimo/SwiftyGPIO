@@ -1,27 +1,27 @@
 /*
-   SwiftyGPIO
+ SwiftyGPIO
 
-   Copyright (c) 2016 Umberto Raimondi
-   Licensed under the MIT license, as follows:
+ Copyright (c) 2016 Umberto Raimondi
+ Licensed under the MIT license, as follows:
 
-   Permission is hereby granted, free of charge, to any person obtaining a copy
-   of this software and associated documentation files (the "Software"), to deal
-   in the Software without restriction, including without limitation the rights
-   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-   copies of the Software, and to permit persons to whom the Software is
-   furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
 
-   The above copyright notice and this permission notice shall be included in all
-   copies or substantial portions of the Software.
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
 
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-   SOFTWARE.)
-*/
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.)
+ */
 #if os(Linux)
     import Glibc
 #else
@@ -133,9 +133,9 @@ public class RaspberryPWM: PWMOutput {
         clockBasePointer = memmap(from: mem_fd, at: CLOCK_BASE)
 
         let DMAOffsets: [Int] = [0x00007000, 0x00007100, 0x00007200, 0x00007300,
-                         0x00007400, 0x00007500, 0x00007600, 0x00007700,
-                         0x00007800, 0x00007900, 0x00007a00, 0x00007b00,
-                         0x00007c00, 0x00007d00, 0x00007e00, 0x00e05000]
+                                 0x00007400, 0x00007500, 0x00007600, 0x00007700,
+                                 0x00007800, 0x00007900, 0x00007a00, 0x00007b00,
+                                 0x00007c00, 0x00007d00, 0x00007e00, 0x00e05000]
 
         func dmanumToPhysicalAddress(_ dmanum: Int) -> Int {
             guard dmanum < DMAOffsets.count else { return 0 }
@@ -156,7 +156,7 @@ public class RaspberryPWM: PWMOutput {
     }
 
     /// Start a PWM signal with specific period in ns and duty cycle from 0 to 100.
-    /// The signal starts, asynchronously(manged by a device external to the CPU), once this method is called and 
+    /// The signal starts, asynchronously(manged by a device external to the CPU), once this method is called and
     /// needs to be stopped manually calling `stopPWM()`.
     public func startPWM(period ns: Int, duty percent: Float) {
         // Kill the clock
@@ -170,7 +170,7 @@ public class RaspberryPWM: PWMOutput {
         let (idiv, scale) = calculateDIVI(base: .PLLD, desired: freq)                                //Using the faster (with known freq) available clock to reduce jitter
 
         // Configure the clock and divisor that will be used to generate the signal
-        clockBasePointer.advanced(by: 41).pointee = CLKM_PASSWD | (idiv << CLKM_DIV_DIVI)            //CM CTL DIV register: Set DIVI value 
+        clockBasePointer.advanced(by: 41).pointee = CLKM_PASSWD | (idiv << CLKM_DIV_DIVI)            //CM CTL DIV register: Set DIVI value
         clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_ENAB | CLKM_CTL_SRC_PLLD  //CM CTL register: Enable clock, MASH 0, source PLLD
         pwmBasePointer.pointee = 0                                                                   //PWM CTL register: Everything at 0, enable flag included, disables previous PWM
         usleep(10)
@@ -193,7 +193,7 @@ public class RaspberryPWM: PWMOutput {
         let m = mmap(
             nil,                 //Any adddress in our space will do
             PAGE_SIZE,          //Map length
-            PROT_READ|PROT_WRITE,// Enable reading & writting to mapped memory
+            PROT_READ|PROT_WRITE, // Enable reading & writting to mapped memory
             MAP_SHARED,          //Shared with other processes
             mem_fd,              //File to map
             off_t(offset)     //Offset to GPIO peripheral
@@ -218,9 +218,9 @@ public class RaspberryPWM: PWMOutput {
 
     /// Calculate the DIVI value that will divide the selected base clock frequency to obtain the desired frequency.
     ///
-    /// For low frequencies, the DIVI value is calculated again increasing the scale value until an acceptable value 
+    /// For low frequencies, the DIVI value is calculated again increasing the scale value until an acceptable value
     /// for the divisor is found. DIVI should be smaller than half the maximum value (0x1000) to reduce jitter.
-    /// The scale value (increased by 10 every time the DIVI value is too high) will be used to increase the number 
+    /// The scale value (increased by 10 every time the DIVI value is too high) will be used to increase the number
     /// of samples generated by the M/S algorithm.
     ///
     /// - Parameter base: base clock that will be used to generate the signal
@@ -354,39 +354,39 @@ extension RaspberryPWM {
         clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_KILL     //Set KILL flag
         usleep(10)
         // Check the BUSY flag, doesn't always work
-        //while (clockBasePointer.advanced(by: 40).pointee & (1 << 7)) != 0 {} 
+        //while (clockBasePointer.advanced(by: 40).pointee & (1 << 7)) != 0 {}
 
         // Configure clock
         let idiv = calculateUnscaledDIVI(base: .PLLD, desired: UInt(symbolBits * patternFrequency))
-        clockBasePointer.advanced(by: 41).pointee = CLKM_PASSWD | (idiv << CLKM_DIV_DIVI)             //Set DIVI value  
+        clockBasePointer.advanced(by: 41).pointee = CLKM_PASSWD | (idiv << CLKM_DIV_DIVI)             //Set DIVI value
         clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_ENAB | CLKM_CTL_SRC_PLLD   //Enable clock, MASH 0, source PLLD
         usleep(10)
         // Check the BUSY flag, doesn't always work
-        //while (clockBasePointer.advanced(by: 40).pointee & (1 << 7)) != 0 {} 
+        //while (clockBasePointer.advanced(by: 40).pointee & (1 << 7)) != 0 {}
 
-        // Configure PWM 
+        // Configure PWM
         pwmBasePointer.advanced(by: 4).pointee = 32         // RNG1: 32-bits per word to serialize
         usleep(10)
         pwmBasePointer.pointee = PWMCTL_CLRF1
         usleep(10)
         pwmBasePointer.advanced(by: 2).pointee = PWMDMAC_ENAB | 7 << PWMDMAC_PANIC | 3 << PWMDMAC_DREQ
         usleep(10)
-        pwmBasePointer.pointee = PWMCTL_USEF1 | PWMCTL_MODE1 //| PWMCTL_USEF2 | PWMCTL_MODE2 // For 2nd chan 
+        pwmBasePointer.pointee = PWMCTL_USEF1 | PWMCTL_MODE1 //| PWMCTL_USEF2 | PWMCTL_MODE2 // For 2nd chan
         usleep(10)
-        pwmBasePointer.pointee |= PWMCTL_PWEN1               //| PWMCTL_PWEN2 // For 2nd chan 
+        pwmBasePointer.pointee |= PWMCTL_PWEN1               //| PWMCTL_PWEN2 // For 2nd chan
 
         // Initialize the DMA control block
         dmaCallbackPointer.pointee = DMACallback(
-                ti: DMATI_NO_WIDE_BURSTS |              // 32-bit transfers
-                     DMATI_WAIT_RESP |                  // wait for write complete
-                     DMATI_DEST_DREQ |                  // user peripheral flow control
-                     UInt32(0x5  << DMATI_PERMAP) |     // PWM peripheral
-                     DMATI_SRC_INC,                     // Increment src addr
-                source_ad: UInt32(mailbox.virtualTobaseBusAddress(UnsafeMutableRawPointer(pwmRawPointer))),
-                dest_ad: UInt32(PWM_PHY_BASE + 0x18),   // PWM FIF1 Register, shared between channels
-                txfr_len: UInt32(dataSize),
-                stride: 0,
-                nextconbk: 0)
+            ti: DMATI_NO_WIDE_BURSTS |              // 32-bit transfers
+                DMATI_WAIT_RESP |                  // wait for write complete
+                DMATI_DEST_DREQ |                  // user peripheral flow control
+                UInt32(0x5  << DMATI_PERMAP) |     // PWM peripheral
+            DMATI_SRC_INC,                     // Increment src addr
+            source_ad: UInt32(mailbox.virtualTobaseBusAddress(UnsafeMutableRawPointer(pwmRawPointer))),
+            dest_ad: UInt32(PWM_PHY_BASE + 0x18),   // PWM FIF1 Register, shared between channels
+            txfr_len: UInt32(dataSize),
+            stride: 0,
+            nextconbk: 0)
 
         dmaBasePointer.pointee = 0                  //0 CS
         dmaBasePointer.advanced(by: 5).pointee = 0  //0 TXFR_LEN
@@ -422,10 +422,10 @@ extension RaspberryPWM {
     /// Pattern at 10% with width 8 bits: 10000000
     /// Pattern at 12% with width 8 bits: 10000000
     /// Pattern at 20% with width 8 bits: 11000000
-    /// 
+    ///
     /// - Parameter zero: percentage of fill for the zero value
     /// - Parameter one: percentage of fill for the one value
-    /// 
+    ///
     /// - Returns: patterns for zero and one and first acceptable bit width
     ///
     private func getRepresentation(zero: Int, one: Int) -> (zero: Int, one: Int, width: Int) {
@@ -445,11 +445,11 @@ extension RaspberryPWM {
     /// Pattern at 10% with width 8 bits: 10000000
     /// Pattern at 12% with width 8 bits: 10000000
     /// Pattern at 20% with width 8 bits: 11000000
-    /// 
+    ///
     /// - Parameter zero: percentage of fill for the zero value
     /// - Parameter one: percentage of fill for the one value
     /// - Parameter bits: number of bits that will be used to generate the bit pattern
-    /// 
+    ///
     /// - Returns: patterns for zero and one
     ///
     private func getRepresentation(zero: Int, one: Int, bits: Int) -> (zero: Int, one: Int) {
@@ -502,13 +502,13 @@ extension RaspberryPWM {
                         // If the pattern overlaps, let's increment startAt to point to the next byte
                         startAt += 1
                         // If the pattern overlaps, this is the amount of shifting needed to push bits
-                        // to the left, bits that were already added in the previous iteration. 
+                        // to the left, bits that were already added in the previous iteration.
                         shiftAmount = 8 + shiftAmount
 
                         // Print the current state of the byte of this iteration
                         // printUInt8(bptr[littleId])
 
-                    // If the amount is <8 there are still bits in the pattern that need to be added to the stream
+                        // If the amount is <8 there are still bits in the pattern that need to be added to the stream
                     } while shiftAmount < 8
 
                     // Counts the number of bits successfully added to the stream
@@ -597,7 +597,7 @@ enum ClockSource: UInt {
 let DMACS_RESET: UInt = (1 << 31)
 let DMACS_ABORT: UInt = (1 << 30)
 let DMACS_WAIT_OUTSTANDING_WRITES: UInt = (1 << 28)
-let DMACS_PANIC_PRIORITY: UInt = 20 // <<              
+let DMACS_PANIC_PRIORITY: UInt = 20 // <<
 let DMACS_PRIORITY: UInt = 16 // <<
 let DMACS_ERROR: UInt = (1 << 8)
 let DMACS_INT: UInt = (1 << 2)

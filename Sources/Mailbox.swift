@@ -1,54 +1,54 @@
 /*
-   SwiftyGPIO
+ SwiftyGPIO
 
-   Copyright (c) 2016 Umberto Raimondi and contributors.
-   Licensed under the MIT license, as follows:
+ Copyright (c) 2016 Umberto Raimondi and contributors.
+ Licensed under the MIT license, as follows:
 
-   Permission is hereby granted, free of charge, to any person obtaining a copy
-   of this software and associated documentation files (the "Software"), to deal
-   in the Software without restriction, including without limitation the rights
-   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-   copies of the Software, and to permit persons to whom the Software is
-   furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
 
-   The above copyright notice and this permission notice shall be included in all
-   copies or substantial portions of the Software.
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
 
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-   SOFTWARE.)
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.)
 
-   ------------------------------------------------------------------------------
+ ------------------------------------------------------------------------------
 
-   The RaspberryPi uses a mechanism based on the mailbox primitive to allow
-   communication between subsystems.
-   Different subsystems like the ARM CPU, VideoCore GPU, the power management
-   unit, leds, etc... can communicate sending requestes to each other using the
-   mailboxes as request routers. The CPU could for example require information 
-   about the power status sending a request with the correct request tag or ask 
-   to the GPU to execute some instruction or other tasks.
+ The RaspberryPi uses a mechanism based on the mailbox primitive to allow
+ communication between subsystems.
+ Different subsystems like the ARM CPU, VideoCore GPU, the power management
+ unit, leds, etc... can communicate sending requestes to each other using the
+ mailboxes as request routers. The CPU could for example require information
+ about the power status sending a request with the correct request tag or ask
+ to the GPU to execute some instruction or other tasks.
 
-   In this case, the GPU is used to allocate a contiguous block of memory in 
-   the secton of the global memory controlled by it. This memory will not be cached
-   by the L1 cache of the CPU to get around issues with cache flushing.
+ In this case, the GPU is used to allocate a contiguous block of memory in
+ the secton of the global memory controlled by it. This memory will not be cached
+ by the L1 cache of the CPU to get around issues with cache flushing.
 
-   Reference implementation for mailbox and other kernel components:
-   https://github.com/raspberrypi/firmware
+ Reference implementation for mailbox and other kernel components:
+ https://github.com/raspberrypi/firmware
 
-   More info on RaspberryPi's mailboxes:
-   https://github.com/raspberrypi/firmware/wiki/Mailboxes
-   https://github.com/raspberrypi/firmware/wiki/Mailbox-property-interface
+ More info on RaspberryPi's mailboxes:
+ https://github.com/raspberrypi/firmware/wiki/Mailboxes
+ https://github.com/raspberrypi/firmware/wiki/Mailbox-property-interface
 
-   Thanks to Jeremy Garff and Richard Hirst, for their great work on the WS281x 
-   library, from which I took more than a few ideas and used to verify that the bit 
-   pattern PWM signal generator was working as expected.
+ Thanks to Jeremy Garff and Richard Hirst, for their great work on the WS281x
+ library, from which I took more than a few ideas and used to verify that the bit
+ pattern PWM signal generator was working as expected.
 
-   https://github.com/jgarff/rpi_ws281x
-*/
+ https://github.com/jgarff/rpi_ws281x
+ */
 
 #if os(Linux)
     import Glibc
@@ -86,16 +86,16 @@ public struct MailBox {
         mailboxFd = Int32(handle)
         self.size = size
 
-        // MEM_FLAG_L1_NONALLOCATING  = (MEM_FLAG_DIRECT | MEM_FLAG_COHERENT) --> Allocating in L2 
+        // MEM_FLAG_L1_NONALLOCATING  = (MEM_FLAG_DIRECT | MEM_FLAG_COHERENT) --> Allocating in L2
         memRef = memAlloc(align: PAGE_SIZE, flags: MEM_FLAG_L1_NONALLOCATING)
         if memRef < 0 {
-           fatalError("Couldn't allocate mailbox")
+            fatalError("Couldn't allocate mailbox")
         }
 
         baseBusAddress = memLock()
         if baseBusAddress == ~0 {
-           memFree()
-           fatalError("Couldn't lock mailbox")
+            memFree()
+            fatalError("Couldn't lock mailbox")
         }
         baseVirtualAddress = mapmem(UInt(baseBusAddress) & ~0xC0000000, size: size)
     }
@@ -127,7 +127,7 @@ public struct MailBox {
         let base_map = mmap(
             nil,                 //Any adddress in our space will do
             size,                //Map length
-            PROT_READ|PROT_WRITE,// Enable reading & writting to mapped memory
+            PROT_READ|PROT_WRITE, // Enable reading & writting to mapped memory
             MAP_SHARED,          //Shared with other processes
             mem_fd,              //File to map
             off_t(ad)            //Address
@@ -257,7 +257,7 @@ public struct MailBox {
         }
     }
 
-    /// Free the memory buffer. 
+    /// Free the memory buffer.
     private func memFree() {
         var i = 0
         var p = [UInt32](repeating:0x0, count:32)
@@ -309,7 +309,7 @@ public struct MailBox {
         }
     }
 
-    /// Unlock buffer. It retains contents, but may move. Needs to be locked before next use. 
+    /// Unlock buffer. It retains contents, but may move. Needs to be locked before next use.
     private func memUnlock() {
         var i = 0
         var p = [UInt32](repeating:0x0, count:32)

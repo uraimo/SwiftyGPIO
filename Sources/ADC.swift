@@ -1,19 +1,19 @@
 /*
  SwiftyGPIO
- 
+
  Copyright (c) 2017 William Dillon; Racepoint Energy LLC.
  Licensed under the MIT license, as follows:
- 
+
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  copies of the Software, and to permit persons to whom the Software is
  furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included in all
  copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,7 +37,7 @@ enum ADCError: Error {
 }
 
 extension SwiftyGPIO {
-    
+
     public static func hardwareADCs(for board: SupportedBoard) -> [ADCInterface]? {
         switch board {
         case .BeagleBoneBlack:
@@ -65,10 +65,9 @@ extension SwiftyGPIO {
         0: SysFSADC(adcPath: "/sys/devices/platform/ocp/44e0d000.tscadc/TI-am335x-adc/iio:device1/in_voltage0_raw", id: 0),
         1: SysFSADC(adcPath: "/sys/devices/platform/ocp/44e0d000.tscadc/TI-am335x-adc/iio:device1/in_voltage1_raw", id: 1),
         2: SysFSADC(adcPath: "/sys/devices/platform/ocp/44e0d000.tscadc/TI-am335x-adc/iio:device1/in_voltage2_raw", id: 2),
-        3: SysFSADC(adcPath: "/sys/devices/platform/ocp/44e0d000.tscadc/TI-am335x-adc/iio:device1/in_voltage3_raw", id: 3),
+        3: SysFSADC(adcPath: "/sys/devices/platform/ocp/44e0d000.tscadc/TI-am335x-adc/iio:device1/in_voltage3_raw", id: 3)
     ]
 }
-
 
 // MARK: ADC
 public protocol ADCInterface {
@@ -86,14 +85,14 @@ public final class SysFSADC: ADCInterface {
         self.adcPath = adcPath
         self.id = id
     }
-    
+
     public func getSample() throws -> Int {
         if fd <= 0 { self.openADC() }
-        
+
         guard fd > 0 else {
             throw ADCError.fileError
         }
-        
+
         var returnData = [CChar].init(repeating: 0, count: 16)
         let count = read(fd, &returnData, 16)
 
@@ -102,7 +101,7 @@ public final class SysFSADC: ADCInterface {
             self.closeADC()
             throw ADCError.readError
         }
-        
+
         guard let sampleString = String(cString: returnData, encoding: .utf8) else {
             self.closeADC()
             throw ADCError.conversionError
@@ -115,24 +114,24 @@ public final class SysFSADC: ADCInterface {
             self.closeADC()
             throw ADCError.conversionError
         }
-        
+
     }
-    
+
     deinit {
         if fd != -1 {
             closeADC()
         }
     }
-    
+
     private func openADC() {
         let fd  = open(adcPath, O_RDONLY)
         self.fd = fd
-        
+
         if fd < 0 {
             fatalError("Couldn't open ADC device: \(strerror(errno))")
         }
     }
-    
+
     private func closeADC() {
         close(fd)
         fd = -1
@@ -140,9 +139,7 @@ public final class SysFSADC: ADCInterface {
 
 }
 
-
 // MARK: - Darwin / Xcode Support
 #if os(OSX)
     private var O_SYNC: CInt { fatalError("Linux only") }
 #endif
-
