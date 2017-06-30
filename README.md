@@ -12,9 +12,10 @@
 
 ![](images/banner.jpg)
 
+
 ## Summary
 
-This library provides an easy way to interact with external sensors and devices using digital GPIOs, SPI interfaces, PWM signals and serial ports with Swift on Linux.
+This library provides an easy way to interact with external sensors and devices using digital GPIOs, SPI/I2C interfaces, PWM signals and serial ports with Swift on Linux.
 
 You'll be able to configure port attributes (direction,edge,active low), read/write the current GPIOs value, use the SPI interfaces (via hardware if your board provides them or using software big-banging SPI), comunicate over a bus with I2C, generate a PWM to drive external displays, servos, leds and more complex sensors, and finally interact with devices that expose UART serial connections using AT commands or custom protocols. See the *[libraries](#libraries)* for some device libraries built using SwiftyGPIO.
 
@@ -309,7 +310,7 @@ The `Example/` directory contains a Swift implementation of *i2cdetect* and coul
 
 ### PWM
 
-PWM output signals can be used for example to drive servo motors, RGB leds and other devices, or more in general, to approximate analog output values when you only have digital GPIO ports.
+PWM output signals can be used to drive servo motors, RGB leds and other devices, or more in general, to approximate analog output values (e.g. generate values as if they where *between* 0V and 3.3V) when you only have digital GPIO ports.
 
 If your board has PWM ports and is supported (at the moment only RaspberryPi boards), retrieve the available `PWMOutput` objects with the `hardwarePWMs` factory method:
 
@@ -357,22 +358,24 @@ This feature uses the M/S algorithm and has been tested with signals with a peri
   
 This functionality leverages the PWM to generate digital signals based on two patterns representing a 0 or a 1 value through a variation of the duty cycle. Let's look at a practical example to better understand the use case and how to use this signal generator:
 
-Let's consider for example the WS2812, a led with integrated driver used in many led strips.
+Let's consider for example the WS2812/NeoPixel, a led with integrated driver used in many led strips.
 
-This led is activated with a signal between 400Khz and 800Khz containing the encoded value of three bytes representing respectively the *Green*,*Blue* and *Red* color values. Each bit composing the byte of each one of the color components has to be encoded this way:
+This led is activated with a signal between 400Khz and 800Khz containing a series of encoded 3 byte values representing respectively the *Green*,*Blue* and *Red* color components, one for each led. Each bit of the color component byte will have  to be encoded this way:
 
 * Bit value 0: _A 1250ns signal that stays, at least, high for 350ns(T0H) and then low for 900ns(T0L), with a tollerance of 150ns._
 * Bit value 1: _A 1250ns signal that stays,at least, high for 650ns(T1H) and then low for 600ns(T0L), with a tollerance of 150ns._
 
-For each byte you'll have to send a sequence of 8 bit encoded this way and three bytes will be needed to configure the color of every led. If you have more than one led connected to each other serially, you'll just need to send a series of 3 bytes values. Once the whole sequence of colors for your strip of leds has been sent, you need to keep the voltage at 0 for 50us, before you'll be able to transmit a new sequence.
+And once the whole sequence of colors for your strip of leds has been sent, you'll need to keep the voltage at 0 for 50us, before you'll be able to transmit a new sequence. The bytes sent will configure the leds of the strip starting from the last one, going backwards to the first one.
 
-The bytes we'll send will configure the leds of the strip starting from the last one, going backwards to the first one.
-
-This diagram from the official documentation gives you a better idea of what those signals look like:
+This diagram from the official documentation gives you a better idea of what those signals look like, based on the T0H,T0L,T1H,T1L defined earlier:
 
 ![ws2812 timings](https://github.com/uraimo/SwiftyGPIO/raw/master/images/ws2812.png)
   
-You could think to just send this signal based on those 0 and 1 pattern changing the values of a GPIO, but that's actually impossible for an ARM board to keep up with the rate required by devices like the WS2812 leds. Once the period of the pattern is lower than 100us or so, you need another way to send your signal. Ant this is what the pattern-based signal generator solves, leveraging PWM-capable outputs.
+You could think to just send this signal based on those 0 and 1 pattern changing the values of a GPIO, but it's actually impossible for an ARM board to keep up with the rate required by devices like the WS2812 leds and trying to generate these signals in software introduces significant jitter too. 
+
+Once the period of the pattern is lower than 100us or so you need another way to send these signals. 
+
+And this is the problem that the pattern-based signal generator solves, leveraging PWM-capable output pins.
 
 You'll find a complete example under `Examples/PWMPattern`, but let's describe each one of the steps needed to use this feature. 
 
