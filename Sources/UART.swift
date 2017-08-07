@@ -32,6 +32,8 @@ extension SwiftyGPIO {
 
     public static func UARTs(for board: SupportedBoard) -> [UARTInterface]? {
         switch board {
+        case .CHIP:
+            return [SysFSUART("S0")!]
         case .RaspberryPiRev1:
             fallthrough
         case .RaspberryPiRev2:
@@ -41,19 +43,11 @@ extension SwiftyGPIO {
         case .RaspberryPi2:
             fallthrough
         case .RaspberryPi3:
-            return [UARTRPI[0]!]
+            return [SysFSUART("AMA0")!]
         default:
             return nil
         }
     }
-}
-
-// MARK: - UART Presets
-extension SwiftyGPIO {
-    // RaspberryPis SPIs
-    static let UARTRPI: [Int:UARTInterface] = [
-        0: SysFSUART("AMA0")!
-    ]
 }
 
 // MARK: UART

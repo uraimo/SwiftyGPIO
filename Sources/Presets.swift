@@ -132,17 +132,48 @@ extension SwiftyGPIO {
         .P27: RaspberryGPIO(name:"GPIO27", id:27, baseAddr:0x3F000000)
     ]
 
-    // CHIP
-    // 408, 409, 410, 411, 412, 413, 414, 415, +undocumented LCD GPIOs
+    // C.H.I.P.
+    // Pins XIO-P0 to P7 linearly map to:
+    // kernel 4.3: gpio408 to gpio415
+    // kernel 4.4.11: gpio1016 to gpio1023 
+    // kernel 4.4.13-ntc-mlc: gpio1013 to gpio 1020 (latest, available since december 2016)
+    //
+    // See: https://docs.getchip.com/chip.html#kernel-4-3-vs-4-4-gpio-how-to-tell-the-difference
     static let GPIOCHIP: [GPIOName:GPIO] = [
-        .P0: GPIO(name:"XIO-P0", id:408),
-        .P1: GPIO(name:"XIO-P1", id:409),
-        .P2: GPIO(name:"XIO-P2", id:410),
-        .P3: GPIO(name:"XIO-P3", id:411),
-        .P4: GPIO(name:"XIO-P4", id:412),
-        .P5: GPIO(name:"XIO-P5", id:413),
-        .P6: GPIO(name:"XIO-P6", id:414),
-        .P7: GPIO(name:"XIO-P7", id:415)
+        .P0: GPIO(name:"XIO-P0", id:1013),
+        .P1: GPIO(name:"XIO-P1", id:1014),
+        .P2: GPIO(name:"XIO-P2", id:1015),
+        .P3: GPIO(name:"XIO-P3", id:1016),
+        .P4: GPIO(name:"XIO-P4", id:1017),
+        .P5: GPIO(name:"XIO-P5", id:1018),
+        .P6: GPIO(name:"XIO-P6", id:1019),
+        .P7: GPIO(name:"XIO-P7", id:1020),
+        .P8: GPIO(name:"LCD_D2", id:98), //LCD pins (PDn pins on AllWinner doc) are calculated with 32*(PD=3) + id
+        .P9: GPIO(name:"LCD_D3", id:99),
+        .P10: GPIO(name:"LCD_D4", id:100),
+        .P11: GPIO(name:"LCD_D5", id:101),
+        .P12: GPIO(name:"LCD_D6", id:102),
+        .P13: GPIO(name:"LCD_D7", id:103),
+        .P14: GPIO(name:"LCD_D8", id:104),
+        .P15: GPIO(name:"LCD_D9", id:105),
+        .P16: GPIO(name:"LCD_D10", id:106),
+        .P17: GPIO(name:"LCD_D11", id:107),
+        .P18: GPIO(name:"LCD_D12", id:108),
+        .P19: GPIO(name:"LCD_D13", id:109),
+        .P20: GPIO(name:"LCD_D14", id:110),
+        .P21: GPIO(name:"LCD_D15", id:111),
+        .P22: GPIO(name:"LCD_D16", id:112),
+        .P23: GPIO(name:"LCD_D17", id:113),
+        .P24: GPIO(name:"LCD_D18", id:114),
+        .P25: GPIO(name:"LCD_D19", id:115),
+        .P26: GPIO(name:"LCD_D20", id:116),
+        .P27: GPIO(name:"LCD_D21", id:117),
+        .P28: GPIO(name:"LCD_D22", id:118),
+        .P29: GPIO(name:"LCD_D23", id:119),
+        .P30: GPIO(name:"LCD_D24", id:120),
+        .P31: GPIO(name:"LCD_D25", id:121),
+        .P32: GPIO(name:"LCD_D26", id:122),
+        .P33: GPIO(name:"LCD_D27", id:123)
     ]
 
     //BeagleBoneBlack

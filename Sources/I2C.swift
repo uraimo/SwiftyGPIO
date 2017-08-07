@@ -32,6 +32,8 @@ extension SwiftyGPIO {
 
     public static func hardwareI2Cs(for board: SupportedBoard) -> [I2CInterface]? {
         switch board {
+        case .CHIP:
+            return [I2CCHIP[1]!, I2CCHIP[2]!]
         case .RaspberryPiRev1:
             fallthrough
         case .RaspberryPiRev2:
@@ -54,6 +56,15 @@ extension SwiftyGPIO {
     static let I2CRPI: [Int:I2CInterface] = [
         0: SysFSI2C(i2cId: 0),
         1: SysFSI2C(i2cId: 1)
+    ]
+
+    // CHIP I2Cs
+    // i2c.0: connected to the AXP209 chip
+    // i2c.1: after 4.4.13-ntc-mlc connected to the U13 header I2C interface
+    // i2c.2: connected to the U14 header I2C interface, XIO gpios are connected on this bus
+    static let I2CCHIP: [Int:I2CInterface] = [
+        1: SysFSI2C(i2cId: 1),
+        2: SysFSI2C(i2cId: 2),
     ]
 }
 

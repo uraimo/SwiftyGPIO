@@ -32,6 +32,8 @@ extension SwiftyGPIO {
 
     public static func hardwareSPIs(for board: SupportedBoard) -> [SPIInterface]? {
         switch board {
+        case .CHIP:
+            return [SPICHIP[0]!]
         case .RaspberryPiRev1:
             fallthrough
         case .RaspberryPiRev2:
@@ -56,6 +58,14 @@ extension SwiftyGPIO {
     static let SPIRPI: [Int:SPIInterface] = [
         0: SysFSSPI(spiId:"0.0"),
         1: SysFSSPI(spiId:"0.1")
+    ]
+
+    // CHIP SPIs
+    // Supported but not readily available
+    // See: https://bbs.nextthing.co/t/can-interface-spi-and-can-utils/18042/3
+    //      https://bbs.nextthing.co/t/can-bus-mcp2515-via-spi-anyone/11388/2
+    static let SPICHIP: [Int:SPIInterface] = [
+        0: SysFSSPI(spiId:"2.0")
     ]
 
     // BananaPi
