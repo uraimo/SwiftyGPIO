@@ -1,14 +1,15 @@
 
 ### What's in this pull request?
 
-_Describe the content of this pull request._
+Describe the content of this pull request. 
 
-_Do you plan to extend it or to create additional PRs based on this one in the future?_
+If it's a new feature, do you plan to create additional PRs based on this one in the future to add additional functionalities?
 
 
 ### Is there something you want to discuss?
 
-Is there something you are unsure of or something you'd like to discuss before merging the final version of this PR? Let's talk about this!
+Is there something you are unsure of or something you'd like to discuss before merging the final version of this PR?
+
 
 ### Pull Request Checklist
 
@@ -17,6 +18,6 @@ Is there something you are unsure of or something you'd like to discuss before m
 - [ ] Verify that you only import what's necessary, this reduces compilation time.
 - [ ] Try to declare the type of every variable and constant, not using type inference greatly reduces compilation time.
 - [ ] Verify that your code compiles with the currently supported Swift version (currently 3.0.2 to support boards with Raspbian, don't use any 3.1 or 3.1.1 feature)
-- [ ] You've read at least one time the [contribution guidelines](https://github.com/uraimo/SwiftyGPIO/blob/master/CONTRIBUTING.md).
+- [ ] You've read the [contribution guidelines](https://github.com/uraimo/SwiftyGPIO/blob/master/CONTRIBUTING.md).
 
 
