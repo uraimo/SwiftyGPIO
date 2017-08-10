@@ -11,7 +11,6 @@
 
 
 ![](images/banner.jpg)
-<img src="https://github.com/uraimo/SwiftyGPIO/raw/master/images/led1.gif" />
 
 ## Summary
 
