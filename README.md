@@ -1,6 +1,6 @@
 ![SwiftyGPIO](https://github.com/uraimo/SwiftyGPIO/raw/master/logo.png)
 
-**A Swift library to interact with Linux GPIOs/SPI/I2C/PWM/UART, blinking leds and much more!**
+**A Swift library to interact with Linux GPIOs/SPI/I2C/PWM/UART and use leds, sensors, displays and much more!**
 
 
 [![Linux-only](https://img.shields.io/badge/OS-linux-green.svg?style=flat)](#) 
@@ -11,15 +11,17 @@
 
 
 ![](images/banner.jpg)
-
+<img src="https://github.com/uraimo/SwiftyGPIO/raw/master/images/led1.gif" />
 
 ## Summary
 
-This library provides an easy way to interact with external sensors and devices using digital GPIOs, SPI/I2C interfaces, PWM signals and serial ports with Swift on Linux.
+This library provides an easy way to interact with external sensors and devices using the digital GPIOs, SPI/I2C interfaces, PWM signals and serial ports that boards like the Raspberry Pi provide, on Linux using Swift.
 
-You'll be able to configure port attributes (direction,edge,active low), read/write the current GPIOs value, use the SPI interfaces (via hardware if your board provides them or using software big-banging SPI), comunicate over a bus with I2C, generate a PWM to drive external displays, servos, leds and more complex sensors, and finally interact with devices that expose UART serial connections using AT commands or custom protocols. See the *[libraries](#libraries)* for some device libraries built using SwiftyGPIO.
+Like Android Things or similar libraries in Python, SwiftyGPIO provides the basic functionalities you'll need to control different devices: sensors, displays, input devices like joypads, RGB led strips and matrices.
 
-The library is built to run **exclusively on Linux ARM Boards** (RaspberryPis, BeagleBone Black, CHIP, etc...) with accessible GPIOs.
+You'll be able to configure port attributes and read/write the current GPIOs value, use the [SPI](https://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus) interfaces (via hardware if your board provides them or using software big-banging SPI), comunicate over a bus with [I2C](https://learn.sparkfun.com/tutorials/i2c), generate a [PWM](https://en.wikipedia.org/wiki/Pulse-width_modulation) to drive external displays, servos, leds and more complex sensors, and finally interact with devices that expose [UART](https://learn.sparkfun.com/tutorials/serial-communication) serial connections using AT commands or custom protocols. See the *[libraries](#libraries)* for some device libraries built using SwiftyGPIO.
+
+The library is built to run **exclusively on Linux ARM Boards** (RaspberryPis, BeagleBone Black, CHIP, etc...) with accessible GPIO pins.
 
 ##### Content:
 - [Supported Boards](#supported-boards)
@@ -41,9 +43,8 @@ The library is built to run **exclusively on Linux ARM Boards** (RaspberryPis, B
 
 ## Supported Boards
 
-Tested:
-* C.H.I.P.
-* BeagleBone Black (Thanks to [@hpux735](https://twitter.com/hpux735))
+The following boards are supported and have been tested with recent releases of Swift:
+
 * Raspberry Pi 2 (Thanks to [@iachievedit](https://twitter.com/iachievedit))
 * Raspberry Pi 3
 * Raspberry Pi Zero (Thanks to [@MacmeDan](https://twitter.com/MacmeDan))
@@ -51,17 +52,24 @@ Tested:
 * Raspberry Pi A,B Revision 1
 * Raspberry Pi A,B Revision 2
 * Raspberry Pi A+, B+
+* C.H.I.P.
+* BeagleBone Black (Thanks to [@hpux735](https://twitter.com/hpux735))
 * OrangePi (Thanks to [@colemancda](https://github.com/colemancda))
 * OrangePi Zero (Thanks to [@eugeniobaglieri](https://github.com/eugeniobaglieri)) 
 * UDOOs (Thanks to [@estebansannin](https://github.com/estebansannin))
+* Asus Tinkerboard (Thanks to Ernesto Lo Valvo)
 
-Not tested but they should work(basically everything that has an ARMv7/Ubuntu14/Raspbian or an ARMv6/Raspbian):
+But basically everything that has an ARMv7+Ubuntu16/Debian/Raspbian or an ARMv6+Raspbian/Debian should work if you can run Swift on it.
+
+Considering that, these board should also work with SwiftyGPIO once you get Swift running:
+
 * BananaPi
 * OLinuXinos
 * ODROIDs
 * Cubieboards
 * Tegra Jetson TK1
 
+Please keep in mind that Swift on ARM is a completely community-driven effort, and that there are a multitude of possible board+OS configurations, don't expect that everything will work right away on every configuration, especially if you are the first to try a new configuration.
 
 ## Installation
 
@@ -69,9 +77,9 @@ To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with Swift 3+
 
 If you have a RaspberryPi (A,B,A+,B+,Zero,ZeroW,2,3) with Ubuntu or Raspbian, get Swift 3.1.1 from [here](https://www.uraimo.com/2017/05/01/An-update-on-Swift-3-1-1-for-raspberry-pi-zero-1-2-3/) or follow the instruction from the post and the linked [build scripts repository](https://github.com/uraimo/buildSwiftOnARM) to build it yourself.
 
-And alternatively, you can setup a cross-compiling toolchain and build ARM binaries (Ubuntu/Raspbian) from a Mac, thanks again to the work of Helge Heß (and Johannes Weiß for implementing it in SPM), read more about that [here](https://github.com/helje5/dockSwiftOnARM/blob/master/toolchain/README.md). The toolchain supports SPM.
+I always recommend to try one of the latest binaries available (either Ubuntu Mate or Raspbian) before putting in the time to compile it yourself, those binaries could(and do most of the times) also work on seemingly different OSes and on different boards.
 
-The same Ubuntu binaries could work for BeagleBoneBlack, C.H.I.P. or any other ARMv6/ARMv7 board too when used with the same release.
+And alternatively, you can setup a cross-compiling toolchain and build ARM binaries (Ubuntu/Raspbian) from a Mac, thanks again to the work of Helge Heß (and Johannes Weiß for implementing it in SPM), read more about that [here](https://github.com/helje5/dockSwiftOnARM/blob/master/toolchain/README.md). The toolchain supports SPM.
 
 If your version of Swift supports the SPM, you just need to add SwiftyGPIO as a dependency in your `Package.swift`:
 
@@ -358,7 +366,7 @@ This feature uses the M/S algorithm and has been tested with signals with a peri
   
 This functionality leverages the PWM to generate digital signals based on two patterns representing a 0 or a 1 value through a variation of the duty cycle. Let's look at a practical example to better understand the use case and how to use this signal generator:
 
-Let's consider for example the WS2812/NeoPixel, a led with integrated driver used in many led strips.
+Let's consider for example the WS2812/NeoPixel (see the dedicated [library](https://github.com/uraimo/WS281x.swift)), a led with integrated driver used in many led strips.
 
 This led is activated with a signal between 400Khz and 800Khz containing a series of encoded 3 byte values representing respectively the *Green*,*Blue* and *Red* color components, one for each led. Each bit of the color component byte will have  to be encoded this way:
 
