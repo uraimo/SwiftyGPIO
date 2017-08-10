@@ -44,8 +44,6 @@ extension SwiftyGPIO {
             fallthrough
         case .RaspberryPi3:
             return [SPIRPI[0]!, SPIRPI[1]!]
-        case .BananaPi:
-            return [SPIBANANAPI[0]!, SPIBANANAPI[1]!]
         default:
             return nil
         }
@@ -66,12 +64,6 @@ extension SwiftyGPIO {
     //      https://bbs.nextthing.co/t/can-bus-mcp2515-via-spi-anyone/11388/2
     static let SPICHIP: [Int:SPIInterface] = [
         0: SysFSSPI(spiId:"2.0")
-    ]
-
-    // BananaPi
-    static let SPIBANANAPI: [Int:SPIInterface] = [
-        0: SysFSSPI(spiId:"0.0"),
-        1: SysFSSPI(spiId:"0.1")
     ]
 }
 

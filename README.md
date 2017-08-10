@@ -55,6 +55,7 @@ The following boards are supported and have been tested with recent releases of 
 * BeagleBone Black (Thanks to [@hpux735](https://twitter.com/hpux735))
 * OrangePi (Thanks to [@colemancda](https://github.com/colemancda))
 * OrangePi Zero (Thanks to [@eugeniobaglieri](https://github.com/eugeniobaglieri)) 
+* BananaPi M1/2/3
 * UDOOs (Thanks to [@estebansannin](https://github.com/estebansannin))
 * Asus Tinkerboard (Thanks to Ernesto Lo Valvo)
 
@@ -62,7 +63,6 @@ But basically everything that has an ARMv7+Ubuntu16/Debian/Raspbian or an ARMv6+
 
 Considering that, these board should also work with SwiftyGPIO once you get Swift running:
 
-* BananaPi
 * OLinuXinos
 * ODROIDs
 * Cubieboards
@@ -87,9 +87,7 @@ let package = Package(
     name: "MyProject",
     dependencies: [
         .Package(url: "https://github.com/uraimo/SwiftyGPIO.git", majorVersion: 0),
-        ...
     ]
-    ...
 )
 ```
 And then build with `swift build`.
@@ -151,11 +149,11 @@ The following are the possible values for the predefined boards:
 * .RaspberryPiRev2 (Pi A,B Revision 2, post-2012, 26 pin header) 
 * .RaspberryPiPlusZero (Raspberry Pi A+ and B+, Raspberry Zero/W, all with a 40 pin header)
 * .RaspberryPi2 (Raspberry Pi 2 with a 40 pin header)
-* .RaspberryPi3 (Raspberry Pi 2 with a 40 pin header)
+* .RaspberryPi3 (Raspberry Pi 3 with a 40 pin header)
 * .BeagleBoneBlack (BeagleBone Black)
 * .CHIP (the $9 C.H.I.P. computer).
-* .BananaPi (RaspberryPi clone)
 * .OrangePi
+* .OrangePiZero
 
 The map returned by `GPIOs(for:)` contains all the GPIOs of a specific board as described by [these diagrams](https://github.com/uraimo/SwiftyGPIO/wiki/GPIO-Pinout). 
 
