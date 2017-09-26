@@ -33,7 +33,7 @@ extension SwiftyGPIO {
     public static func UARTs(for board: SupportedBoard) -> [UARTInterface]? {
         switch board {
         case .CHIP:
-            return [SysFSUART("S0")!]
+            return [SysFSUART("serial0")!]
         case .RaspberryPiRev1:
             fallthrough
         case .RaspberryPiRev2:
@@ -41,9 +41,10 @@ extension SwiftyGPIO {
         case .RaspberryPiPlusZero:
             fallthrough
         case .RaspberryPi2:
-            fallthrough
+            return [SysFSUART("serial0")!]
         case .RaspberryPi3:
-            return [SysFSUART("AMA0")!]
+            return [SysFSUART("serial0")!,
+                    SysFSUART("serial1")!]
         default:
             return nil
         }
@@ -111,6 +112,8 @@ public enum StopBits {
 }
 
 public enum UARTSpeed {
+    case S2400
+    case S4800
     case S9600
     case S19200
     case S38400
@@ -119,6 +122,12 @@ public enum UARTSpeed {
 
     public func configure(_ cfg: inout termios) {
         switch self {
+        case .S2400:
+            cfsetispeed(&cfg, speed_t(B2400))
+            cfsetospeed(&cfg, speed_t(B2400))
+        case .S4800:
+            cfsetispeed(&cfg, speed_t(B4800))
+            cfsetospeed(&cfg, speed_t(B4800))
         case .S9600:
             cfsetispeed(&cfg, speed_t(B9600))
             cfsetospeed(&cfg, speed_t(B9600))
@@ -145,10 +154,10 @@ public final class SysFSUART: UARTInterface {
     var fd: Int32
 
     public init?(_ uartId: String) {
-        device = "/dev/tty"+uartId
+        device = "/dev/"+uartId
         tty = termios()
 
-        fd = open(device, O_RDWR | O_NOCTTY | O_SYNC)
+        fd = open(device, O_RDWR | O_NOCTTY | O_SYNC | O_NONBLOCK)
         guard fd>0 else {
             perror("Couldn't open UART device")
             abort()
