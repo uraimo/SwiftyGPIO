@@ -33,7 +33,7 @@ extension SwiftyGPIO {
     public static func UARTs(for board: SupportedBoard) -> [UARTInterface]? {
         switch board {
         case .CHIP:
-            return [SysFSUART("serial0")!]
+            return [SysFSUART(["serial0","ttyAMA0"])!]
         case .RaspberryPiRev1:
             fallthrough
         case .RaspberryPiRev2:
@@ -41,10 +41,10 @@ extension SwiftyGPIO {
         case .RaspberryPiPlusZero:
             fallthrough
         case .RaspberryPi2:
-            return [SysFSUART("serial0")!]
+            return [SysFSUART(["serial0","ttyAMA0"])!]
         case .RaspberryPi3:
-            return [SysFSUART("serial0")!,
-                    SysFSUART("serial1")!]
+            return [SysFSUART(["serial0","ttyS0"])!,
+                    SysFSUART(["serial1","ttyAMA0"])!]
         default:
             return nil
         }
@@ -153,22 +153,39 @@ public final class SysFSUART: UARTInterface {
     var tty: termios
     var fd: Int32
 
-    public init?(_ uartId: String) {
-        device = "/dev/"+uartId
-        tty = termios()
+    public init?(_ uartIdList: [String]) {
+        // try all items in list until one works
+        for uartId in uartIdList {
 
-        fd = open(device, O_RDWR | O_NOCTTY | O_SYNC | O_NONBLOCK)
-        guard fd>0 else {
-            perror("Couldn't open UART device")
-            abort()
-        }
+            device = "/dev/"+uartId
+            tty = termios()
 
-        let ret = tcgetattr(fd, &tty)
+            fd = open(device, O_RDWR | O_NOCTTY | O_SYNC)
+            guard fd>0 else {
+                if errno == ENOENT {
+                    // silently return nil if no such device
+                    continue
+                }
+                perror("Couldn't open UART device")
+                continue
+            }
 
-        guard ret == 0 else {
-            perror("Couldn't get terminal attributes")
-            abort()
-        }
+            let ret = tcgetattr(fd, &tty)
+
+            guard ret == 0 else {
+	        close(fd)
+                perror("Couldn't get terminal attributes")
+                continue
+            }
+
+            return
+	}
+
+        return nil
+    }
+
+    public convenience init?(_ uartId: String) {
+        self.init([uartId])
     }
 
     public func configureInterface(speed: UARTSpeed, bitsPerChar: CharSize, stopBits: StopBits, parity: ParityType) {
