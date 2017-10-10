@@ -320,7 +320,7 @@ public final class SysFSI2C: I2CInterface {
                             size: I2C_SMBUS_WORD_DATA,
                             data: &data)
         if r >= 0 {
-            return Int32(data[1] << 8) + Int32(data[0] >> 8)
+            return (Int32(data[1]) << 8) + (Int32(data[0]) >> 8)
         } else {
             return -1
         }
