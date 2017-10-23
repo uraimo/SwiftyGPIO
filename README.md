@@ -558,8 +558,9 @@ A few projects and libraries built using SwiftyGPIO. Have you built something th
 * [u-Blox GPS Receivers](https://github.com/uraimo/UBloxGPS.swift) - Get location data from boards with the u-Blox 6/7/8 family of A-GPS receivers with an UART serial connection (e.g. NEO6M).
 * [MPU-6050 Accelerometer/Gyro](https://github.com/uraimo/MPU-6050.swift) - A library for the MPU-6050 (and MPU-6000 family) Accelerometer and Gyroscope.
 * [DS1307 RTC](https://github.com/uraimo/DS1307.swift) - A library for the DS1307 (DS1302, DS3231) I2C Real-Time Clock.
-* [Wii Nunchuck](https://github.com/uraimo/Nunchuck.swift) - A Library for the Wii Nunchuck controller.
+* [Wii Nunchuck](https://github.com/uraimo/Nunchuck.swift) - A library for the Wii Nunchuck controller.
 * [RCWL-0516](https://github.com/uraimo/RCWL-0516-Radar.swift) - A Swift library for the RCWL-0516 Microwave Radar.
+* [DS18B20](https://github.com/uraimo/DS18B20.swift) - A library for the DS18B20 temperature sensor.
 
 
 ### Awesome Projects 
