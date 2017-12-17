@@ -634,6 +634,6 @@ let DMATI_DEST_DREQ: UInt32 = (1 << 6)
 let DMATI_WAIT_RESP: UInt32 = (1 << 3)
 
 // MARK: - Darwin / Xcode Support
-#if os(OSX)
+#if os(OSX) || os(iOS)
     private var O_SYNC: CInt { fatalError("Linux only") }
 #endif

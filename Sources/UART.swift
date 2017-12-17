@@ -271,7 +271,7 @@ public final class SysFSUART: UARTInterface {
 }
 
 // MARK: - Darwin / Xcode Support
-#if os(OSX)
+#if os(OSX) || os(iOS)
     private var O_SYNC: CInt { fatalError("Linux only") }
     private var CRTSCTS: CInt { fatalError("Linux only") }
 

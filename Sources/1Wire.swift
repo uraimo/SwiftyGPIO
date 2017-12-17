@@ -133,7 +133,7 @@ public final class SysFSOneWire: OneWireInterface {
 internal let ONEWIREBASEPATH = "/sys/bus/w1/devices/"
 
 // MARK: - Darwin / Xcode Support
-#if os(OSX)
+#if os(OSX) || os(iOS)
     private var O_SYNC: CInt { fatalError("Linux only") }
 #endif
 

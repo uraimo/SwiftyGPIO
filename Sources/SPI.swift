@@ -443,6 +443,6 @@ internal let SPI_IOC_MESSAGE1: UInt = 0x40206b00
 internal let SPIBASEPATH="/dev/spidev"
 
 // MARK: - Darwin / Xcode Support
-#if os(OSX)
+#if os(OSX) || os(iOS)
     private var O_SYNC: CInt { fatalError("Linux only") }
 #endif
