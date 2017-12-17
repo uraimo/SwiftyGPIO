@@ -1,7 +1,6 @@
 ![SwiftyGPIO](https://github.com/uraimo/SwiftyGPIO/raw/master/logo.png)
 
-**A Swift library to interact with Linux GPIOs/SPI/I2C/PWM/UART/1Wire and use leds, sensors, displays and much more!**
-
+**A Swift library for hardware projects on Linux/ARM boards with support for GPIOs/SPI/I2C/PWM/UART/1Wire.**
 
 [![Linux-only](https://img.shields.io/badge/OS-linux-green.svg?style=flat)](#) 
 [![License: MIT](http://img.shields.io/badge/License-MIT-blue.svg?style=flat)](https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/LICENSE) 
@@ -187,7 +186,16 @@ gp.direction = .IN
 let current = gp.value
 ```
 
-The other properties available on the GPIO object (edge,active low) refer to the additional attributes of the GPIO that can be configured but you will not need them most of the times. For a detailed description refer to the [kernel documentation](https://www.kernel.org/doc/Documentation/gpio/sysfs.txt)
+Some boards like the RaspberryPi allow to enable a pull up/down resistance on some of the GPIO pins to connect a pin to 3.3V (.up), 0V (.down) or leave it floating (.neither) by default when external devices are disconnected, to enable it just set the `pull` property:
+
+```swift
+gp.direction = .IN
+gp.pull = .up
+```
+
+The pull state can only be set and not read back.
+
+The other properties available on the GPIO object (edge,active low) refer to the additional attributes of the GPIO that can be configured but you will not need them most of the times. For a detailed description refer to the [kernel documentation](https://www.kernel.org/doc/Documentation/gpio/sysfs.txt).
 
 GPIOs also support the execution of closures when the value of the pin changes. Closures can be added with `onRaising` (the pin value changed from 0 to 1), `onFalling` (the value changed from 1 to 0) and `onChange` (the value simply changed from the previous one):
 
