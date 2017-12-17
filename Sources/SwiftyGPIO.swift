@@ -467,6 +467,6 @@ public enum ByteOrder {
 let PAGE_SIZE = (1 << 12)
 
 // MARK: - Darwin / Xcode Support
-#if os(OSX)
+#if os(OSX) || os(iOS)
     private var O_SYNC: CInt { fatalError("Linux only") }
 #endif

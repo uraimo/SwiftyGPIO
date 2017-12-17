@@ -419,6 +419,6 @@ internal let I2C_MAX_LENGTH: Int = 32
 internal let I2CBASEPATH="/dev/i2c-"
 
 // MARK: - Darwin / Xcode Support
-#if os(OSX)
+#if os(OSX) || os(iOS)
     private var O_SYNC: CInt { fatalError("Linux only") }
 #endif
