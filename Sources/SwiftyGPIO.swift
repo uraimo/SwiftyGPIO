@@ -83,6 +83,15 @@ public class GPIO {
         }
     }
 
+    public var pull: GPIOPull {
+        set(dir) {
+            fatalError("Unsupported parameter.")
+        }
+        get{
+            fatalError("Parameter cannot be read.")
+        }
+    }
+
     public var value: Int {
         set(val) {
             if !exported {enableIO(id)}
@@ -284,6 +293,16 @@ public final class RaspberryGPIO: GPIO {
         }
     }
 
+    public override var pull: GPIOPull {
+        set(pull) {
+            if !exported {enableIO(id)}
+            setGpioPull(pull)
+        }
+        get{
+            fatalError("Parameter cannot be read.")
+        }
+    }
+
     public override func isMemoryMapped() -> Bool {
         return true
     }
@@ -341,6 +360,19 @@ public final class RaspberryGPIO: GPIO {
         let ptr = gpioBasePointer.advanced(by: id/10)       // GPFSELn 0..5
         let d = (ptr.pointee & (7<<((UInt(id)%10)*3)))
         return (d == 0) ? .IN : .OUT
+    }
+
+    func setGpioPull(_ value: GPIOPull){
+        let gpioGPPUDPointer = gpioBasePointer.advanced(by: 37)
+        gpioGPPUDPointer.pointee = value.rawValue   // Configure GPPUD
+        usleep(10);                                 // 150 cycles or more
+        let gpioGPPUDCLK0Pointer = gpioBasePointer.advanced(by: 38)
+        gpioGPPUDCLK0Pointer.pointee = setGetId     // Configure GPPUDCLK0 for specific gpio (Ids always lower than 31, no GPPUDCLK1 needed)
+        usleep(10);                                 // 150 cycles or more
+        gpioGPPUDPointer.pointee = 0                // Reset GPPUD
+        usleep(10);                                 // 150 cycles or more
+        gpioGPPUDCLK0Pointer.pointee = 0            // Reset GPPUDCLK0/1 for specific gpio
+        usleep(10);                                 // 150 cycles or more
     }
 
     private func gpioGet() -> Int {
@@ -455,6 +487,12 @@ public enum GPIOEdge: String {
     case RISING="rising"
     case FALLING="falling"
     case BOTH="both"
+}
+
+public enum GPIOPull: UInt {
+    case neither = 0
+    case down    = 1
+    case up      = 2
 }
 
 public enum ByteOrder {
