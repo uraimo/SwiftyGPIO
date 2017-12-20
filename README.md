@@ -1,9 +1,12 @@
-![SwiftyGPIO](https://github.com/uraimo/SwiftyGPIO/raw/master/logo.png)
+<p style="text-align:center;padding-bottom:50px;">
+<img src="https://github.com/uraimo/SwiftyGPIO/raw/master/logo.png"/>
+</p>
+
 
 **A Swift library for hardware projects on Linux/ARM boards with support for GPIOs/SPI/I2C/PWM/UART/1Wire.**
 
-[![Linux-only](https://img.shields.io/badge/OS-linux-green.svg?style=flat)](#) 
 [![License: MIT](http://img.shields.io/badge/License-MIT-blue.svg?style=flat)](https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/LICENSE) 
+[![Linux-only](https://img.shields.io/badge/OS-linux-green.svg?style=flat)](#) 
 [![Swift 3.x](https://img.shields.io/badge/Swift-3.x-orange.svg?style=flat)](https://developer.apple.com/swift) 
 [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
 [![Join the slack channel](https://img.shields.io/badge/Slack-swift/arm-red.svg?style=flat)](https://slackpass.io/swift-arm)
@@ -13,7 +16,7 @@
 
 ## Summary
 
-This library provides an easy way to interact with external sensors and devices using the digital GPIOs, SPI/I2C interfaces, PWM signals and serial ports that boards like the Raspberry Pi provide, on Linux using Swift.
+This library provides an easy way to interact with external sensors and devices using the digital GPIOs, SPI/I2C interfaces, 1-Wire buses, PWM signals and serial ports that boards like the Raspberry Pi provide, on Linux using Swift.
 
 Like Android Things or similar libraries in Python, SwiftyGPIO provides the basic functionalities you'll need to control different devices: sensors, displays, input devices like joypads, RGB led strips and matrices.
 
