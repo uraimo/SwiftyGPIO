@@ -1,16 +1,18 @@
-<p style="text-align:center;padding-bottom:50px;">
+<p align="center" style="padding-bottom:50px;">
 <img src="https://github.com/uraimo/SwiftyGPIO/raw/master/logo.png"/>
 </p>
 
+<p align="center">
+	<a href="https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/LICENSE"><img src="http://img.shields.io/badge/License-MIT-blue.svg?style=flat"/></a>
+	<a href="#"><img src="https://img.shields.io/badge/OS-linux-green.svg?style=flat"/></a> 
+	<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/Swift-3.x-orange.svg?style=flat"/></a> 
+	<a href="https://github.com/apple/swift-package-manager"><img src="https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg"/></a>
+	<a href="https://slackpass.io/swift-arm"><img src="https://img.shields.io/badge/Slack-swift/arm-red.svg?style=flat"/></a>
+</p>
 
-**A Swift library for hardware projects on Linux/ARM boards with support for GPIOs/SPI/I2C/PWM/UART/1Wire.**
-
-[![License: MIT](http://img.shields.io/badge/License-MIT-blue.svg?style=flat)](https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/LICENSE) 
-[![Linux-only](https://img.shields.io/badge/OS-linux-green.svg?style=flat)](#) 
-[![Swift 3.x](https://img.shields.io/badge/Swift-3.x-orange.svg?style=flat)](https://developer.apple.com/swift) 
-[![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
-[![Join the slack channel](https://img.shields.io/badge/Slack-swift/arm-red.svg?style=flat)](https://slackpass.io/swift-arm)
-
+<p align="center">
+<i>A Swift library for hardware projects on Linux/ARM boards with support for GPIOs/SPI/I2C/PWM/UART/1Wire.</i>
+</p>
 
 ![](images/banner.jpg)
 
@@ -66,12 +68,7 @@ The following boards are supported and have been tested with recent releases of 
 
 But basically everything that has an ARMv7+Ubuntu16/Debian/Raspbian or an ARMv6+Raspbian/Debian should work if you can run Swift on it.
 
-Considering that, these board should also work with SwiftyGPIO once you get Swift running:
-
-* OLinuXinos
-* ODROIDs
-* Cubieboards
-* Tegra Jetson TK1
+Considering that, other ARMv7/8 boards should also work with SwiftyGPIO once you get Swift running.
 
 Please keep in mind that Swift on ARM is a completely community-driven effort, and that there are a multitude of possible board+OS configurations, don't expect that everything will work right away on every configuration, especially if you are the first to try a new configuration.
 
@@ -83,7 +80,7 @@ If you have a RaspberryPi (A,B,A+,B+,Zero,ZeroW,2,3) with Ubuntu or Raspbian, ge
 
 I always recommend to try one of the latest binaries available (either Ubuntu Mate or Raspbian) before putting in the time to compile it yourself, those binaries could(and do most of the times) also work on seemingly different OSes and on different boards.
 
-And alternatively, you can setup a cross-compiling toolchain and build ARM binaries (Ubuntu/Raspbian) from a Mac, thanks again to the work of Helge Heß (and Johannes Weiß for implementing it in SPM), read more about that [here](https://github.com/helje5/dockSwiftOnARM/blob/master/toolchain/README.md). The toolchain supports SPM.
+And alternatively, you can setup a cross-compiling toolchain and build ARM binaries (Ubuntu/Raspbian) from a Mac, thanks again to the work of Helge Heß (and Johannes Weiß for implementing it in SPM), read more about that [here](https://github.com/AlwaysRightInstitute/swift-mac2arm-x-compile-toolchain). The toolchain supports SPM.
 
 If your version of Swift supports the SPM, you just need to add SwiftyGPIO as a dependency in your `Package.swift`:
 
@@ -99,21 +96,9 @@ And then build with `swift build`.
 
 The compiler will create an executable under `.build/`.
 
-If your version of Swift does not support the Swift Package Manager, download manually all the needed files: 
+**IMPORTANT:** As everything interacting with GPIOs via sysfs/mmapped registers, if your OS does not come with a predefined user group to access these functionalities, you'll need to run your application with root privileges using `sudo`. If you are using a RaspberryPi with a recent Raspbian (post November 2016) or a recent Ubuntu (from 16.04 Xenial onward) implementing /dev/gpiomem, this will be not required to use basic GPIOs, just launch your application calling the executable built by the compiler.
 
-    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Presets.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SunXi.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SPI.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/PWM.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Mailbox.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/I2C.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/UART.swift
-
-And once downloaded, in the same directory create an additional file that will contain the code of your application named `main.swift`. 
-
-When your code is ready, compile it (every functionality is modularized in a different file, so that the PWM, SPI, I2C, UART files can be deleted if you don't need them) with:
-
-    swiftc *.swift
-    
-The compiler will create a **main** executable.
-
-**IMPORTANT:** As everything interacting with GPIOs via sysfs/mmapped registers, if your OS does not come with a predefined user group to access these functionalities, you'll need to run your application with root privileges using `sudo ./main`. If you are using a RaspberryPi with a recent Raspbian (post November 2016) or a recent Ubuntu (from 16.04 Xenial onward) implementing /dev/gpiomem, this will be not required to use basic GPIOs, just launch your application with `./main`.
-
-On misconfigured systems, features like the listeners may require root privileges anyway. Advanced features like PWM still require root privileges.
+On misconfigured systems, features like the listeners may require root privileges too and advanced features like PWM always  require root privileges.
 
 Alternatively, a specific user group for gpio access can be configured manually as shown [here](https://arcanesciencelab.wordpress.com/2016/03/31/running-rpi3-applications-that-use-gpio-without-being-root/) or in this [answer on stackoverflow](https://stackoverflow.com/questions/30938991/access-gpio-sys-class-gpio-as-non-root/30940526#30940526).
 After following those instruction, remember to add your user (e.g. pi) to the gpio group with `sudo usermod -aG gpio pi` and to reboot so that the changes you made are applied.
@@ -137,7 +122,7 @@ Currently, SwiftyGPIO expose GPIOs, SPIs(if not available a bit-banging VirtualS
 
 Let's suppose we are using a Raspberry 2 board and have a led connected between the GPIO pin P2 (possibly with a resistance of 1K Ohm or so) and GND and we want to turn it on.
 
-Note that SwiftyGPIO uses the raw Broadcom numbering scheme ([described here](https://github.com/uraimo/SwiftyGPIO/wiki/GPIO-Pinout)) to assign a number to each pin.
+Note that SwiftyGPIO uses the *raw Broadcom numbering scheme* ([described here](https://github.com/uraimo/SwiftyGPIO/wiki/GPIO-Pinout)) to assign a number to each pin.
 
 First, we need to retrieve the list of GPIOs available on the board and get a reference to the one we want to modify:
 
