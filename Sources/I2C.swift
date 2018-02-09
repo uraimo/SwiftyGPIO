@@ -335,7 +335,7 @@ public final class SysFSI2C: I2CInterface {
                             data: &data)
         if r >= 0 {
             for i in 0..<Int(data[0]) {
-                values[i-1] = data[i+1]
+                values[i] = data[i+1]
             }
             return Int32(data[0])
         } else {
