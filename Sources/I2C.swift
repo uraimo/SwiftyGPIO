@@ -387,7 +387,7 @@ public final class SysFSI2C: I2CInterface {
     private func i2c_smbus_write_block_data(command: UInt8, values: [UInt8]) -> Int32 {
         var data = [UInt8](repeating:0, count: I2C_MAX_LENGTH+1)
 
-        for i in 1..<values.count {
+        for i in 1...values.count {
             data[i] = values[i-1]
         }
         data[0] = UInt8(values.count)
