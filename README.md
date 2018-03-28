@@ -8,7 +8,7 @@
 	<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/Swift-3.x-orange.svg?style=flat"/></a> 
 	<a href="https://github.com/apple/swift-package-manager"><img src="https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg"/></a>
 	<a href="https://slackpass.io/swift-arm"><img src="https://img.shields.io/badge/Slack-swift/arm-red.svg?style=flat"/></a>
-	<a href="https://twitter.com/intent/tweet?text=Interact%20with%20your%20RaspberryPi%20from%20Swift%20with%20SwiftyGPIO!&url=https://github.com/uraimo/SwiftyGPIO&via=uraimo"><img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=flat"/></a>
+	<a href="https://twitter.com/intent/tweet?text=Interact%20with%20your%20RaspberryPi%20from%20Swift%20with%20SwiftyGPIO!&url=https://github.com/uraimo/SwiftyGPIO&via=uraimo"><img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social"/></a>
 </p>
 
 <p align="center">
