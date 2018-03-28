@@ -8,6 +8,7 @@
 	<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/Swift-3.x-orange.svg?style=flat"/></a> 
 	<a href="https://github.com/apple/swift-package-manager"><img src="https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg"/></a>
 	<a href="https://slackpass.io/swift-arm"><img src="https://img.shields.io/badge/Slack-swift/arm-red.svg?style=flat"/></a>
+	<a href="https://twitter.com/intent/tweet?text=Interact%20with%20your%20RaspberryPi%20from%20Swift%20with%20SwiftyGPIO!&url=https://github.com/uraimo/SwiftyGPIO&via=uraimo"><img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=flat"/></a>
 </p>
 
 <p align="center">
@@ -557,7 +558,7 @@ A few projects and libraries built using SwiftyGPIO. Have you built something th
 * [Wii Nunchuck](https://github.com/uraimo/Nunchuck.swift) - A library for the Wii Nunchuck controller.
 * [RCWL-0516](https://github.com/uraimo/RCWL-0516-Radar.swift) - A Swift library for the RCWL-0516 Microwave Radar.
 * [DS18B20](https://github.com/uraimo/DS18B20.swift) - A library for the DS18B20 temperature sensor.
-* [HT16K33 Leds](https://github.com/jrahaim/swift-raspberry-pi-adafruit-led) - A project that uses the HT16K33 to drive an 8x8 led matrix.
+* [HT16K33 Leds](https://github.com/jrahaim/swift-raspberry-pi-adafruit-led) - A project that uses the HT16K33 to drive led matrices and segment displays via I2C.
 
 ### Awesome Projects 
 * [Portable Wifi Monitor in Swift](http://saygoodnight.com/2016/04/05/portable-wifimon-raspberrypi.html) - A battery powered wifi signal monitor to map your wifi coverage.
