@@ -35,14 +35,16 @@ internal let GPIOBASEPATH="/sys/class/gpio/"
 // MARK: GPIO
 
 public class GPIO {
+    public var bounceTime: TimeInterval?
+
     var name: String = ""
     var id: Int = 0
     var exported = false
     var listening = false
     var intThread: Thread?
-    var intFuncFalling: ((GPIO) -> Void)?
-    var intFuncRaising: ((GPIO) -> Void)?
-    var intFuncChange: ((GPIO) -> Void)?
+    var intFalling: (func: ((GPIO) -> Void), lastCall: Date?)?
+    var intRaising: (func: ((GPIO) -> Void), lastCall: Date?)?
+    var intChange: (func: ((GPIO) -> Void), lastCall: Date?)?
 
     public init(name: String,
                 id: Int) {
@@ -108,7 +110,7 @@ public class GPIO {
     }
 
     public func onFalling(_ closure: @escaping (GPIO) -> Void) {
-        intFuncFalling = closure
+        intFalling = (func: closure, lastCall: nil)
         if intThread == nil {
             intThread = makeInterruptThread()
             listening = true
@@ -117,7 +119,7 @@ public class GPIO {
     }
 
     public func onRaising(_ closure: @escaping (GPIO) -> Void) {
-        intFuncRaising = closure
+        intRaising = (func: closure, lastCall: nil)
         if intThread == nil {
             intThread = makeInterruptThread()
             listening = true
@@ -126,7 +128,7 @@ public class GPIO {
     }
 
     public func onChange(_ closure: @escaping (GPIO) -> Void) {
-        intFuncChange = closure
+        intChange = (func: closure, lastCall: nil)
         if intThread == nil {
             intThread = makeInterruptThread()
             listening = true
@@ -135,7 +137,7 @@ public class GPIO {
     }
 
     public func clearListeners() {
-        (intFuncFalling, intFuncRaising, intFuncChange) = (nil, nil, nil)
+        (intFalling, intRaising, intChange) = (nil, nil, nil)
         listening = false
     }
 
@@ -235,17 +237,28 @@ fileprivate extension GPIO {
                     let res = String(validatingUTF8: buf)!
                     switch res {
                     case "0":
-                        self.intFuncFalling?(self)
+                        self.interrupt(type: &(self.intFalling))
                     case "1":
-                        self.intFuncRaising?(self)
+                        self.interrupt(type: &(self.intRaising))
                     default:
                         break
                     }
-                    self.intFuncChange?(self)
+                    self.interrupt(type: &(self.intChange))
                 }
             }
         }
         return thread
+    }
+
+    func interrupt(type: inout (func: ((GPIO) -> Void), lastCall: Date?)?) {
+        guard let itype = type else {
+            return
+        }
+        if let interval = self.bounceTime, let lastCall = itype.lastCall, Date().timeIntervalSince(lastCall) < interval {
+            return
+        }
+        itype.func(self)
+        type?.lastCall = Date()
     }
 }
 
