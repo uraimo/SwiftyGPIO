@@ -170,7 +170,7 @@ fileprivate extension GPIO {
     func writeToFile(_ path: String, value: String) {
         let fp = fopen(path, "w")
         if fp != nil {
-          #if swift(>=4.1)
+          #if swift(>=4.0)
             let len = value.count
           #else
             let len = value.characters.count
