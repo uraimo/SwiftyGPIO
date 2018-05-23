@@ -86,6 +86,9 @@ And alternatively, you can setup a cross-compiling toolchain and build ARM binar
 If your version of Swift supports the SPM, you just need to add SwiftyGPIO as a dependency in your `Package.swift`:
 
 ```swift
+// Package.swift
+import PackageDescription
+
 let package = Package(
     name: "MyProject",
     dependencies: [
@@ -93,9 +96,17 @@ let package = Package(
     ]
 )
 ```
+
+```swift
+// main.swift
+import MyProject
+
+// code
+```
+
 And then build with `swift build`.
 
-The compiler will create an executable under `.build/`.
+The compiler will create an executable under `.build/debug/MyProject`.
 
 **IMPORTANT:** As everything interacting with GPIOs via sysfs/mmapped registers, if your OS does not come with a predefined user group to access these functionalities, you'll need to run your application with root privileges using `sudo`. If you are using a RaspberryPi with a recent Raspbian (post November 2016) or a recent Ubuntu (from 16.04 Xenial onward) implementing /dev/gpiomem, this will be not required to use basic GPIOs, just launch your application calling the executable built by the compiler.
 
