@@ -170,8 +170,13 @@ fileprivate extension GPIO {
     func writeToFile(_ path: String, value: String) {
         let fp = fopen(path, "w")
         if fp != nil {
-            let ret = fwrite(value, MemoryLayout<CChar>.stride, value.characters.count, fp)
-            if ret<value.characters.count {
+          #if swift(>=4.0)
+            let len = value.count
+          #else
+            let len = value.characters.count
+          #endif
+            let ret = fwrite(value, MemoryLayout<CChar>.stride, len, fp)
+            if ret<len {
                 if ferror(fp) != 0 {
                     perror("Error while writing to file")
                     abort()
