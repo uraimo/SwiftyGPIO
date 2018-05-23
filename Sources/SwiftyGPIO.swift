@@ -173,7 +173,7 @@ fileprivate extension GPIO {
           #if swift(>=4.1)
             let len = value.count
           #else
-            let ret = value.characters.count
+            let len = value.characters.count
           #endif
             let ret = fwrite(value, MemoryLayout<CChar>.stride, len, fp)
             if ret<len {
