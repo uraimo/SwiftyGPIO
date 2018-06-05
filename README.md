@@ -222,7 +222,23 @@ gp.onChange{
 The closure receives as its only parameter a reference to the GPIO object that has been updated so that you don't need to use the external variable.
 Calling `clearListeners()` removes all the closures listening for changes and disables the changes handler.
 While GPIOs are checked for updates, the `direction` of the pin cannot be changed (and configured as `.IN`), but once the listeners have been cleared, either inside the closure or somewhere else, you are free to modify it.
+
+Setting the `bounceTime` property will enable software debounce, that will limit the number of transitions notified to the closure allowing only one event in the specified time interval in seconds.
+
+The following example allows only one transition every 500ms:
+
+```swift
+let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi2)
+var gp = gpios[.P2]!
+
+gp.bounceTime = 0.5
+gp.onRaising{
+    gpio in
+    print("Transition to 1, current value:" + String(gpio.value))
+} 
+```
  
+This functionality is extremely useful when using switches, that tend to generate multiple value spikes when the switch is pressed due to the mechanical characteristics of the compoment.
 
 ### SPI
 
