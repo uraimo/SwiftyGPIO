@@ -180,7 +180,7 @@ public struct MailBox {
             perror("Failed to create mailbox device\n")
             return -1
         }
-      #else
+      #elseif !os(OSX) && !os(iOS)
         if mknod(filename, S_IFCHR|0600, UInt(gnu_dev_makedev(100, 0))) < 0 {
             perror("Failed to create mailbox device\n")
             return -1
