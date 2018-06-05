@@ -5,7 +5,7 @@
 <p align="center">
 	<a href="https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/LICENSE"><img src="http://img.shields.io/badge/License-MIT-blue.svg?style=flat"/></a>
 	<a href="#"><img src="https://img.shields.io/badge/OS-linux-green.svg?style=flat"/></a> 
-	<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/Swift-3.x-orange.svg?style=flat"/></a> 
+	<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/Swift-4.x-orange.svg?style=flat"/></a> 
 	<a href="https://github.com/apple/swift-package-manager"><img src="https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg"/></a>
 	<a href="https://slackpass.io/swift-arm"><img src="https://img.shields.io/badge/Slack-swift/arm-red.svg?style=flat"/></a>
 	<a href="https://twitter.com/intent/tweet?text=Interact%20with%20your%20RaspberryPi%20from%20Swift%20with%20SwiftyGPIO!&url=https://github.com/uraimo/SwiftyGPIO&via=uraimo"><img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social"/></a>
@@ -75,7 +75,7 @@ Please keep in mind that Swift on ARM is a completely community-driven effort, a
 
 ## Installation
 
-To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with Swift 3+.
+To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with Swift 3.x/4.x.
 
 If you have a RaspberryPi (A,B,A+,B+,Zero,ZeroW,2,3) with Ubuntu or Raspbian, get Swift 3.1.1 from [here](https://www.uraimo.com/2017/05/01/An-update-on-Swift-3-1-1-for-raspberry-pi-zero-1-2-3/) or follow the instruction from the post and the linked [build scripts repository](https://github.com/uraimo/buildSwiftOnARM) to build it yourself.
 
@@ -92,7 +92,7 @@ import PackageDescription
 let package = Package(
     name: "MyProject",
     dependencies: [
-        .Package(url: "https://github.com/uraimo/SwiftyGPIO.git", majorVersion: 0),
+        .Package(url: "https://github.com/uraimo/SwiftyGPIO.git", majorVersion: 1),
     ]
 )
 ```
@@ -120,11 +120,8 @@ After following those instruction, remember to add your user (e.g. pi) to the gp
 
 If you prefer starting with a real project instead of just reading documentation, more than a few tutorials are available online.
 
-If you are using Swift 3.0 and the latest version of SwiftyGPIO, [Cameron Perry has a great step by step guide](http://mistercameron.com/2016/06/accessing-raspberry-pi-gpio-pins-with-swift/) on how to setup a Raspberry Pi for Swift and using a led and a temperature sensor. 
+If you are using Swift 3.x and the latest version of SwiftyGPIO, [Cameron Perry has a great step by step guide](http://mistercameron.com/2016/06/accessing-raspberry-pi-gpio-pins-with-swift/) on how to setup a Raspberry Pi for Swift and using a led and a temperature sensor. 
 
-If you are still using Swift 2.x and need a practical example of how to use SwiftyGPIO (get it from [the specific 2.x branch](https://github.com/uraimo/SwiftyGPIO/tree/swift-2.2)), Joe from iachievedit has written a [fantastic tutorial](http://dev.iachieved.it/iachievedit/raspberry-pi-2-gpio-with-swiftygpio/) that will explain everything you need to know.
-
-Additional tutorials are also available in [中文](http://swift.gg/2016/04/01/raspberry-pi-2-gpio-with-swiftygpio/), [日本語](https://ja.ngs.io/2016/06/01/swifty-gpio/) and [Tiếng Việt](https://techmaster.vn/posts/34237/lap-trinh-swift-tren-raspberry-pi).
 
 ## Usage
 
@@ -589,6 +586,7 @@ A few projects and libraries built using SwiftyGPIO. Have you built something th
 * [HC-SR04 Ultrasonic sensors](https://github.com/konifer44/HCSR04.swift) - A library for the HC-SR04 ultrasonic ranging sensor.
 
 ### Awesome Projects 
+* [Experimental Swift on the Raspberry Pi](https://medium.com/@piotr.gorzelany/experimental-swift-8c9131b62a9d) [(GH)](https://github.com/pgorzelany/experimental-swift-server) - Experimenting with Swift and a few different devices.
 * [Portable Wifi Monitor in Swift](http://saygoodnight.com/2016/04/05/portable-wifimon-raspberrypi.html) - A battery powered wifi signal monitor to map your wifi coverage.
 * [Temperature & Humidity Monitor in Swift](http://saygoodnight.com/2016/04/13/swift-temperature-raspberrypi.html) - A temperature monitor with a Raspberry Pi and an AM2302.
 * [Motion Detector with Swift and a Beaglebone Black](http://myroboticadventure.blogspot.it/2016/04/beaglebone-black-motion-detector-with.html) - A motion detector built with a BBB using a HC-SR502 sensor.
@@ -596,9 +594,8 @@ A few projects and libraries built using SwiftyGPIO. Have you built something th
 * [Swifty Buzz](https://github.com/DigitalTools/SwiftyBuzz) - Swifty tunes with a buzzer connected to a GPIO.
 * [Swift... Swift Everywhere](https://medium.com/@darthpelo/swift-swift-everywhere-eba445ef2bcd) - A tutorial that builds a complete platform, an iOS app controlling leds through a Vapor-based REST service.
 * [Bluetooth Smart Lock](https://github.com/colemancda/Lock) - A smart lock controller with companion iOS app that unlocks 12v solenoid locks via Bluetooth.
-* [Experimental Swift on the Raspberry Pi](https://medium.com/@piotr.gorzelany/experimental-swift-8c9131b62a9d) [(GH)](https://github.com/pgorzelany/experimental-swift-server) - Experimenting with Swift and a few different devices.
  
 
 ## Additional documentation
 
-Additional documentation can be found in the `docs` directory.
+Additional documentation, mostly implementation details, can be found in the `docs` directory.
