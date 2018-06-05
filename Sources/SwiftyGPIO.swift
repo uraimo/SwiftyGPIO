@@ -37,8 +37,8 @@ internal let GPIOBASEPATH="/sys/class/gpio/"
 public class GPIO {
     public var bounceTime: TimeInterval?
 
-    var name: String = ""
-    var id: Int = 0
+    public private(set) var name: String = ""
+    public private(set) var id: Int = 0
     var exported = false
     var listening = false
     var intThread: Thread?
