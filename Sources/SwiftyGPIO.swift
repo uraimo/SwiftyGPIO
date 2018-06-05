@@ -262,6 +262,12 @@ fileprivate extension GPIO {
     }
 }
 
+extension GPIO: CustomStringConvertible {
+    public var description: String {
+        return "\(name)<\(direction),\(edge),\(activeLow),\(pull)>: \(value)"
+    }
+}
+
 // MARK: GPIO:Raspberry
 
 public final class RaspberryGPIO: GPIO {
