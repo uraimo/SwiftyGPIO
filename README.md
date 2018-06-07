@@ -571,6 +571,9 @@ Notice that we are converting the 0x9F `Int` using the constructor `UInt8(trunca
 A few projects and libraries built using SwiftyGPIO. Have you built something that you want to share? Let me know!
 
 ### Libraries
+* [TM1637](https://github.com/AlwaysRightInstitute/SwiftyTM1637) - Library for the TM1637 7-segment driver chip.
+* [HC-SR04 Ultrasonic sensors](https://github.com/konifer44/HCSR04.swift) - A library for the HC-SR04 ultrasonic ranging sensor.
+* [HT16K33 Leds](https://github.com/jrahaim/swift-raspberry-pi-adafruit-led) - A project that uses the HT16K33 to drive led matrices and segment displays via I2C.
 * [WS281x Leds](https://github.com/uraimo/WS281x.swift) - A library for WS2812x (WS2811,WS2812,WS2812B) RGB led strips, rings, sticks, matrices, etc...
 * [Nokia5110(PCD8544) 128x64 LCD](http://github.com/uraimo/5110lcd_pcd8544.swift) - Show text and graphics on a Nokia 3110/5110 LCD display.
 * [HD44780U Character LCD](https://github.com/uraimo/HD44780CharacterLCD.swift) - Show text on character LCDs controlled by the HD44780 or one of its clones.
@@ -583,8 +586,7 @@ A few projects and libraries built using SwiftyGPIO. Have you built something th
 * [Wii Nunchuck](https://github.com/uraimo/Nunchuck.swift) - A library for the Wii Nunchuck controller.
 * [RCWL-0516](https://github.com/uraimo/RCWL-0516-Radar.swift) - A Swift library for the RCWL-0516 Microwave Radar.
 * [DS18B20](https://github.com/uraimo/DS18B20.swift) - A library for the DS18B20 temperature sensor.
-* [HT16K33 Leds](https://github.com/jrahaim/swift-raspberry-pi-adafruit-led) - A project that uses the HT16K33 to drive led matrices and segment displays via I2C.
-* [HC-SR04 Ultrasonic sensors](https://github.com/konifer44/HCSR04.swift) - A library for the HC-SR04 ultrasonic ranging sensor.
+
 
 ### Awesome Projects 
 * [Experimental Swift on the Raspberry Pi](https://medium.com/@piotr.gorzelany/experimental-swift-8c9131b62a9d) [(GH)](https://github.com/pgorzelany/experimental-swift-server) - Experimenting with Swift and a few different devices.
