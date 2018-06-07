@@ -225,8 +225,12 @@ fileprivate extension GPIO {
             var buf: [Int8] = [0, 0, 0] //Dummy read to discard current value
             read(fp, &buf, 3)
 
+          #if swift(>=4.0)
+            var pfd = pollfd(fd:fp, events:Int16(truncatingIfNeeded:POLLPRI), revents:0)
+          #else
             var pfd = pollfd(fd:fp, events:Int16(truncatingBitPattern:POLLPRI), revents:0)
-
+          #endif
+          
             while self.listening {
                 let ready = poll(&pfd, 1, -1)
                 if ready > -1 {
