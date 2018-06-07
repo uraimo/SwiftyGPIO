@@ -406,7 +406,11 @@ extension RaspberryPWM {
 
         // Copy the pattern stream to the raw pwm buffer location
         stream.withUnsafeBytes { (ptr: UnsafeRawBufferPointer) in
+        #if swift(>=4.0)
+            UnsafeMutableRawPointer(pwmRawPointer).copyMemory(from: ptr.baseAddress!, byteCount: stream.count * MemoryLayout<UInt32>.stride)
+        #else
             UnsafeMutableRawPointer(pwmRawPointer).copyBytes(from: ptr.baseAddress!, count: stream.count * MemoryLayout<UInt32>.stride)
+        #endif
         }
 
         // Start the DMA transfer toward the PWM FIFO

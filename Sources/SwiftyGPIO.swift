@@ -206,7 +206,11 @@ fileprivate extension GPIO {
             //Remove the trailing \n
             buf[len-1]=0
             res = String.init(validatingUTF8: buf)
+        #if swift(>=4.0)
+            buf.deallocate()
+        #else
             buf.deallocate(capacity: MAXLEN)
+        #endif
         }
         return res
     }
