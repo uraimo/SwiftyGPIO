@@ -240,7 +240,7 @@ This functionality is extremely useful when using switches, that tend to generat
 
 ### SPI
 
-If your board has a SPI connection and SwiftyGPIO has it among its presets, a list of the available SPI channels can be obrained calling `hardwareSPIs(for:)` with one of the predefined boards.
+If your board has a SPI connection and SwiftyGPIO has it among its presets, a list of the available SPI channels can be obtained by calling `hardwareSPIs(for:)` with one of the predefined boards.
 
 On RaspberryPi and other boards the hardware SPI SysFS interface is not enabled by default, check out the setup guide on [wiki](https://github.com/uraimo/SwiftyGPIO/wiki/Enabling-SPI-on-RaspberryPi-and-others).
 
