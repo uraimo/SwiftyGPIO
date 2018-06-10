@@ -82,6 +82,7 @@ public class RaspberryPWM: PWMOutput {
     let gpioId: UInt
     let alt: UInt
     let channel: Int
+    let pwmdma: Int
 
     let BCM2708_PERI_BASE: Int
     let GPIO_BASE: Int  // GPIO Register
@@ -89,7 +90,6 @@ public class RaspberryPWM: PWMOutput {
     let CLOCK_BASE: Int // Clock Manager Register
     let BCM2708_PHY_BASE: Int = 0x7e000000
     let PWM_PHY_BASE: Int
-    let PWMDMA = 5
 
     var gpioBasePointer: UnsafeMutablePointer<UInt>!
     var pwmBasePointer: UnsafeMutablePointer<UInt>!
@@ -106,10 +106,11 @@ public class RaspberryPWM: PWMOutput {
     var patternDelay: Int = 0
     var dataLength: Int = 0
 
-    public init(gpioId: UInt, alt: UInt, channel: Int, baseAddr: Int, dmanum: Int = 5) { //PWMDMA
+    public init(gpioId: UInt, alt: UInt, channel: Int, baseAddr: Int, dmanum: Int = 5) {
         self.gpioId = gpioId
         self.alt = alt
         self.channel = channel
+        self.pwmdma = dmanum
         BCM2708_PERI_BASE = baseAddr
         GPIO_BASE = BCM2708_PERI_BASE + 0x200000  // GPIO Register
         PWM_BASE =  BCM2708_PERI_BASE + 0x20C000  // PWM Register
@@ -142,7 +143,7 @@ public class RaspberryPWM: PWMOutput {
             return BCM2708_PERI_BASE + DMAOffsets[dmanum]
         }
 
-        var dma_addr = dmanumToPhysicalAddress(PWMDMA) // Address of a specific DMA Channel registers set
+        var dma_addr = dmanumToPhysicalAddress(pwmdma) // Address of a specific DMA Channel registers set
         let pageOffset = dma_addr % PAGE_SIZE
         dma_addr -= pageOffset
 
