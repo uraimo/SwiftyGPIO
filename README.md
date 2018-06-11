@@ -139,7 +139,7 @@ First, we need to retrieve the list of GPIOs available on the board and get a re
 ```swift
 import SwiftyGPIO //Not needed when you compile via swiftc
 
-let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi2)
+let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi3)
 var gp = gpios[.P2]!
 ```
 
@@ -198,7 +198,7 @@ The other properties available on the GPIO object (edge,active low) refer to the
 GPIOs also support the execution of closures when the value of the pin changes. Closures can be added with `onRaising` (the pin value changed from 0 to 1), `onFalling` (the value changed from 1 to 0) and `onChange` (the value simply changed from the previous one):
 
 ```swift
-let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi2)
+let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi3)
 var gp = gpios[.P2]!
 
 
@@ -226,7 +226,7 @@ Setting the `bounceTime` property will enable software debounce, that will limit
 The following example allows only one transition every 500ms:
 
 ```swift
-let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi2)
+let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi3)
 var gp = gpios[.P2]!
 
 gp.bounceTime = 0.5
@@ -244,10 +244,10 @@ If your board has a SPI connection and SwiftyGPIO has it among its presets, a li
 
 On RaspberryPi and other boards the hardware SPI SysFS interface is not enabled by default, check out the setup guide on [wiki](https://github.com/uraimo/SwiftyGPIO/wiki/Enabling-SPI-on-RaspberryPi-and-others).
 
-Let's see some examples using a RaspberryPi 2 that has two bidirectional SPIs, managed by SwiftyGPIO as two SPIObjects:
+Let's see some examples using a RaspberryPi 3 that has two bidirectional SPIs, managed by SwiftyGPIO as two SPIObjects:
  
 ```swift
-let spis = SwiftyGPIO.hardwareSPIs(for:.RaspberryPi2)!
+let spis = SwiftyGPIO.hardwareSPIs(for:.RaspberryPi3)!
 var spi = spis[0]
 ```
 
@@ -257,7 +257,7 @@ Alternatively, we can create a software SPI using four GPIOs, one that will serv
 
 To create a software SPI, just retrieve two pins and create a `VirtualSPI` object:
 ```swift
-let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi2)
+let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi3)
 var cs = gpios[.P27]!
 var mosi = gpios[.P22]!
 var miso = gpios[.P4]!
@@ -295,7 +295,7 @@ The I2C interface can be used to communicate using the SMBus protocol on a I2C b
 To obtain a reference to the `I2CInterface` object, call the `hardwareI2Cs(for:)` utility method of the SwiftyGPIO class:
 
 ```swift
-let i2cs = SwiftyGPIO.hardwareI2Cs(for:.RaspberryPi2)!
+let i2cs = SwiftyGPIO.hardwareI2Cs(for:.RaspberryPi3)!
 let i2c = i2cs[1]
 ```
 
@@ -345,7 +345,7 @@ PWM output signals can be used to drive servo motors, RGB leds and other devices
 If your board has PWM ports and is supported (at the moment only RaspberryPi boards), retrieve the available `PWMOutput` objects with the `hardwarePWMs` factory method:
 
 ```swift
-let pwms = SwiftyGPIO.hardwarePWMs(for:.RaspberryPi2)!
+let pwms = SwiftyGPIO.hardwarePWMs(for:.RaspberryPi3)!
 let pwm = (pwms[0]?[.P18])!
 ```
 
@@ -414,7 +414,7 @@ In this brief guide I'm using an 8x8 led matrix with 64 WS2812 leds (these matri
 First of all let's retrieve a `PWMOutput` object and then initialize it:
 
 ```swift
-let pwms = SwiftyGPIO.hardwarePWMs(for:.RaspberryPi2)!
+let pwms = SwiftyGPIO.hardwarePWMs(for:.RaspberryPi3)!
 let pwm = (pwms[0]?[.P18])!
 
 // Initialize PWM
@@ -473,7 +473,7 @@ At this point you could configure a different signal calling again `initPWMPatte
 If your board support the UART serial ports feature (disable the login on serial with `raspi-config` for RaspberryPi boards), you can retrieve the list of available `UARTInterface` with `SwiftyGPIO.UARTs(for:)`:
 
 ```swift
-let uarts = SwiftyGPIO.UARTs(for:.RaspberryPi2)!
+let uarts = SwiftyGPIO.UARTs(for:.RaspberryPi3)!
 var uart = uarts[0]
 ```
 
@@ -501,7 +501,7 @@ A specific method that reads lines of text (`\n` is used as line terminator, the
 If your board provides a 1-Wire port (right now only RaspberryPi boards), you can retrieve the list of available `OneWireInterface` with `SwiftyGPIO.hardware1Wires(for:)`:
 
 ```swift
-let onewires = SwiftyGPIO.hardware1Wires(for:.RaspberryPi2)!
+let onewires = SwiftyGPIO.hardware1Wires(for:.RaspberryPi3)!
 var onewire = onewires[0]
 ```
 
