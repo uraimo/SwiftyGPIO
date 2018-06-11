@@ -244,14 +244,14 @@ If your board has a SPI connection and SwiftyGPIO has it among its presets, a li
 
 On RaspberryPi and other boards the hardware SPI SysFS interface is not enabled by default, check out the setup guide on [wiki](https://github.com/uraimo/SwiftyGPIO/wiki/Enabling-SPI-on-RaspberryPi-and-others).
 
-Let's see some examples using a RaspberryPi 2 that has one bidirectional SPI, managed by SwiftyGPIO as two mono-directional SPIObjects:
+Let's see some examples using a RaspberryPi 2 that has two bidirectional SPIs, managed by SwiftyGPIO as two SPIObjects:
  
 ```swift
 let spis = SwiftyGPIO.hardwareSPIs(for:.RaspberryPi2)!
 var spi = spis[0]
 ```
 
-The items returned refer to different devices addressable through the SPI bus, the number is equal to the number of CS(or CE) pins available on your board.
+The interface is composed by 3 wire: a clock line (SCLK), an input line (MISO) and an output line (MOSI). One or more CS pins (with inverse logic) are available to enable or disable slave devices.
 
 Alternatively, we can create a software SPI using four GPIOs, one that will serve as clock pin (SCLK), one as chip-select (CS or CE) and the other two will be used to send and receive the actual data (MOSI and MISO). This kind of bit-banging SPI is slower than the hardware one, so, the recommended approach is to use hardware SPIs when available.
 
