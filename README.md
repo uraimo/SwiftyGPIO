@@ -283,8 +283,8 @@ Since the interface performs only full duplex transmissions, to read some data f
 Let's see a simple example, that reads 32 bytes from a device sending just 32 empty bytes:
 
 ```swift
-let data: [UInt8] = [UInt8](repeating:0, count: 32)
-let res = spi?.sendData(data)
+let data = [ UInt8 ](repeating: 0, count: 32)
+let res  = spi?.sendDataAndRead(data)
 ```
 The `res` array will contain the raw data received from the device. Again, what to send and how the received data should be interpreted depends from the device or IC you are using, always read the reference manual.
 
