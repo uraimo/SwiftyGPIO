@@ -267,7 +267,7 @@ var spi = VirtualSPI(mosiGPIO: mosi, misoGPIO: miso, clockGPIO: clk, csGPIO: cs)
 ```
 
 Both objects implement the same `SPIObject` protocol and so provide the same methods.
-To distinguish between hardware and software SPIObjects, use the `isHardware` method.
+To distinguish between hardware and software SPIObjects, use the `isHardware` property.
 
 To send one or more byte over a SPI, use the `sendData` method.
 In its simplest form it just needs an array of UInt8 as parameter:
