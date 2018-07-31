@@ -105,10 +105,9 @@ final public class RaspberryPHY {
     var gpioBasePointer: UnsafeMutablePointer<UInt>!
     var pwmBasePointer: UnsafeMutablePointer<UInt>!
     var clockBasePointer: UnsafeMutablePointer<UInt>!
-    var dmaBasePointer: UnsafeMutablePointer<UInt>!
-    var dmaCallbackPointer: UnsafeMutablePointer<DMACallback>! = nil
-    var pwmRawPointer: UnsafeMutablePointer<UInt>! = nil
+    var dmaBasePointers: [UnsafeMutablePointer<UInt>]!
 
+    public private(set) var isInitialized: Bool = false
     public private(set) var isReadyForPwm: Bool = false
 
     private init(baseAddr: Int) {
@@ -120,6 +119,8 @@ final public class RaspberryPHY {
     }
 
     func initPhy() {
+        guard !isInitialized else { return }
+
         var mem_fd: Int32 = 0
 
         //The only mem device that support PWM is /dev/mem
@@ -133,22 +134,19 @@ final public class RaspberryPHY {
         pwmBasePointer = memmap(from: mem_fd, at: PWM_BASE)
         clockBasePointer = memmap(from: mem_fd, at: CLOCK_BASE)
 
-        /*let DMAOffsets: [Int] = [0x00007000, 0x00007100, 0x00007200, 0x00007300,
+        let DMAOffsets: [Int] = [0x00007000, 0x00007100, 0x00007200, 0x00007300,
                                  0x00007400, 0x00007500, 0x00007600, 0x00007700,
                                  0x00007800, 0x00007900, 0x00007a00, 0x00007b00,
                                  0x00007c00, 0x00007d00, 0x00007e00, 0x00e05000]
 
-        func dmanumToPhysicalAddress(_ dmanum: Int) -> Int {
-            guard dmanum < DMAOffsets.count else { return 0 }
-            return BCM2708_PERI_BASE + DMAOffsets[dmanum]
+        for dma_addr in DMAOffsets.map({ BCM2708_PERI_BASE + $0 }) {
+            let pageOffset = dma_addr % PAGE_SIZE
+            let adjusted_dma_addr = dma_addr - pageOffset
+            let dma_map = UnsafeMutableRawPointer(memmap(from: mem_fd, at: adjusted_dma_addr))
+
+            let dmaBasePointer = (dma_map + pageOffset).assumingMemoryBound(to: UInt.self)
+            dmaBasePointers.append(dmaBasePointer)
         }
-
-        var dma_addr = dmanumToPhysicalAddress(pwmdma) // Address of a specific DMA Channel registers set
-        let pageOffset = dma_addr % PAGE_SIZE
-        dma_addr -= pageOffset
-
-        let dma_map = UnsafeMutableRawPointer(memmap(from: mem_fd, at: dma_addr))
-        dmaBasePointer = (dma_map + pageOffset).assumingMemoryBound(to: UInt.self)*/
 
         close(mem_fd)
     }
@@ -203,6 +201,9 @@ public class RaspberryPWM: PWMOutput {
 
     let phy: RaspberryPHY
 
+    var dmaBasePointer: UnsafeMutablePointer<UInt>!
+    var dmaCallbackPointer: UnsafeMutablePointer<DMACallback>! = nil
+    var pwmRawPointer: UnsafeMutablePointer<UInt>! = nil
     var mailbox: MailBox! = nil
 
     var zeroPattern: Int = 0
@@ -223,6 +224,7 @@ public class RaspberryPWM: PWMOutput {
     /// Init PWM on this pin, set alternative function
     public func initPWM() {
         phy.initPhy()
+        dmaBasePointer = phy.dmaBasePointers[pwmdma]
 
         // set PWM alternate function for this GPIO
         setAlt()
@@ -255,7 +257,7 @@ public class RaspberryPWM: PWMOutput {
         let PWMCTL_MSEN = (channel == 0) ? PWMCTL_MSEN1 : PWMCTL_MSEN2
         let PWMCTL_PWEN = (channel == 0) ? PWMCTL_PWEN1 : PWMCTL_PWEN2
         let oldCtl = phy.pwmBasePointer.pointee
-        phy.pwmBasePointer.pointee = oldCtl & ~PWMCTL_MSEN & ~PWMCTL_PWEN      //PWM CTL register, everything at 0, enable flag included
+        phy.pwmBasePointer.pointee = oldCtl & ~PWMCTL_MSEN & ~PWMCTL_PWEN      //PWM CTL register, clear just the channel.
     }
 
     /// Maps a block of memory and returns the pointer
@@ -344,22 +346,22 @@ extension RaspberryPWM {
 
     /// Start the DMA feeding the PWM FIFO.  This will stream the entire DMA buffer out of both PWM channels.
     internal func dma_start(dmaCallback address: UInt) {
-        phy.dmaBasePointer.pointee = DMACS_RESET
+        dmaBasePointer.pointee = DMACS_RESET
         usleep(10)
-        phy.dmaBasePointer.pointee = DMACS_INT | DMACS_END
-        phy.dmaBasePointer.advanced(by: 1).pointee  = address    //CONBLK_AD
-        phy.dmaBasePointer.advanced(by: 8).pointee = 7           //DEBUG: clear debug error flags
-        phy.dmaBasePointer.pointee = DMACS_WAIT_OUTSTANDING_WRITES | (15 << DMACS_PANIC_PRIORITY) | (15 << DMACS_PRIORITY) | DMACS_ACTIVE
+        dmaBasePointer.pointee = DMACS_INT | DMACS_END
+        dmaBasePointer.advanced(by: 1).pointee  = address    //CONBLK_AD
+        dmaBasePointer.advanced(by: 8).pointee = 7           //DEBUG: clear debug error flags
+        dmaBasePointer.pointee = DMACS_WAIT_OUTSTANDING_WRITES | (15 << DMACS_PANIC_PRIORITY) | (15 << DMACS_PRIORITY) | DMACS_ACTIVE
     }
 
     /// Wait for any executing DMA operation to complete before returning.
     internal func dma_wait() {
-        while (phy.dmaBasePointer.pointee & DMACS_ACTIVE > 0) && !(phy.dmaBasePointer.pointee & DMACS_ERROR > 0) {
+        while (dmaBasePointer.pointee & DMACS_ACTIVE > 0) && !(dmaBasePointer.pointee & DMACS_ERROR > 0) {
             usleep(10)
         }
 
-        if (phy.dmaBasePointer.pointee & DMACS_ERROR)>0 {
-            fatalError("DMA Error: \(phy.dmaBasePointer.advanced(by: 8).pointee)")
+        if (dmaBasePointer.pointee & DMACS_ERROR)>0 {
+            fatalError("DMA Error: \(dmaBasePointer.advanced(by: 8).pointee)")
         }
     }
 
@@ -408,13 +410,13 @@ extension RaspberryPWM {
 
         guard let mailbox = mailbox else {fatalError("Could allocate mailbox.")}
 
-        phy.dmaCallbackPointer = mailbox.baseVirtualAddress.assumingMemoryBound(to: DMACallback.self)
-        phy.pwmRawPointer = (mailbox.baseVirtualAddress + MemoryLayout<DMACallback>.stride).assumingMemoryBound(to: UInt.self)
+        dmaCallbackPointer = mailbox.baseVirtualAddress.assumingMemoryBound(to: DMACallback.self)
+        pwmRawPointer = (mailbox.baseVirtualAddress + MemoryLayout<DMACallback>.stride).assumingMemoryBound(to: UInt.self)
 
         // Fill PWM buffer with zeros
         let rows = dataSize / MemoryLayout<UInt>.stride
         for pos in 0..<rows {
-            phy.pwmRawPointer.advanced(by: pos).pointee = 0
+            pwmRawPointer.advanced(by: pos).pointee = 0
         }
 
         // Stop the PWM
@@ -446,20 +448,20 @@ extension RaspberryPWM {
         phy.pwmBasePointer.pointee |= PWMCTL_PWEN1               //| PWMCTL_PWEN2 // For 2nd chan
 
         // Initialize the DMA control block
-        phy.dmaCallbackPointer.pointee = DMACallback(
+        dmaCallbackPointer.pointee = DMACallback(
             ti: DMATI_NO_WIDE_BURSTS |              // 32-bit transfers
                 DMATI_WAIT_RESP |                  // wait for write complete
                 DMATI_DEST_DREQ |                  // user peripheral flow control
                 UInt32(0x5  << DMATI_PERMAP) |     // PWM peripheral
             DMATI_SRC_INC,                     // Increment src addr
-            source_ad: UInt32(mailbox.virtualTobaseBusAddress(UnsafeMutableRawPointer(phy.pwmRawPointer))),
+            source_ad: UInt32(mailbox.virtualTobaseBusAddress(UnsafeMutableRawPointer(pwmRawPointer))),
             dest_ad: UInt32(phy.PWM_PHY_BASE + 0x18),   // PWM FIF1 Register, shared between channels
             txfr_len: UInt32(dataSize),
             stride: 0,
             nextconbk: 0)
 
-        phy.dmaBasePointer.pointee = 0                  //0 CS
-        phy.dmaBasePointer.advanced(by: 5).pointee = 0  //0 TXFR_LEN
+        dmaBasePointer.pointee = 0                  //0 CS
+        dmaBasePointer.advanced(by: 5).pointee = 0  //0 TXFR_LEN
 
     }
 
@@ -477,9 +479,9 @@ extension RaspberryPWM {
         // Copy the pattern stream to the raw pwm buffer location
         stream.withUnsafeBytes { (ptr: UnsafeRawBufferPointer) in
         #if swift(>=4.1)
-            UnsafeMutableRawPointer(phy.pwmRawPointer).copyMemory(from: ptr.baseAddress!, byteCount: stream.count * MemoryLayout<UInt32>.stride)
+            UnsafeMutableRawPointer(pwmRawPointer).copyMemory(from: ptr.baseAddress!, byteCount: stream.count * MemoryLayout<UInt32>.stride)
         #else
-            UnsafeMutableRawPointer(phy.pwmRawPointer).copyBytes(from: ptr.baseAddress!, count: stream.count * MemoryLayout<UInt32>.stride)
+            UnsafeMutableRawPointer(pwmRawPointer).copyBytes(from: ptr.baseAddress!, count: stream.count * MemoryLayout<UInt32>.stride)
         #endif
         }
 
