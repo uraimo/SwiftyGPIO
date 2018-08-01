@@ -105,7 +105,7 @@ final public class RaspberryPHY {
     var gpioBasePointer: UnsafeMutablePointer<UInt>!
     var pwmBasePointer: UnsafeMutablePointer<UInt>!
     var clockBasePointer: UnsafeMutablePointer<UInt>!
-    var dmaBasePointers: [UnsafeMutablePointer<UInt>]!
+    var dmaBasePointers: [UnsafeMutablePointer<UInt>]! = []
 
     public private(set) var isInitialized: Bool = false
     public private(set) var isReadyForPwm: Bool = false
