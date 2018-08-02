@@ -168,8 +168,9 @@ final public class RaspberryPHY {
 
     func killClock() {
         clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_KILL     //CM CTL register: Set KILL flag
-        isReadyForPwm = false
         usleep(10)
+
+        isReadyForPwm = false
     }
 
     /// Maps a block of memory and returns the pointer
@@ -376,9 +377,8 @@ extension RaspberryPWM {
         // Stop the PWM
         phy.pwmBasePointer.pointee = 0
         usleep(10)
-        // Stop the clock killing the clock
-        phy.clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_KILL     //Set KILL flag
-        usleep(10)
+        // Kill the Clock
+        phy.killClock()
 
         mailbox.cleanup()
     }
@@ -423,8 +423,7 @@ extension RaspberryPWM {
         phy.pwmBasePointer.pointee = 0
         usleep(10)
         // Stop the clock killing the clock
-        phy.clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_KILL     //Set KILL flag
-        usleep(10)
+        phy.killClock()
         // Check the BUSY flag, doesn't always work
         //while (clockBasePointer.advanced(by: 40).pointee & (1 << 7)) != 0 {}
 
