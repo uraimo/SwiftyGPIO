@@ -586,7 +586,7 @@ A few projects and libraries built using SwiftyGPIO. Have you built something th
 * [Wii Nunchuck](https://github.com/uraimo/Nunchuck.swift) - A library for the Wii Nunchuck controller.
 * [RCWL-0516](https://github.com/uraimo/RCWL-0516-Radar.swift) - A Swift library for the RCWL-0516 Microwave Radar.
 * [DS18B20](https://github.com/uraimo/DS18B20.swift) - A library for the DS18B20 temperature sensor.
-
+* [PCA9685](https://github.com/Kaiede/PCA9685) - A library for the PCA9685 I2C PWM/Servo controller.
 
 ### Awesome Projects 
 * [Experimental Swift on the Raspberry Pi](https://medium.com/@piotr.gorzelany/experimental-swift-8c9131b62a9d) [(GH)](https://github.com/pgorzelany/experimental-swift-server) - Experimenting with Swift and a few different devices.
