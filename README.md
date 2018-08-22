@@ -571,6 +571,7 @@ Notice that we are converting the 0x9F `Int` using the constructor `UInt8(trunca
 A few projects and libraries built using SwiftyGPIO. Have you built something that you want to share? Let me know!
 
 ### Libraries
+* [PCA9685](https://github.com/Kaiede/PCA9685) - 16-Channel 12-bit PWM/Servo Driver I2C board library.
 * [TM1637](https://github.com/AlwaysRightInstitute/SwiftyTM1637) - Library for the TM1637 7-segment driver chip.
 * [HC-SR04 Ultrasonic sensors](https://github.com/konifer44/HCSR04.swift) - A library for the HC-SR04 ultrasonic ranging sensor.
 * [HT16K33 Leds](https://github.com/jrahaim/swift-raspberry-pi-adafruit-led) - A project that uses the HT16K33 to drive led matrices and segment displays via I2C.
