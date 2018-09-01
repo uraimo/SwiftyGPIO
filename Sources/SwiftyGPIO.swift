@@ -379,18 +379,18 @@ public final class RaspberryGPIO: GPIO {
 
     private func gpioAsInput() {
         let ptr = gpioBasePointer.advanced(by: id/10)       // GPFSELn 0..5
-        ptr.pointee &= ~(7<<((UInt(id)%10)*3))                    // SEL=000 input
+        ptr.pointee &= ~(7<<((UInt32(id)%10)*3))                    // SEL=000 input
     }
 
     private func gpioAsOutput() {
         let ptr = gpioBasePointer.advanced(by: id/10)       // GPFSELn 0..5
-        ptr.pointee &= ~(7<<((UInt(id)%10)*3))
-        ptr.pointee |=  (1<<((UInt(id)%10)*3))                    // SEL=001 output
+        ptr.pointee &= ~(7<<((UInt32(id)%10)*3))
+        ptr.pointee |=  (1<<((UInt32(id)%10)*3))                    // SEL=001 output
     }
 
     private func gpioGetDirection() -> GPIODirection {
         let ptr = gpioBasePointer.advanced(by: id/10)       // GPFSELn 0..5
-        let d = (ptr.pointee & (7<<((UInt(id)%10)*3)))
+        let d = (ptr.pointee & (7<<((UInt32(id)%10)*3)))
         return (d == 0) ? .IN : .OUT
     }
 
