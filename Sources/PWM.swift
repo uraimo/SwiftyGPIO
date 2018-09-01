@@ -102,10 +102,10 @@ final public class RaspberryPHY {
     let BCM2708_PHY_BASE: Int = 0x7e000000
     let PWM_PHY_BASE: Int
 
-    var gpioBasePointer: UnsafeMutablePointer<UInt>!
-    var pwmBasePointer: UnsafeMutablePointer<UInt>!
-    var clockBasePointer: UnsafeMutablePointer<UInt>!
-    var dmaBasePointers: [UnsafeMutablePointer<UInt>]! = []
+    var gpioBasePointer: UnsafeMutablePointer<UInt32>!
+    var pwmBasePointer: UnsafeMutablePointer<UInt32>!
+    var clockBasePointer: UnsafeMutablePointer<UInt32>!
+    var dmaBasePointers: [UnsafeMutablePointer<UInt32>] = []
 
     public private(set) var isInitialized: Bool = false
     public private(set) var isReadyForPwm: Bool = false
@@ -144,7 +144,7 @@ final public class RaspberryPHY {
             let adjusted_dma_addr = dma_addr - pageOffset
             let dma_map = UnsafeMutableRawPointer(memmap(from: mem_fd, at: adjusted_dma_addr))
 
-            let dmaBasePointer = (dma_map + pageOffset).assumingMemoryBound(to: UInt.self)
+            let dmaBasePointer = (dma_map + pageOffset).assumingMemoryBound(to: UInt32.self)
             dmaBasePointers.append(dmaBasePointer)
         }
 
@@ -156,7 +156,7 @@ final public class RaspberryPHY {
 
         killClock()
 
-        let idiv = UInt(2) // 250Mhz base frequency
+        let idiv = UInt32(2) // 250Mhz base frequency
         // Configure the clock and divisor that will be used to generate the signal
         clockBasePointer.advanced(by: 41).pointee = CLKM_PASSWD | (idiv << CLKM_DIV_DIVI)            //CM CTL DIV register: Set DIVI value
         clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_ENAB | CLKM_CTL_SRC_PLLD  //CM CTL register: Enable clock, MASH 0, source PLLD
@@ -174,7 +174,7 @@ final public class RaspberryPHY {
     }
 
     /// Maps a block of memory and returns the pointer
-    internal func memmap(from mem_fd: Int32, at offset: Int) -> UnsafeMutablePointer<UInt> {
+    internal func memmap(from mem_fd: Int32, at offset: Int) -> UnsafeMutablePointer<UInt32> {
         let m = mmap(
             nil,                 //Any adddress in our space will do
             PAGE_SIZE,          //Map length
@@ -188,23 +188,23 @@ final public class RaspberryPHY {
             perror("mmap error")
             abort()
         }
-        let pointer = m.assumingMemoryBound(to: UInt.self)
+        let pointer = m.assumingMemoryBound(to: UInt32.self)
 
         return pointer
     }
 }
 
 public class RaspberryPWM: PWMOutput {
-    let gpioId: UInt
-    let alt: UInt
-    let channel: Int
+    let gpioId: UInt32
+    let alt: UInt32
+    let channel: Int32
     let pwmdma: Int
 
     let phy: RaspberryPHY
 
-    var dmaBasePointer: UnsafeMutablePointer<UInt>!
+    var dmaBasePointer: UnsafeMutablePointer<UInt32>!
     var dmaCallbackPointer: UnsafeMutablePointer<DMACallback>! = nil
-    var pwmRawPointer: UnsafeMutablePointer<UInt>! = nil
+    var pwmRawPointer: UnsafeMutablePointer<UInt32>! = nil
     var mailbox: MailBox! = nil
 
     var zeroPattern: Int = 0
@@ -214,7 +214,7 @@ public class RaspberryPWM: PWMOutput {
     var patternDelay: Int = 0
     var dataLength: Int = 0
 
-    public init(gpioId: UInt, alt: UInt, channel: Int, phy: RaspberryPHY, dmanum: Int = 5) {
+    public init(gpioId: UInt32, alt: UInt32, channel: Int32, phy: RaspberryPHY, dmanum: Int = 5) {
         self.phy = phy
         self.gpioId = gpioId
         self.alt = alt
@@ -240,8 +240,8 @@ public class RaspberryPWM: PWMOutput {
         }
 
         // Need to provide for a minimum period here.
-        let range = UInt(max(ns, 750))
-        let data = UInt(percent * Float(ns) / 100.0)
+        let range = UInt32(max(ns, 750))
+        let data = UInt32(percent * Float(ns) / 100.0)
 
         // Configure the parameters for the M/S algorithm, S the number of total slots in RNG1 and M the number of slots with high value in DAT1
         let RNG = (channel == 0) ? 4 : 8
@@ -262,7 +262,7 @@ public class RaspberryPWM: PWMOutput {
     }
 
     /// Maps a block of memory and returns the pointer
-    internal func memmap(from mem_fd: Int32, at offset: Int) -> UnsafeMutablePointer<UInt> {
+    internal func memmap(from mem_fd: Int32, at offset: Int) -> UnsafeMutablePointer<UInt32> {
         let m = mmap(
             nil,                 //Any adddress in our space will do
             PAGE_SIZE,          //Map length
@@ -276,7 +276,7 @@ public class RaspberryPWM: PWMOutput {
             perror("mmap error")
             abort()
         }
-        let pointer = m.assumingMemoryBound(to: UInt.self)
+        let pointer = m.assumingMemoryBound(to: UInt32.self)
 
         return pointer
     }
@@ -327,7 +327,7 @@ public class RaspberryPWM: PWMOutput {
     ///
     /// - Returns: divi divisor value
     ///
-    internal func calculateUnscaledDIVI(base: ClockSource, desired: UInt) -> UInt {
+    internal func calculateUnscaledDIVI(base: ClockSource, desired: UInt) -> UInt32 {
         var divi: UInt = base.rawValue/desired
 
         if divi > 0x1000 {
@@ -338,7 +338,7 @@ public class RaspberryPWM: PWMOutput {
         if divi < 1 {
             divi = 1
         }
-        return divi
+        return UInt32(divi)
     }
 }
 
@@ -350,8 +350,8 @@ extension RaspberryPWM {
         dmaBasePointer.pointee = DMACS_RESET
         usleep(10)
         dmaBasePointer.pointee = DMACS_INT | DMACS_END
-        dmaBasePointer.advanced(by: 1).pointee  = address    //CONBLK_AD
-        dmaBasePointer.advanced(by: 8).pointee = 7           //DEBUG: clear debug error flags
+        dmaBasePointer.advanced(by: 1).pointee = UInt32(address)    //CONBLK_AD
+        dmaBasePointer.advanced(by: 8).pointee = 7                  //DEBUG: clear debug error flags
         dmaBasePointer.pointee = DMACS_WAIT_OUTSTANDING_WRITES | (15 << DMACS_PANIC_PRIORITY) | (15 << DMACS_PRIORITY) | DMACS_ACTIVE
     }
 
@@ -411,7 +411,7 @@ extension RaspberryPWM {
         guard let mailbox = mailbox else {fatalError("Could allocate mailbox.")}
 
         dmaCallbackPointer = mailbox.baseVirtualAddress.assumingMemoryBound(to: DMACallback.self)
-        pwmRawPointer = (mailbox.baseVirtualAddress + MemoryLayout<DMACallback>.stride).assumingMemoryBound(to: UInt.self)
+        pwmRawPointer = (mailbox.baseVirtualAddress + MemoryLayout<DMACallback>.stride).assumingMemoryBound(to: UInt32.self)
 
         // Fill PWM buffer with zeros
         let rows = dataSize / MemoryLayout<UInt>.stride
@@ -621,34 +621,34 @@ extension RaspberryPWM {
 // MARK: - PWM Contants
 
 // Constants for the Clock Manager General Purpose Control Register
-let CLKM_PASSWD: UInt = 0x5A000000
-let CLKM_CTL_KILL: UInt = (1 << 5)
-let CLKM_CTL_ENAB: UInt = (1 << 4)
-let CLKM_CTL_SRC_OSC: UInt = 1    // 19.2 MHz oscillator
-let CLKM_CTL_SRC_PLLA: UInt = 4   // ~393.216 MHz PLLA (Audio)
-let CLKM_CTL_SRC_PLLC: UInt = 5   // 1000 MHz PLLC (changes with overclock settings)
-let CLKM_CTL_SRC_PLLD: UInt = 6   // 500 MHz  PLLD
-let CLKM_CTL_SRC_HDMI: UInt = 7   // 216 MHz  HDMI auxiliary
+let CLKM_PASSWD: UInt32 = 0x5A000000
+let CLKM_CTL_KILL: UInt32 = (1 << 5)
+let CLKM_CTL_ENAB: UInt32 = (1 << 4)
+let CLKM_CTL_SRC_OSC: UInt32 = 1    // 19.2 MHz oscillator
+let CLKM_CTL_SRC_PLLA: UInt32 = 4   // ~393.216 MHz PLLA (Audio)
+let CLKM_CTL_SRC_PLLC: UInt32 = 5   // 1000 MHz PLLC (changes with overclock settings)
+let CLKM_CTL_SRC_PLLD: UInt32 = 6   // 500 MHz  PLLD
+let CLKM_CTL_SRC_HDMI: UInt32 = 7   // 216 MHz  HDMI auxiliary
 // Constants for the Clock Manager General Purpose Divisors Register
-let CLKM_DIV_DIVI: UInt = 12
-let CLKM_DIV_DIVF: UInt = 0
+let CLKM_DIV_DIVI: UInt32 = 12
+let CLKM_DIV_DIVF: UInt32 = 0
 // Constants for the PWM Control Register
-let PWMCTL_MSEN2: UInt =  (1 << 15)
+let PWMCTL_MSEN2: UInt32 =  (1 << 15)
 // No PWMCTL_CLRF2, the FIFO is shared
-let PWMCTL_USEF2: UInt =  (1 << 13)
-let PWMCTL_POLA2: UInt =  (1 << 12)
-let PWMCTL_SBIT2: UInt =  (1 << 11)
-let PWMCTL_RPTL2: UInt =  (1 << 10)
-let PWMCTL_MODE2: UInt =  (1 << 9)
-let PWMCTL_PWEN2: UInt =  (1 << 8)
-let PWMCTL_MSEN1: UInt =  (1 << 7)
-let PWMCTL_CLRF1: UInt =  (1 << 6)
-let PWMCTL_USEF1: UInt =  (1 << 5)
-let PWMCTL_POLA1: UInt =  (1 << 4)
-let PWMCTL_SBIT1: UInt =  (1 << 3)
-let PWMCTL_RPTL1: UInt =  (1 << 2)
-let PWMCTL_MODE1: UInt =  (1 << 1)
-let PWMCTL_PWEN1: UInt =  (1 << 0)
+let PWMCTL_USEF2: UInt32 =  (1 << 13)
+let PWMCTL_POLA2: UInt32 =  (1 << 12)
+let PWMCTL_SBIT2: UInt32 =  (1 << 11)
+let PWMCTL_RPTL2: UInt32 =  (1 << 10)
+let PWMCTL_MODE2: UInt32 =  (1 << 9)
+let PWMCTL_PWEN2: UInt32 =  (1 << 8)
+let PWMCTL_MSEN1: UInt32 =  (1 << 7)
+let PWMCTL_CLRF1: UInt32 =  (1 << 6)
+let PWMCTL_USEF1: UInt32 =  (1 << 5)
+let PWMCTL_POLA1: UInt32 =  (1 << 4)
+let PWMCTL_SBIT1: UInt32 =  (1 << 3)
+let PWMCTL_RPTL1: UInt32 =  (1 << 2)
+let PWMCTL_MODE1: UInt32 =  (1 << 1)
+let PWMCTL_PWEN1: UInt32 =  (1 << 0)
 
 // Clock sources
 // 0     0 Hz     Ground
@@ -669,15 +669,15 @@ enum ClockSource: UInt {
 }
 
 // DMA Register
-let DMACS_RESET: UInt = (1 << 31)
-let DMACS_ABORT: UInt = (1 << 30)
-let DMACS_WAIT_OUTSTANDING_WRITES: UInt = (1 << 28)
-let DMACS_PANIC_PRIORITY: UInt = 20 // <<
-let DMACS_PRIORITY: UInt = 16 // <<
-let DMACS_ERROR: UInt = (1 << 8)
-let DMACS_INT: UInt = (1 << 2)
-let DMACS_END: UInt = (1 << 1)
-let DMACS_ACTIVE: UInt = (1 << 0)
+let DMACS_RESET: UInt32 = (1 << 31)
+let DMACS_ABORT: UInt32 = (1 << 30)
+let DMACS_WAIT_OUTSTANDING_WRITES: UInt32 = (1 << 28)
+let DMACS_PANIC_PRIORITY: UInt32 = 20 // <<
+let DMACS_PRIORITY: UInt32 = 16 // <<
+let DMACS_ERROR: UInt32 = (1 << 8)
+let DMACS_INT: UInt32 = (1 << 2)
+let DMACS_END: UInt32 = (1 << 1)
+let DMACS_ACTIVE: UInt32 = (1 << 0)
 
 /*
  * DMA Control Block in Main Memory
@@ -697,9 +697,9 @@ struct DMACallback {
 }
 
 // PWM DMAC Register
-let PWMDMAC_ENAB: UInt =  (1 << 31)
-let PWMDMAC_PANIC: UInt = 8
-let PWMDMAC_DREQ: UInt = 0
+let PWMDMAC_ENAB: UInt32 =  (1 << 31)
+let PWMDMAC_PANIC: UInt32 = 8
+let PWMDMAC_DREQ: UInt32 = 0
 
 // DMA Register
 let DMATI_NO_WIDE_BURSTS: UInt32 =  (1 << 26)

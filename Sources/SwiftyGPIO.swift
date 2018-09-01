@@ -280,20 +280,20 @@ extension GPIO: CustomStringConvertible {
 
 public final class RaspberryGPIO: GPIO {
 
-    var setGetId: UInt = 0
+    var setGetId: UInt32 = 0
     var baseAddr: Int = 0
     var inited = false
 
     let BCM2708_PERI_BASE: Int
     let GPIO_BASE: Int
 
-    var gpioBasePointer: UnsafeMutablePointer<UInt>!
-    var gpioGetPointer: UnsafeMutablePointer<UInt>!
-    var gpioSetPointer: UnsafeMutablePointer<UInt>!
-    var gpioClearPointer: UnsafeMutablePointer<UInt>!
+    var gpioBasePointer: UnsafeMutablePointer<UInt32>!
+    var gpioGetPointer: UnsafeMutablePointer<UInt32>!
+    var gpioSetPointer: UnsafeMutablePointer<UInt32>!
+    var gpioClearPointer: UnsafeMutablePointer<UInt32>!
 
     public init(name: String, id: Int, baseAddr: Int) {
-        self.setGetId = UInt(1<<id)
+        self.setGetId = UInt32(1<<id)
         self.BCM2708_PERI_BASE = baseAddr
         self.GPIO_BASE = BCM2708_PERI_BASE + 0x200000 /* GPIO controller */
         super.init(name:name, id:id)
@@ -368,7 +368,7 @@ public final class RaspberryGPIO: GPIO {
             perror("mmap error")
             abort()
         }
-        gpioBasePointer = gpio_map.assumingMemoryBound(to: UInt.self)
+        gpioBasePointer = gpio_map.assumingMemoryBound(to: UInt32.self)
 
         gpioGetPointer = gpioBasePointer.advanced(by: 13)   // GPLEV0
         gpioSetPointer = gpioBasePointer.advanced(by: 7)    // GPSET0
@@ -379,18 +379,18 @@ public final class RaspberryGPIO: GPIO {
 
     private func gpioAsInput() {
         let ptr = gpioBasePointer.advanced(by: id/10)       // GPFSELn 0..5
-        ptr.pointee &= ~(7<<((UInt(id)%10)*3))                    // SEL=000 input
+        ptr.pointee &= ~(7<<((UInt32(id)%10)*3))                    // SEL=000 input
     }
 
     private func gpioAsOutput() {
         let ptr = gpioBasePointer.advanced(by: id/10)       // GPFSELn 0..5
-        ptr.pointee &= ~(7<<((UInt(id)%10)*3))
-        ptr.pointee |=  (1<<((UInt(id)%10)*3))                    // SEL=001 output
+        ptr.pointee &= ~(7<<((UInt32(id)%10)*3))
+        ptr.pointee |=  (1<<((UInt32(id)%10)*3))                    // SEL=001 output
     }
 
     private func gpioGetDirection() -> GPIODirection {
         let ptr = gpioBasePointer.advanced(by: id/10)       // GPFSELn 0..5
-        let d = (ptr.pointee & (7<<((UInt(id)%10)*3)))
+        let d = (ptr.pointee & (7<<((UInt32(id)%10)*3)))
         return (d == 0) ? .IN : .OUT
     }
 
@@ -521,7 +521,7 @@ public enum GPIOEdge: String {
     case BOTH="both"
 }
 
-public enum GPIOPull: UInt {
+public enum GPIOPull: UInt32 {
     case neither = 0
     case down    = 1
     case up      = 2
