@@ -242,9 +242,14 @@ public class RaspberryPWM: PWMOutput {
             phy.setPwmClock()
         }
 
-        // Need to provide for a minimum period here.
-        let range = UInt(max(ns, 750))
-        let data = UInt(percent * Float(ns) / 100.0)
+        // @ 250Mhz, one slot in the PWM channel is 4 ns. All valid periods are multiples of that.
+        // Pick a range that is at least as large as requested that we can represent, and round the
+        // desired duty cycle to the nearest whole slot.
+        //
+        // Double precision is used here to handle very low frequencies in the range of <15Hz.
+        // Otherwise we lose precision calculating data. 
+        let range = UInt(max((Double(ns) / 4.0).rounded(.awayFromZero), 1))
+        let data = min(UInt((Double(percent) * Double(range) / 100.0).rounded(.toNearestOrAwayFromZero)), range)
 
         // Configure the parameters for the M/S algorithm, S the number of total slots in RNG1 and M the number of slots with high value in DAT1
         let RNG = (channel == 0) ? 4 : 8
