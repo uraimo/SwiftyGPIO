@@ -83,15 +83,18 @@ public protocol PWMOutput {
 }
 
 final public class RaspberryPHY {
-    private static var existingPhys: [Int: RaspberryPHY] = [:]
+    private static var existingPhy: RaspberryPHY? = nil
 
     static func phyFor(baseAddr: Int) -> RaspberryPHY {
-        if let phy = existingPhys[baseAddr] {
+        // If the physical base has changed, throw away the existing cache.
+        // This generally shouldn't happen, as the base address is fixed.
+        // It is reasonable to create a new instance if there is a mismatch, though.
+        if let phy = existingPhy, phy.BCM2708_PERI_BASE == baseAddr {
             return phy
         }
 
         let phy = RaspberryPHY(baseAddr: baseAddr)
-        existingPhys[baseAddr] = phy
+        existingPhy = phy
         return phy
     }
 
