@@ -278,7 +278,7 @@ extension RaspberryPWM {
         dmaBasePointer.pointee = DMACS_RESET
         usleep(10)
         dmaBasePointer.pointee = DMACS_INT | DMACS_END
-        dmaBasePointer.advanced(by: 1).pointee  = UInt32(address)    //CONBLK_AD  //Verify this on 64bit
+        dmaBasePointer.advanced(by: 1).pointee  = UInt32(address)    //CONBLK_AD
         dmaBasePointer.advanced(by: 8).pointee = 7           //DEBUG: clear debug error flags
         dmaBasePointer.pointee = DMACS_WAIT_OUTSTANDING_WRITES | (15 << DMACS_PANIC_PRIORITY) | (15 << DMACS_PRIORITY) | DMACS_ACTIVE
     }
