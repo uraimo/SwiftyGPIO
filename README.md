@@ -54,7 +54,7 @@ The library is built to run **exclusively on Linux ARM Boards** (RaspberryPis, B
 The following boards are supported and have been tested with recent releases of Swift:
 
 * Raspberry Pi 2 (Thanks to [@iachievedit](https://twitter.com/iachievedit))
-* Raspberry Pi 3
+* Raspberry Pi 3, 3B+
 * Raspberry Pi Zero (Thanks to [@MacmeDan](https://twitter.com/MacmeDan))
 * Raspberry Pi Zero W
 * Raspberry Pi A,B Revision 1
