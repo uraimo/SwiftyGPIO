@@ -79,7 +79,7 @@ public protocol SPIInterface {
     // Send data and then receive a chunck of data at the default frequency
     func sendDataAndRead(_ values: [UInt8]) -> [UInt8]
     // Returns true if the SPIInterface is using a real SPI pin, false if performing bit-banging
-    func isHardware() -> Bool
+    var isHardware: Bool { get }
 }
 
 /// Hardware SPI via SysFS
@@ -109,6 +109,8 @@ public final class SysFSSPI: SPIInterface {
         //TODO: Check if available?
     }
 
+    public var isHardware =  true
+
     public func sendData(_ values: [UInt8], frequencyHz: UInt = 500000) {
         if frequencyHz > 500000 {
             speed = UInt32(frequencyHz)
@@ -130,10 +132,6 @@ public final class SysFSSPI: SPIInterface {
 
     public func sendDataAndRead(_ values: [UInt8]) -> [UInt8] {
         return sendDataAndRead(values, frequencyHz: 500000)
-    }
-
-    public func isHardware() -> Bool {
-        return true
     }
 
     /// Write and read bits, will need a few dummy writes if you want only read
@@ -276,6 +274,8 @@ public final class VirtualSPI: SPIInterface {
         self.csGPIO.direction = .OUT
         self.csGPIO.value = 1
     }
+
+    public var isHardware =  true
 
     public func sendData(_ values: [UInt8], frequencyHz: UInt = 500000) {
         let mmapped = mosiGPIO.isMemoryMapped()
@@ -427,9 +427,6 @@ public final class VirtualSPI: SPIInterface {
         return value
     }
 
-    public func isHardware() -> Bool {
-        return false
-    }
 }
 
 // MARK: - SPI Constants

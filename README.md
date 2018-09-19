@@ -5,10 +5,11 @@
 <p align="center">
 	<a href="https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/LICENSE"><img src="http://img.shields.io/badge/License-MIT-blue.svg?style=flat"/></a>
 	<a href="#"><img src="https://img.shields.io/badge/OS-linux-green.svg?style=flat"/></a> 
-	<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/Swift-3.x-orange.svg?style=flat"/></a> 
+	<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/Swift-4.x-orange.svg?style=flat"/></a> 
 	<a href="https://github.com/apple/swift-package-manager"><img src="https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg"/></a>
 	<a href="https://slackpass.io/swift-arm"><img src="https://img.shields.io/badge/Slack-swift/arm-red.svg?style=flat"/></a>
 	<a href="https://twitter.com/intent/tweet?text=Interact%20with%20your%20RaspberryPi%20from%20Swift%20with%20SwiftyGPIO!&url=https://github.com/uraimo/SwiftyGPIO&via=uraimo"><img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social"/></a>
+	<a href="https://travis-ci.org/uraimo/SwiftyGPIO"><img src="https://travis-ci.org/uraimo/SwiftyGPIO.svg?branch=master" /></a>
 </p>
 
 <p align="center">
@@ -75,7 +76,7 @@ Please keep in mind that Swift on ARM is a completely community-driven effort, a
 
 ## Installation
 
-To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with Swift 3+.
+To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with Swift 3.x/4.x.
 
 If you have a RaspberryPi (A,B,A+,B+,Zero,ZeroW,2,3) with Ubuntu or Raspbian, get Swift 3.1.1 from [here](https://www.uraimo.com/2017/05/01/An-update-on-Swift-3-1-1-for-raspberry-pi-zero-1-2-3/) or follow the instruction from the post and the linked [build scripts repository](https://github.com/uraimo/buildSwiftOnARM) to build it yourself.
 
@@ -92,7 +93,7 @@ import PackageDescription
 let package = Package(
     name: "MyProject",
     dependencies: [
-        .Package(url: "https://github.com/uraimo/SwiftyGPIO.git", majorVersion: 0),
+        .Package(url: "https://github.com/uraimo/SwiftyGPIO.git", majorVersion: 1),
     ]
 )
 ```
@@ -120,11 +121,8 @@ After following those instruction, remember to add your user (e.g. pi) to the gp
 
 If you prefer starting with a real project instead of just reading documentation, more than a few tutorials are available online.
 
-If you are using Swift 3.0 and the latest version of SwiftyGPIO, [Cameron Perry has a great step by step guide](http://mistercameron.com/2016/06/accessing-raspberry-pi-gpio-pins-with-swift/) on how to setup a Raspberry Pi for Swift and using a led and a temperature sensor. 
+If you are using Swift 3.x and the latest version of SwiftyGPIO, [Cameron Perry has a great step by step guide](http://mistercameron.com/2016/06/accessing-raspberry-pi-gpio-pins-with-swift/) on how to setup a Raspberry Pi for Swift and using a led and a temperature sensor. 
 
-If you are still using Swift 2.x and need a practical example of how to use SwiftyGPIO (get it from [the specific 2.x branch](https://github.com/uraimo/SwiftyGPIO/tree/swift-2.2)), Joe from iachievedit has written a [fantastic tutorial](http://dev.iachieved.it/iachievedit/raspberry-pi-2-gpio-with-swiftygpio/) that will explain everything you need to know.
-
-Additional tutorials are also available in [中文](http://swift.gg/2016/04/01/raspberry-pi-2-gpio-with-swiftygpio/), [日本語](https://ja.ngs.io/2016/06/01/swifty-gpio/) and [Tiếng Việt](https://techmaster.vn/posts/34237/lap-trinh-swift-tren-raspberry-pi).
 
 ## Usage
 
@@ -141,7 +139,7 @@ First, we need to retrieve the list of GPIOs available on the board and get a re
 ```swift
 import SwiftyGPIO //Not needed when you compile via swiftc
 
-let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi2)
+let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi3)
 var gp = gpios[.P2]!
 ```
 
@@ -200,7 +198,7 @@ The other properties available on the GPIO object (edge,active low) refer to the
 GPIOs also support the execution of closures when the value of the pin changes. Closures can be added with `onRaising` (the pin value changed from 0 to 1), `onFalling` (the value changed from 1 to 0) and `onChange` (the value simply changed from the previous one):
 
 ```swift
-let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi2)
+let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi3)
 var gp = gpios[.P2]!
 
 
@@ -222,28 +220,44 @@ gp.onChange{
 The closure receives as its only parameter a reference to the GPIO object that has been updated so that you don't need to use the external variable.
 Calling `clearListeners()` removes all the closures listening for changes and disables the changes handler.
 While GPIOs are checked for updates, the `direction` of the pin cannot be changed (and configured as `.IN`), but once the listeners have been cleared, either inside the closure or somewhere else, you are free to modify it.
+
+Setting the `bounceTime` property will enable software debounce, that will limit the number of transitions notified to the closure allowing only one event in the specified time interval in seconds.
+
+The following example allows only one transition every 500ms:
+
+```swift
+let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi3)
+var gp = gpios[.P2]!
+
+gp.bounceTime = 0.5
+gp.onRaising{
+    gpio in
+    print("Transition to 1, current value:" + String(gpio.value))
+} 
+```
  
+This functionality is extremely useful when using switches, that tend to generate multiple value spikes when the switch is pressed due to the mechanical characteristics of the compoment.
 
 ### SPI
 
-If your board has a SPI connection and SwiftyGPIO has it among its presets, a list of the available SPI channels can be obrained calling `hardwareSPIs(for:)` with one of the predefined boards.
+If your board has a SPI connection and SwiftyGPIO has it among its presets, a list of the available SPI channels can be obtained by calling `hardwareSPIs(for:)` with one of the predefined boards.
 
 On RaspberryPi and other boards the hardware SPI SysFS interface is not enabled by default, check out the setup guide on [wiki](https://github.com/uraimo/SwiftyGPIO/wiki/Enabling-SPI-on-RaspberryPi-and-others).
 
-Let's see some examples using a RaspberryPi 2 that has one bidirectional SPI, managed by SwiftyGPIO as two mono-directional SPIObjects:
+Let's see some examples using a RaspberryPi 3 that has two bidirectional SPIs, managed by SwiftyGPIO as two SPIObjects:
  
 ```swift
-let spis = SwiftyGPIO.hardwareSPIs(for:.RaspberryPi2)!
+let spis = SwiftyGPIO.hardwareSPIs(for:.RaspberryPi3)!
 var spi = spis[0]
 ```
 
-The items returned refer to different devices addressable through the SPI bus, the number is equal to the number of CS(or CE) pins available on your board.
+The interface is composed by 3 wire: a clock line (SCLK), an input line (MISO) and an output line (MOSI). One or more CS pins (with inverse logic) are available to enable or disable slave devices.
 
 Alternatively, we can create a software SPI using four GPIOs, one that will serve as clock pin (SCLK), one as chip-select (CS or CE) and the other two will be used to send and receive the actual data (MOSI and MISO). This kind of bit-banging SPI is slower than the hardware one, so, the recommended approach is to use hardware SPIs when available.
 
 To create a software SPI, just retrieve two pins and create a `VirtualSPI` object:
 ```swift
-let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi2)
+let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi3)
 var cs = gpios[.P27]!
 var mosi = gpios[.P22]!
 var miso = gpios[.P4]!
@@ -253,7 +267,7 @@ var spi = VirtualSPI(mosiGPIO: mosi, misoGPIO: miso, clockGPIO: clk, csGPIO: cs)
 ```
 
 Both objects implement the same `SPIObject` protocol and so provide the same methods.
-To distinguish between hardware and software SPIObjects, use the `isHardware` method.
+To distinguish between hardware and software SPIObjects, use the `isHardware` property.
 
 To send one or more byte over a SPI, use the `sendData` method.
 In its simplest form it just needs an array of UInt8 as parameter:
@@ -269,8 +283,8 @@ Since the interface performs only full duplex transmissions, to read some data f
 Let's see a simple example, that reads 32 bytes from a device sending just 32 empty bytes:
 
 ```swift
-let data: [UInt8] = [UInt8](repeating:0, count: 32)
-let res = spi?.sendData(data)
+let data = [ UInt8 ](repeating: 0, count: 32)
+let res  = spi?.sendDataAndRead(data)
 ```
 The `res` array will contain the raw data received from the device. Again, what to send and how the received data should be interpreted depends from the device or IC you are using, always read the reference manual.
 
@@ -281,7 +295,7 @@ The I2C interface can be used to communicate using the SMBus protocol on a I2C b
 To obtain a reference to the `I2CInterface` object, call the `hardwareI2Cs(for:)` utility method of the SwiftyGPIO class:
 
 ```swift
-let i2cs = SwiftyGPIO.hardwareI2Cs(for:.RaspberryPi2)!
+let i2cs = SwiftyGPIO.hardwareI2Cs(for:.RaspberryPi3)!
 let i2c = i2cs[1]
 ```
 
@@ -331,7 +345,7 @@ PWM output signals can be used to drive servo motors, RGB leds and other devices
 If your board has PWM ports and is supported (at the moment only RaspberryPi boards), retrieve the available `PWMOutput` objects with the `hardwarePWMs` factory method:
 
 ```swift
-let pwms = SwiftyGPIO.hardwarePWMs(for:.RaspberryPi2)!
+let pwms = SwiftyGPIO.hardwarePWMs(for:.RaspberryPi3)!
 let pwm = (pwms[0]?[.P18])!
 ```
 
@@ -400,7 +414,7 @@ In this brief guide I'm using an 8x8 led matrix with 64 WS2812 leds (these matri
 First of all let's retrieve a `PWMOutput` object and then initialize it:
 
 ```swift
-let pwms = SwiftyGPIO.hardwarePWMs(for:.RaspberryPi2)!
+let pwms = SwiftyGPIO.hardwarePWMs(for:.RaspberryPi3)!
 let pwm = (pwms[0]?[.P18])!
 
 // Initialize PWM
@@ -459,7 +473,7 @@ At this point you could configure a different signal calling again `initPWMPatte
 If your board support the UART serial ports feature (disable the login on serial with `raspi-config` for RaspberryPi boards), you can retrieve the list of available `UARTInterface` with `SwiftyGPIO.UARTs(for:)`:
 
 ```swift
-let uarts = SwiftyGPIO.UARTs(for:.RaspberryPi2)!
+let uarts = SwiftyGPIO.UARTs(for:.RaspberryPi3)!
 var uart = uarts[0]
 ```
 
@@ -487,7 +501,7 @@ A specific method that reads lines of text (`\n` is used as line terminator, the
 If your board provides a 1-Wire port (right now only RaspberryPi boards), you can retrieve the list of available `OneWireInterface` with `SwiftyGPIO.hardware1Wires(for:)`:
 
 ```swift
-let onewires = SwiftyGPIO.hardware1Wires(for:.RaspberryPi2)!
+let onewires = SwiftyGPIO.hardware1Wires(for:.RaspberryPi3)!
 var onewire = onewires[0]
 ```
 
@@ -557,6 +571,10 @@ Notice that we are converting the 0x9F `Int` using the constructor `UInt8(trunca
 A few projects and libraries built using SwiftyGPIO. Have you built something that you want to share? Let me know!
 
 ### Libraries
+* [PCA9685](https://github.com/Kaiede/PCA9685) - 16-Channel 12-bit PWM/Servo Driver I2C board library.
+* [TM1637](https://github.com/AlwaysRightInstitute/SwiftyTM1637) - Library for the TM1637 7-segment driver chip.
+* [HC-SR04 Ultrasonic sensors](https://github.com/konifer44/HCSR04.swift) - A library for the HC-SR04 ultrasonic ranging sensor.
+* [HT16K33 Leds](https://github.com/jrahaim/swift-raspberry-pi-adafruit-led) - A project that uses the HT16K33 to drive led matrices and segment displays via I2C.
 * [WS281x Leds](https://github.com/uraimo/WS281x.swift) - A library for WS2812x (WS2811,WS2812,WS2812B) RGB led strips, rings, sticks, matrices, etc...
 * [Nokia5110(PCD8544) 128x64 LCD](http://github.com/uraimo/5110lcd_pcd8544.swift) - Show text and graphics on a Nokia 3110/5110 LCD display.
 * [HD44780U Character LCD](https://github.com/uraimo/HD44780CharacterLCD.swift) - Show text on character LCDs controlled by the HD44780 or one of its clones.
@@ -569,10 +587,10 @@ A few projects and libraries built using SwiftyGPIO. Have you built something th
 * [Wii Nunchuck](https://github.com/uraimo/Nunchuck.swift) - A library for the Wii Nunchuck controller.
 * [RCWL-0516](https://github.com/uraimo/RCWL-0516-Radar.swift) - A Swift library for the RCWL-0516 Microwave Radar.
 * [DS18B20](https://github.com/uraimo/DS18B20.swift) - A library for the DS18B20 temperature sensor.
-* [HT16K33 Leds](https://github.com/jrahaim/swift-raspberry-pi-adafruit-led) - A project that uses the HT16K33 to drive led matrices and segment displays via I2C.
-* [HC-SR04 Ultrasonic sensors](https://github.com/konifer44/HCSR04.swift) - A library for the HC-SR04 ultrasonic ranging sensor.
+
 
 ### Awesome Projects 
+* [Experimental Swift on the Raspberry Pi](https://medium.com/@piotr.gorzelany/experimental-swift-8c9131b62a9d) [(GH)](https://github.com/pgorzelany/experimental-swift-server) - Experimenting with Swift and a few different devices.
 * [Portable Wifi Monitor in Swift](http://saygoodnight.com/2016/04/05/portable-wifimon-raspberrypi.html) - A battery powered wifi signal monitor to map your wifi coverage.
 * [Temperature & Humidity Monitor in Swift](http://saygoodnight.com/2016/04/13/swift-temperature-raspberrypi.html) - A temperature monitor with a Raspberry Pi and an AM2302.
 * [Motion Detector with Swift and a Beaglebone Black](http://myroboticadventure.blogspot.it/2016/04/beaglebone-black-motion-detector-with.html) - A motion detector built with a BBB using a HC-SR502 sensor.
@@ -580,9 +598,8 @@ A few projects and libraries built using SwiftyGPIO. Have you built something th
 * [Swifty Buzz](https://github.com/DigitalTools/SwiftyBuzz) - Swifty tunes with a buzzer connected to a GPIO.
 * [Swift... Swift Everywhere](https://medium.com/@darthpelo/swift-swift-everywhere-eba445ef2bcd) - A tutorial that builds a complete platform, an iOS app controlling leds through a Vapor-based REST service.
 * [Bluetooth Smart Lock](https://github.com/colemancda/Lock) - A smart lock controller with companion iOS app that unlocks 12v solenoid locks via Bluetooth.
-* [Experimental Swift on the Raspberry Pi](https://medium.com/@piotr.gorzelany/experimental-swift-8c9131b62a9d) [(GH)](https://github.com/pgorzelany/experimental-swift-server) - Experimenting with Swift and a few different devices.
  
 
 ## Additional documentation
 
-Additional documentation can be found in the `docs` directory.
+Additional documentation, mostly implementation details, can be found in the `docs` directory.
