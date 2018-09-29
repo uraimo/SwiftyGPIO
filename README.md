@@ -100,7 +100,7 @@ let package = Package(
 
 ```swift
 // main.swift
-import MyProject
+import SwiftyGPIO
 
 // code
 ```
@@ -119,18 +119,18 @@ After following those instruction, remember to add your user (e.g. pi) to the gp
 <a href="#first"></a>
 ## Your First Project: Blinking leds and sensors
 
-If you prefer starting with a real project instead of just reading documentation, more than a few tutorials are available online.
+If you prefer starting with a real project instead of just reading documentation, you'll find some ready to run examples under `Examples/` and more than a few tutorials available online.
 
 If you are using Swift 3.x and the latest version of SwiftyGPIO, [Cameron Perry has a great step by step guide](http://mistercameron.com/2016/06/accessing-raspberry-pi-gpio-pins-with-swift/) on how to setup a Raspberry Pi for Swift and using a led and a temperature sensor. 
 
 
 ## Usage
 
-Currently, SwiftyGPIO expose GPIOs, SPIs(if not available a bit-banging VirtualSPI can be created), I2Cs, PWMs and UART ports, let's see how to use them.
+Currently, SwiftyGPIO expose GPIOs, SPIs(if not available a bit-banging VirtualSPI can be created), I2Cs, PWMs, 1-Wire and UART ports, let's see how to use them.
 
 ### GPIO
 
-Let's suppose we are using a Raspberry 2 board and have a led connected between the GPIO pin P2 (possibly with a resistance of 1K Ohm or so) and GND and we want to turn it on.
+Let's suppose we are using a Raspberry 3 board and have a led connected between the GPIO pin P2 (possibly with a resistance of 1K Ohm or so) and GND and we want to turn it on.
 
 Note that SwiftyGPIO uses the *raw Broadcom numbering scheme* ([described here](https://github.com/uraimo/SwiftyGPIO/wiki/GPIO-Pinout)) to assign a number to each pin.
 
@@ -571,7 +571,7 @@ Notice that we are converting the 0x9F `Int` using the constructor `UInt8(trunca
 A few projects and libraries built using SwiftyGPIO. Have you built something that you want to share? Let me know!
 
 ### Libraries
-* [PCA9685](https://github.com/Kaiede/PCA9685) - 16-Channel 12-bit PWM/Servo Driver I2C board library.
+* [PCA9685](https://github.com/Kaiede/PCA9685) - 16-Channel 12-bit PWM/Servo Driver PCA9685 I2C board library.
 * [TM1637](https://github.com/AlwaysRightInstitute/SwiftyTM1637) - Library for the TM1637 7-segment driver chip.
 * [HC-SR04 Ultrasonic sensors](https://github.com/konifer44/HCSR04.swift) - A library for the HC-SR04 ultrasonic ranging sensor.
 * [HT16K33 Leds](https://github.com/jrahaim/swift-raspberry-pi-adafruit-led) - A project that uses the HT16K33 to drive led matrices and segment displays via I2C.
