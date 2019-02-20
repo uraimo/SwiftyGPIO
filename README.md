@@ -571,6 +571,7 @@ Notice that we are converting the 0x9F `Int` using the constructor `UInt8(trunca
 A few projects and libraries built using SwiftyGPIO. Have you built something that you want to share? Let me know!
 
 ### Libraries
+* [LSM303](https://github.com/flx/LSM303) - Triple-axis Accelerometer+Magnetometer (Compass) I2C board library.
 * [PCA9685](https://github.com/Kaiede/PCA9685) - 16-Channel 12-bit PWM/Servo Driver PCA9685 I2C board library.
 * [TM1637](https://github.com/AlwaysRightInstitute/SwiftyTM1637) - Library for the TM1637 7-segment driver chip.
 * [HC-SR04 Ultrasonic sensors](https://github.com/konifer44/HCSR04.swift) - A library for the HC-SR04 ultrasonic ranging sensor.
@@ -589,7 +590,9 @@ A few projects and libraries built using SwiftyGPIO. Have you built something th
 * [DS18B20](https://github.com/uraimo/DS18B20.swift) - A library for the DS18B20 temperature sensor.
 
 
-### Awesome Projects 
+### Awesome Projects
+* [SwiftyLinkerKit](https://github.com/SwiftyLinkerKit) - Swift Modules to build LinkerKit Projects.
+* [Swifty Adafruit Servo HAT](https://github.com/ezrover/SwiftyServo) - Control the Adafruit Servo HAT with PCA9685 and I2C with Swift.
 * [Experimental Swift on the Raspberry Pi](https://medium.com/@piotr.gorzelany/experimental-swift-8c9131b62a9d) [(GH)](https://github.com/pgorzelany/experimental-swift-server) - Experimenting with Swift and a few different devices.
 * [Portable Wifi Monitor in Swift](http://saygoodnight.com/2016/04/05/portable-wifimon-raspberrypi.html) - A battery powered wifi signal monitor to map your wifi coverage.
 * [Temperature & Humidity Monitor in Swift](http://saygoodnight.com/2016/04/13/swift-temperature-raspberrypi.html) - A temperature monitor with a Raspberry Pi and an AM2302.
