@@ -1,8 +1,5 @@
 <p align="center" style="padding-bottom:50px;">
-<img src="https://github.com/uraimo/SwiftyGPIO/raw/master/logo.png"/>
-</p>
-
-<p align="center">
+    <img width="500" height="200" src="logo.svg" alt="SwiftyGPIO"/>
 	<a href="https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/LICENSE"><img src="http://img.shields.io/badge/License-MIT-blue.svg?style=flat"/></a>
 	<a href="#"><img src="https://img.shields.io/badge/OS-linux-green.svg?style=flat"/></a> 
 	<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/Swift-4.x-orange.svg?style=flat"/></a> 
@@ -26,9 +23,10 @@ Like Android Things or similar libraries in Python, SwiftyGPIO provides the basi
 
 You'll be able to configure port attributes and read/write the current GPIOs value, use the [SPI](https://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus) interfaces (via hardware if your board provides them or using software big-banging SPI), comunicate over a bus with [I2C](https://learn.sparkfun.com/tutorials/i2c), generate a [PWM](https://en.wikipedia.org/wiki/Pulse-width_modulation) to drive external displays, servos, leds and more complex sensors, interact with devices that expose [UART](https://learn.sparkfun.com/tutorials/serial-communication) serial connections using AT commands or custom protocols, and finally connect to [1-Wire](https://en.wikipedia.org/wiki/1-Wire) devices. 
 
-See the *[libraries](#libraries)* for some device libraries built using SwiftyGPIO.
+While you'll still be able to develop your project with Xcode or another IDE, the library is built to run exclusively on Linux ARM Boards (RaspberryPis, BeagleBones, ODROIDs, OrangePis, etc...).
 
-The library is built to run **exclusively on Linux ARM Boards** (RaspberryPis, BeagleBone Black, CHIP, etc...) with accessible GPIO pins.
+Examples of  *[device libraries](#libraries)* and *[complete projects](#awesome-projects)* built using SwiftyGPIO that you can use as inspiration for your own DIY hardware projects are listed below, **have fun!**
+
 
 ##### Content:
 - [Supported Boards](#supported-boards)
@@ -53,41 +51,36 @@ The library is built to run **exclusively on Linux ARM Boards** (RaspberryPis, B
 
 The following boards are supported and have been tested with recent releases of Swift:
 
-* Raspberry Pi 2 (Thanks to [@iachievedit](https://twitter.com/iachievedit))
 * Raspberry Pi 3, 3B+
-* Raspberry Pi Zero (Thanks to [@MacmeDan](https://twitter.com/MacmeDan))
+* Raspberry Pi 2 (Thanks to [@iachievedit](https://twitter.com/iachievedit))
 * Raspberry Pi Zero W
-* Raspberry Pi A,B Revision 1
-* Raspberry Pi A,B Revision 2
-* Raspberry Pi A+, B+
-* C.H.I.P.
-* BeagleBone Black (Thanks to [@hpux735](https://twitter.com/hpux735))
+* Raspberry Pi Zero (Thanks to [@MacmeDan](https://twitter.com/MacmeDan))
+* Raspberry Pi Classic A,B,A+,B+ Rev1/Rev2
+* BeagleBones (Thanks to [@hpux735](https://twitter.com/hpux735))
 * OrangePi (Thanks to [@colemancda](https://github.com/colemancda))
 * OrangePi Zero (Thanks to [@eugeniobaglieri](https://github.com/eugeniobaglieri)) 
-* BananaPi M1/2/3
-* UDOOs (Thanks to [@estebansannin](https://github.com/estebansannin))
 * Asus Tinkerboard (Thanks to Ernesto Lo Valvo)
+* C.H.I.P.
+* BananaPi M1/2/3
 
-But basically everything that has an ARMv7+Ubuntu16/Debian/Raspbian or an ARMv6+Raspbian/Debian should work if you can run Swift on it.
+But basically everything that has an ARMv7/8+Ubuntu/Debian/Raspbian or an ARMv6+Raspbian/Debian should work if you can run Swift on it.
 
-Considering that, other ARMv7/8 boards should also work with SwiftyGPIO once you get Swift running.
-
-Please keep in mind that Swift on ARM is a completely community-driven effort, and that there are a multitude of possible board+OS configurations, don't expect that everything will work right away on every configuration, especially if you are the first to try a new configuration.
+Please keep in mind that Swift on ARM is a completely community-driven effort, and that there are a multitude of possible board+OS configurations, don't expect that everything will work right away on every configuration even if most of the times it does, especially if you are the first to try a new configuration or board.
 
 ## Installation
 
-To use this library, you'll need a Linux ARM(ARMv7 or ARMv6) board with Swift 3.x/4.x.
+To use this library, you'll need a Linux ARM(ARMv7/8 or ARMv6) board with Swift 3.x/4.x.
 
-If you have a RaspberryPi (A,B,A+,B+,Zero,ZeroW,2,3) with Ubuntu or Raspbian, get Swift 3.1.1 from [here](https://www.uraimo.com/2017/05/01/An-update-on-Swift-3-1-1-for-raspberry-pi-zero-1-2-3/) or follow the instruction from the post and the linked [build scripts repository](https://github.com/uraimo/buildSwiftOnARM) to build it yourself.
+If you have a RaspberryPi (A,B,A+,B+,Zero,ZeroW,2,3) with Ubuntu or Raspbian, get Swift 4.2.x from [here](https://github.com/uraimo/buildSwiftOnARM/releases/latest) or follow the instruction from [buildSwiftOnARM](https://github.com/uraimo/buildSwiftOnARM) to build it yourself in a few hours.
 
 I always recommend to try one of the latest binaries available (either Ubuntu Mate or Raspbian) before putting in the time to compile it yourself, those binaries could(and do most of the times) also work on seemingly different OSes and on different boards.
 
-And alternatively, you can setup a cross-compiling toolchain and build ARM binaries (Ubuntu/Raspbian) from a Mac, thanks again to the work of Helge Heß (and Johannes Weiß for implementing it in SPM), read more about that [here](https://github.com/AlwaysRightInstitute/swift-mac2arm-x-compile-toolchain). The toolchain supports SPM.
+And alternatively, you can setup a cross-compiling toolchain and build ARM binaries (Ubuntu/Raspbian) from a Mac, thanks again to the work of Helge Heß (and Johannes Weiß for implementing it in SPM), read more about that [here](https://github.com/AlwaysRightInstitute/swift-mac2arm-x-compile-toolchain).
 
-If your version of Swift supports the SPM, you just need to add SwiftyGPIO as a dependency in your `Package.swift`:
+To start your project add SwiftyGPIO as a dependency in your `Package.swift`:
 
 ```swift
-// Package.swift
+// swift-tools-version:4.0
 import PackageDescription
 
 let package = Package(
@@ -98,20 +91,13 @@ let package = Package(
 )
 ```
 
-```swift
-// main.swift
-import SwiftyGPIO
-
-// code
-```
-
 And then build with `swift build`.
 
 The compiler will create an executable under `.build/debug/MyProject`.
 
-**IMPORTANT:** As everything interacting with GPIOs via sysfs/mmapped registers, if your OS does not come with a predefined user group to access these functionalities, you'll need to run your application with root privileges using `sudo`. If you are using a RaspberryPi with a recent Raspbian (post November 2016) or a recent Ubuntu (from 16.04 Xenial onward) implementing /dev/gpiomem, this will be not required to use basic GPIOs, just launch your application calling the executable built by the compiler.
+**IMPORTANT:** Like every library using GPIOs/SPI/I2C/etc..., if your OS does not come with a predefined user group to access these functionalities, you'll need to run your application with root privileges using `sudo`. If you are using a RaspberryPi with a Raspbian or a recent Ubuntu (from 16.04 Xenial onward) implementing /dev/gpiomem, sudo will be not required to use basic GPIOs, just launch your application calling the executable built by the compiler.
 
-On misconfigured systems, features like the listeners may require root privileges too and advanced features like PWM always  require root privileges.
+On misconfigured systems, features like the listeners may require root privileges too and advanced features like PWM sadly always require root privileges.
 
 Alternatively, a specific user group for gpio access can be configured manually as shown [here](https://arcanesciencelab.wordpress.com/2016/03/31/running-rpi3-applications-that-use-gpio-without-being-root/) or in this [answer on stackoverflow](https://stackoverflow.com/questions/30938991/access-gpio-sys-class-gpio-as-non-root/30940526#30940526).
 After following those instruction, remember to add your user (e.g. pi) to the gpio group with `sudo usermod -aG gpio pi` and to reboot so that the changes you made are applied.
@@ -119,9 +105,14 @@ After following those instruction, remember to add your user (e.g. pi) to the gp
 <a href="#first"></a>
 ## Your First Project: Blinking leds and sensors
 
-If you prefer starting with a real project instead of just reading documentation, you'll find some ready to run examples under `Examples/` and more than a few tutorials available online.
+If you prefer starting with a real project instead of just reading documentation, you'll find some ready to run examples under `Examples/` and more than a few tutorials, [full projects](#awesome-projects), videos and courses available online.
 
-If you are using Swift 3.x and the latest version of SwiftyGPIO, [Cameron Perry has a great step by step guide](http://mistercameron.com/2016/06/accessing-raspberry-pi-gpio-pins-with-swift/) on how to setup a Raspberry Pi for Swift and using a led and a temperature sensor. 
+* [Video: SwiftNIO on the Raspberry PI by Helge Heß at Serverside.swift 2018 Conference](https://www.youtube.com/watch?v=FPGf652O90Y).
+* [Video: SwiftyPi by Kate Castellano at Try! Swift Tokyo 2018](https://www.youtube.com/watch?v=xnGOLSI45Mw).
+* [Video: Swift for IoT by Subhransu Behera& Kheng Meng Yeo at iOS Conf SG 2016](https://www.youtube.com/watch?v=YuPM_I9bQMI).
+* [A tutorial and some example projects from John Woolsey](https://www.woolseyworkshop.com/2018/06/20/blink-making-an-led-blink-on-a-raspberry-pi/), [#2](https://github.com/WoolseyWorkshop).
+* [Piotr Gorzelany wrote a popular series of posts on how to get started](https://hackernoon.com/setting-up-a-swift-development-environment-on-raspberry-pi-c7af7fceac1e), [#2](https://medium.com/@piotr.gorzelany/experimental-swift-8c9131b62a9d).
+* [Cameron Perry has a great step by step guide](http://mistercameron.com/2016/06/accessing-raspberry-pi-gpio-pins-with-swift/). 
 
 
 ## Usage
@@ -130,14 +121,14 @@ Currently, SwiftyGPIO expose GPIOs, SPIs(if not available a bit-banging VirtualS
 
 ### GPIO
 
-Let's suppose we are using a Raspberry 3 board and have a led connected between the GPIO pin P2 (possibly with a resistance of 1K Ohm or so) and GND and we want to turn it on.
+Let's suppose we are using a Raspberry 3 board and have a led connected between the GPIO pin P2 (possibly with a resistance of 1K Ohm or so in between) and GND and we want to turn it on.
 
 Note that SwiftyGPIO uses the *raw Broadcom numbering scheme* ([described here](https://github.com/uraimo/SwiftyGPIO/wiki/GPIO-Pinout)) to assign a number to each pin.
 
 First, we need to retrieve the list of GPIOs available on the board and get a reference to the one we want to modify:
 
 ```swift
-import SwiftyGPIO //Not needed when you compile via swiftc
+import SwiftyGPIO
 
 let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi3)
 var gp = gpios[.P2]!
@@ -177,7 +168,7 @@ gp.value = 1
 
 That's it, the led will turn on.
 
-Now, suppose we have a switch connected to P2 instead, to read the value coming in the P2 port, the direction must be configured as `.IN` and the value can be read from the `value` property:
+Now, suppose we have a switch or a button connected to P2 instead, to read the value coming in the P2 port, the direction must be configured as `.IN` and the value can be read from the `value` property:
 
 ```swift
 gp.direction = .IN
@@ -193,9 +184,9 @@ gp.pull = .up
 
 The pull state can only be set and not read back.
 
-The other properties available on the GPIO object (edge,active low) refer to the additional attributes of the GPIO that can be configured but you will not need them most of the times. For a detailed description refer to the [kernel documentation](https://www.kernel.org/doc/Documentation/gpio/sysfs.txt).
+The other properties available on the GPIO object (edge,active low) refer to the additional attributes of the GPIO that can be configured but you will not need them most of the times. For a detailed description refer to the [kernel sysfs documentation](https://www.kernel.org/doc/Documentation/gpio/sysfs.txt).
 
-GPIOs also support the execution of closures when the value of the pin changes. Closures can be added with `onRaising` (the pin value changed from 0 to 1), `onFalling` (the value changed from 1 to 0) and `onChange` (the value simply changed from the previous one):
+The GPIO object also supports the execution of closures when the value of the pin changes. Closures can be added with the methods `onRaising` (the pin value changed from 0 to 1), `onFalling` (the value changed from 1 to 0) and `onChange` (the value simply changed from the previous one):
 
 ```swift
 let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi3)
