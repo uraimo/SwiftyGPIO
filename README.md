@@ -2,11 +2,8 @@
     <img width="500" height="200" src="logo.svg" alt="SwiftyGPIO"/>
     <br/>
 	<a href="https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/LICENSE"><img src="http://img.shields.io/badge/License-MIT-blue.svg?style=flat"/></a>
-	<a href="#"><img src="https://img.shields.io/badge/OS-linux-green.svg?style=flat"/></a> 
 	<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/Swift-4.x-orange.svg?style=flat"/></a> 
-	<a href="https://github.com/apple/swift-package-manager"><img src="https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg"/></a>
 	<a href="https://slackpass.io/swift-arm"><img src="https://img.shields.io/badge/Slack-swift/arm-red.svg?style=flat"/></a>
-	<a href="https://twitter.com/intent/tweet?text=Interact%20with%20your%20RaspberryPi%20from%20Swift%20with%20SwiftyGPIO!&url=https://github.com/uraimo/SwiftyGPIO&via=uraimo"><img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social"/></a>
 	<a href="https://travis-ci.org/uraimo/SwiftyGPIO"><img src="https://travis-ci.org/uraimo/SwiftyGPIO.svg?branch=master" /></a>
 </p>
 
@@ -106,14 +103,15 @@ After following those instruction, remember to add your user (e.g. pi) to the gp
 <a href="#first"></a>
 ## Your First Project: Blinking leds and sensors
 
-If you prefer starting with a real project instead of just reading documentation, you'll find some ready to run examples under `Examples/` and more than a few tutorials, [full projects](#awesome-projects), videos and courses available online.
+If you prefer starting with a real project instead of just reading documentation, you'll find some ready to run examples under `Examples/` and more than a few tutorials, [full projects](#awesome-projects) and videos available online:
 
-* [Video: SwiftNIO on the Raspberry PI by Helge Heß at Serverside.swift 2018 Conference](https://www.youtube.com/watch?v=FPGf652O90Y).
-* [Video: SwiftyPi by Kate Castellano at Try! Swift Tokyo 2018](https://www.youtube.com/watch?v=xnGOLSI45Mw).
-* [Video: Swift for IoT by Subhransu Behera& Kheng Meng Yeo at iOS Conf SG 2016](https://www.youtube.com/watch?v=YuPM_I9bQMI).
-* [A tutorial and some example projects from John Woolsey](https://www.woolseyworkshop.com/2018/06/20/blink-making-an-led-blink-on-a-raspberry-pi/), [#2](https://github.com/WoolseyWorkshop).
-* [Piotr Gorzelany wrote a popular series of posts on how to get started](https://hackernoon.com/setting-up-a-swift-development-environment-on-raspberry-pi-c7af7fceac1e), [#2](https://medium.com/@piotr.gorzelany/experimental-swift-8c9131b62a9d).
-* [Cameron Perry has a great step by step guide](http://mistercameron.com/2016/06/accessing-raspberry-pi-gpio-pins-with-swift/). 
+* Video: Swift Hardware Hacking (video not yet available) - Talk by Sally Shepard at *try! Swift Tokyo 2019 Conference*.
+* [Video: SwiftNIO on the Raspberry PI](https://www.youtube.com/watch?v=FPGf652O90Y),[#2](http://www.alwaysrightinstitute.com/linkerkit/) -  Talk by Helge Heß at *Serverside.swift 2018 Conference*.
+* [Video: SwiftyPi](https://www.youtube.com/watch?v=xnGOLSI45Mw) -  Talk by Kate Castellano at *try! Swift Tokyo 2018*.
+* [Video: Swift for IoT](https://www.youtube.com/watch?v=YuPM_I9bQMI) -  Talk by Subhransu Behera and Kheng Meng Yeo at *iOS Conf SG 2016*.
+* [Swift on Raspberry projects at Woolsey Workshop](https://www.woolseyworkshop.com/2018/06/20/blink-making-an-led-blink-on-a-raspberry-pi/), [#2](https://github.com/WoolseyWorkshop) - A series of tutorials and some example projects from John Woolsey.
+* [Swift Development with Raspberry Pi](https://hackernoon.com/setting-up-a-swift-development-environment-on-raspberry-pi-c7af7fceac1e), [#2](https://medium.com/@piotr.gorzelany/experimental-swift-8c9131b62a9d) - A series of popular posts by Piotr Gorzelany.
+* [Accessing RaspberryPi GPIO pins with Swift](http://mistercameron.com/2016/06/accessing-raspberry-pi-gpio-pins-with-swift/) - A great step by step guide by Cameron Perry. 
 
 
 ## Usage
