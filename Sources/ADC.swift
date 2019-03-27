@@ -97,7 +97,11 @@ public final class SysFSADC: ADCInterface {
         let count = read(fd, &returnData, 16)
 
         guard count > 0 else {
+            #if swift(>=3.1)
+            print("Unable to read from ADC: \(String(describing: strerror(errno)))")
+            #else
             print("Unable to read from ADC: \(strerror(errno))")
+            #endif
             self.closeADC()
             throw ADCError.readError
         }
@@ -128,7 +132,11 @@ public final class SysFSADC: ADCInterface {
         self.fd = fd
 
         if fd < 0 {
+            #if swift(>=3.1)
+            fatalError("Couldn't open ADC device: \(String(describing: strerror(errno)))")
+            #else
             fatalError("Couldn't open ADC device: \(strerror(errno))")
+            #endif
         }
     }
 
