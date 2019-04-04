@@ -446,7 +446,7 @@ public struct SwiftyGPIO {
 
 // MARK: - Global Enums
 
-public enum SupportedBoard {
+public enum SupportedBoard: String, Codable {
     case RaspberryPiRev1   // Pi A,B Revision 1
     case RaspberryPiRev2   // Pi A,B Revision 2
     case RaspberryPiPlusZero // Pi A+,B+,Zero with 40 pin header
@@ -458,7 +458,7 @@ public enum SupportedBoard {
     case OrangePiZero
 }
 
-public enum GPIOName {
+public enum GPIOName: String, Codable {
     case P0
     case P1
     case P2
@@ -509,19 +509,19 @@ public enum GPIOName {
     case P47
 }
 
-public enum GPIODirection: String {
+public enum GPIODirection: String, Codable {
     case IN="in"
     case OUT="out"
 }
 
-public enum GPIOEdge: String {
+public enum GPIOEdge: String, Codable {
     case NONE="none"
     case RISING="rising"
     case FALLING="falling"
     case BOTH="both"
 }
 
-public enum GPIOPull: UInt32 {
+public enum GPIOPull: UInt32, Codable {
     case neither = 0
     case down    = 1
     case up      = 2
