@@ -72,7 +72,7 @@ public func == (lhs: SunXiGPIO, rhs: SunXiGPIO) -> Bool {
 
 public extension SunXiGPIO {
 
-    public enum Letter: Int {
+    enum Letter: Int {
 
         case A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z
     }
