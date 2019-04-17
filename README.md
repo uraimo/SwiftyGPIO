@@ -105,7 +105,7 @@ After following those instruction, remember to add your user (e.g. pi) to the gp
 
 If you prefer starting with a real project instead of just reading documentation, you'll find some ready to run examples under `Examples/` and more than a few tutorials, [full projects](#awesome-projects) and videos available online:
 
-* Video: Swift Hardware Hacking (video not yet available), [#2](https://www.slideshare.net/mostgood/swift-hardware-hacking-try-swift) - Talk by Sally Shepard at *try! Swift Tokyo 2019 Conference*.
+* [Video: Swift Hardware Hacking](https://www.youtube.com/watch?v=b9EVb0jEt8E), [#2](https://www.slideshare.net/mostgood/swift-hardware-hacking-try-swift) - Talk by Sally Shepard at *try! Swift Tokyo 2019 Conference*.
 * [Video: SwiftNIO on the Raspberry PI](https://www.youtube.com/watch?v=FPGf652O90Y),[#2](http://www.alwaysrightinstitute.com/linkerkit/) -  Talk by Helge Heß at *Serverside.swift 2018 Conference*.
 * [Video: SwiftyPi](https://www.youtube.com/watch?v=xnGOLSI45Mw) -  Talk by Kate Castellano at *try! Swift Tokyo 2018*.
 * [Video: Swift for IoT](https://www.youtube.com/watch?v=YuPM_I9bQMI) -  Talk by Subhransu Behera and Kheng Meng Yeo at *iOS Conf SG 2016*.
