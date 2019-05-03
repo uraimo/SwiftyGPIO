@@ -17,7 +17,7 @@ Is there something you are unsure of or something you'd like to discuss before m
 - [ ] Every new file has been correctly indented, no tabs, 4 spaces (you can use swiftlint).
 - [ ] Verify that you only import what's necessary, this reduces compilation time.
 - [ ] Try to declare the type of every variable and constant, not using type inference greatly reduces compilation time.
-- [ ] Verify that your code compiles with the currently supported Swift version (currently 4.1.3)
+- [ ] Verify that your code compiles with the currently supported Swift version (currently 4.0 onward)
 - [ ] You've read the [contribution guidelines](https://github.com/uraimo/SwiftyGPIO/blob/master/CONTRIBUTING.md).
 
 

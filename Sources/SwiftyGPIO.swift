@@ -172,11 +172,7 @@ fileprivate extension GPIO {
     func writeToFile(_ path: String, value: String) {
         let fp = fopen(path, "w")
         if fp != nil {
-          #if swift(>=3.2)
             let len = value.count
-          #else
-            let len = value.characters.count
-          #endif
             let ret = fwrite(value, MemoryLayout<CChar>.stride, len, fp)
             if ret<len {
                 if ferror(fp) != 0 {
@@ -229,11 +225,7 @@ fileprivate extension GPIO {
             var buf: [Int8] = [0, 0, 0] //Dummy read to discard current value
             read(fp, &buf, 3)
 
-          #if swift(>=4.0)
             var pfd = pollfd(fd:fp, events:Int16(truncatingIfNeeded:POLLPRI), revents:0)
-          #else
-            var pfd = pollfd(fd:fp, events:Int16(truncatingBitPattern:POLLPRI), revents:0)
-          #endif
           
             while self.listening {
                 let ready = poll(&pfd, 1, -1)
@@ -534,7 +526,6 @@ public enum ByteOrder {
 
 // MARK: - Codable
 
-#if swift(>=4.0)
 extension SupportedBoard: Codable { }
 
 extension GPIOName: Codable { }
@@ -544,7 +535,6 @@ extension GPIODirection: Codable { }
 extension GPIOEdge: Codable { }
 
 extension GPIOPull: Codable { }
-#endif
 
 // MARK: - Constants
 
