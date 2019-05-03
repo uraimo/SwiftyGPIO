@@ -1,4 +1,3 @@
-//Remove this import if you are compiling manually with switfc
 import SwiftyGPIO
  
 // Let's use the hardware SPI with the device #0

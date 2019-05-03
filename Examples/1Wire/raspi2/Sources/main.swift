@@ -1,4 +1,4 @@
-import SwiftyGPIO //Remove this import if you are compiling manually with switfc
+import SwiftyGPIO
 #if os(Linux)
     import Glibc
 #else

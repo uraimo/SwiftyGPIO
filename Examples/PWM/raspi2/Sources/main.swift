@@ -1,6 +1,6 @@
 import Glibc
-import SwiftyGPIO //Remove this import if you are compiling manually with switfc
- 
+import SwiftyGPIO
+
 let pwms = SwiftyGPIO.hardwarePWMs(for:.RaspberryPi2)!
 let pwm = (pwms[0]?[.P18])!
 

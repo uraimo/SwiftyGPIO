@@ -1,6 +1,6 @@
 import Glibc
-import SwiftyGPIO //Remove this import if you are compiling manually with switfc
- 
+import SwiftyGPIO
+
 let i2cs = SwiftyGPIO.hardwareI2Cs(for:.RaspberryPi2)!
 let i2c = i2cs[1]
 
