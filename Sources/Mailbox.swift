@@ -234,28 +234,18 @@ public struct MailBox {
 
     /// Allocates contiguous memory on the GPU. size and alignment are in bytes.
     private func memAlloc(align: Int, flags: Int) -> UInt32 {
-        var i = 0
         var p = [UInt32](repeating:0x0, count:32)
 
-        p[i] = 0                  // Actual size, to be set at the end
-        i += 1
-        p[i] = 0x00000000         // Process request
-        i += 1
-        p[i] = 0x3000c            // Tag id
-        i += 1
-        p[i] = 12                 // Buffer size
-        i += 1
-        p[i] = 12                 // Data size
-        i += 1
-        p[i] = UInt32(self.size)  // Memory block size
-        i += 1
-        p[i] = UInt32(align)      // Alignment
-        i += 1
-        p[i] = UInt32(flags)      // Should be MEM_FLAG_L1_NONALLOCATING
-        i += 1
-        p[i] = 0x00000000         // End tag
-        i += 1
-        p[0] = UInt32(i * MemoryLayout<UInt32>.size)  // Actual size
+        p[0] = 0                  // Actual size, to be set at the end
+        p[1] = 0x00000000         // Process request
+        p[2] = 0x3000c            // Tag id
+        p[3] = 12                 // Buffer size
+        p[4] = 12                 // Data size
+        p[5] = UInt32(self.size)  // Memory block size
+        p[6] = UInt32(align)      // Alignment
+        p[7] = UInt32(flags)      // Should be MEM_FLAG_L1_NONALLOCATING
+        p[8] = 0x00000000         // End tag
+        p[0] = UInt32(9 * MemoryLayout<UInt32>.size)  // Actual size
 
         if mailboxSetProperty(buf: &p) < 0 {
             return 0
@@ -266,48 +256,32 @@ public struct MailBox {
 
     /// Free the memory buffer.
     private func memFree() {
-        var i = 0
         var p = [UInt32](repeating:0x0, count:32)
 
-        p[i] = 0            // Actual size, to be set at the end
-        i += 1
-        p[i] = 0x00000000   // Process request
-        i += 1
-        p[i] = 0x3000f      // Tag id
-        i += 1
-        p[i] = 4            // Buffer size
-        i += 1
-        p[i] = 4            // Data size
-        i += 1
-        p[i] = self.memRef  // Handle
-        i += 1
-        p[i] = 0x00000000   // End tag
-        i += 1
-        p[0] = UInt32(i * MemoryLayout<UInt32>.size)  // Actual size
+        p[0] = 0            // Actual size, to be set at the end
+        p[1] = 0x00000000   // Process request
+        p[2] = 0x3000f      // Tag id
+        p[3] = 4            // Buffer size
+        p[4] = 4            // Data size
+        p[5] = self.memRef  // Handle
+        p[6] = 0x00000000   // End tag
+        p[0] = UInt32(7 * MemoryLayout<UInt32>.size)  // Actual size
 
         mailboxSetProperty(buf: &p)
     }
 
     /// Lock buffer in place, and return a bus address. Must be done before memory can be accessed.
     private func memLock() -> UInt32 {
-        var i = 0
         var p = [UInt32](repeating:0x0, count:32)
 
-        p[i] = 0            // Actual size, to be set at the end
-        i += 1
-        p[i] = 0x00000000   // Process request
-        i += 1
-        p[i] = 0x3000d      // Tag id
-        i += 1
-        p[i] = 4            // Buffer size
-        i += 1
-        p[i] = 4            // Data size
-        i += 1
-        p[i] = self.memRef  // Handle
-        i += 1
-        p[i] = 0x00000000   // End tag
-        i += 1
-        p[0] = UInt32(i * MemoryLayout<UInt32>.size)  // Actual size
+        p[0] = 0            // Actual size, to be set at the end
+        p[1] = 0x00000000   // Process request
+        p[2] = 0x3000d      // Tag id
+        p[3] = 4            // Buffer size
+        p[4] = 4            // Data size
+        p[5] = self.memRef  // Handle
+        p[6] = 0x00000000   // End tag
+        p[0] = UInt32(7 * MemoryLayout<UInt32>.size)  // Actual size
 
         if mailboxSetProperty(buf: &p) < 0 {
             return ~0
@@ -318,24 +292,16 @@ public struct MailBox {
 
     /// Unlock buffer. It retains contents, but may move. Needs to be locked before next use.
     private func memUnlock() {
-        var i = 0
         var p = [UInt32](repeating:0x0, count:32)
 
-        p[i] = 0            // Actual size, to be set at the end
-        i += 1
-        p[i] = 0x00000000   // Process request
-        i += 1
-        p[i] = 0x3000e      // Tag id
-        i += 1
-        p[i] = 4            // Buffer size
-        i += 1
-        p[i] = 4            // Data size
-        i += 1
-        p[i] = self.memRef  // Handle
-        i += 1
-        p[i] = 0x00000000   // End tag
-        i += 1
-        p[0] = UInt32(i * MemoryLayout<UInt32>.size)  // Actual size
+        p[0] = 0            // Actual size, to be set at the end
+        p[1] = 0x00000000   // Process request
+        p[2] = 0x3000e      // Tag id
+        p[3] = 4            // Buffer size
+        p[4] = 4            // Data size
+        p[5] = self.memRef  // Handle
+        p[6] = 0x00000000   // End tag
+        p[0] = UInt32(7 * MemoryLayout<UInt32>.size)  // Actual size
 
         mailboxSetProperty(buf: &p)
     }
