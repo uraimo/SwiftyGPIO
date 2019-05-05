@@ -51,6 +51,11 @@ public class GPIO {
         self.name = name
         self.id = id
     }
+    
+    public init(id: Int) {
+        self.name = "GPIO\(id)"
+        self.id = id
+    }
 
     public var direction: GPIODirection {
         set(dir) {
@@ -264,7 +269,7 @@ fileprivate extension GPIO {
 
 extension GPIO: CustomStringConvertible {
     public var description: String {
-        return "\(name)<\(direction),\(edge),\(activeLow),\(pull)>: \(value)"
+        return "\(name)<\(id)> with direction:<\(direction), edge:\(edge), active:\(activeLow),pull:\(pull)>: \(value)"
     }
 }
 
@@ -273,22 +278,19 @@ extension GPIO: CustomStringConvertible {
 public final class RaspberryGPIO: GPIO {
 
     var setGetId: UInt32 = 0
-    var baseAddr: Int = 0
     var inited = false
 
-    let BCM2708_PERI_BASE: Int
-    let GPIO_BASE: Int
+    var BCM2708_PERI_BASE: Int = 0
+    var GPIO_BASE: Int = 0
 
     var gpioBasePointer: UnsafeMutablePointer<UInt32>!
     var gpioGetPointer: UnsafeMutablePointer<UInt32>!
     var gpioSetPointer: UnsafeMutablePointer<UInt32>!
     var gpioClearPointer: UnsafeMutablePointer<UInt32>!
 
-    public init(name: String, id: Int, baseAddr: Int) {
+    public override init(id: Int) {
         self.setGetId = UInt32(1<<id)
-        self.BCM2708_PERI_BASE = baseAddr
-        self.GPIO_BASE = BCM2708_PERI_BASE + 0x200000 /* GPIO controller */
-        super.init(name:name, id:id)
+        super.init(id:id)
     }
 
     public override var value: Int {
@@ -319,7 +321,7 @@ public final class RaspberryGPIO: GPIO {
 
     public override var pull: GPIOPull {
         set(pull) {
-            if !exported {enableIO(id)}
+            if !inited {enableIO(id)}
             setGpioPull(pull)
         }
         get{
@@ -334,6 +336,9 @@ public final class RaspberryGPIO: GPIO {
     private func initIO() {
         var mem_fd: Int32 = 0
 
+        self.BCM2708_PERI_BASE = getbaseAddr()
+        self.GPIO_BASE = BCM2708_PERI_BASE + 0x200000 /* GPIO controller */
+        
         //Try to open one of the mem devices
         for device in ["/dev/gpiomem", "/dev/mem"] {
             mem_fd=open(device, O_RDWR | O_SYNC)
@@ -407,7 +412,40 @@ public final class RaspberryGPIO: GPIO {
         let ptr = value==1 ? gpioSetPointer : gpioClearPointer
         ptr!.pointee = setGetId
     }
-
+    
+    private func getbaseAddr()->Int{
+        switch(Architecture.shared.getCurrent()){
+        case "armv6l":
+            return 0x20000000
+        case "armv7l":
+            return 0x3F000000
+        case "aarch64":
+            return 0x3F000000
+        default:
+            fatalError("Unknown RaspberryPi architecture.")
+        }
+    }
+    
+    class Architecture {
+        private var current: String = ""
+        public static let shared = Architecture()
+        
+        private init() { }
+        
+        public func getCurrent() -> String {
+            guard current.isEmpty else {return current}
+            
+            var name = utsname()
+            guard uname(&name)>0 else { fatalError("Couldn't retrieve the current system information.") }
+        
+            let archstr = withUnsafeBytes(of: &name, { (p) -> String in
+                let charPtr = p.baseAddress!.assumingMemoryBound(to: CChar.self)
+                return String(cString: charPtr).lowercased()
+            })
+            current=archstr
+            return current
+        }
+    }
 }
 
 public struct SwiftyGPIO {
