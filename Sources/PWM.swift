@@ -54,14 +54,14 @@ extension SwiftyGPIO {
 
     // RaspberryPis ARMv6 (all 1, Zero, Zero W) PWMs, only accessible ones, divided in channels (can use only one for each channel)
     static let PWMRPI1: [Int:[GPIOName:PWMOutput]] = [
-        0: [.P12: RaspberryPWM(gpioId: 12, alt: 0, channel:0, baseAddr: 0x20000000), .P18: RaspberryPWM(gpioId: 18, alt: 5, channel:0, baseAddr: 0x20000000)],
-        1: [.P13: RaspberryPWM(gpioId: 13, alt: 0, channel:1, baseAddr: 0x20000000), .P19: RaspberryPWM(gpioId: 19, alt: 5, channel:1, baseAddr: 0x20000000)]
+        0: [.pin12: RaspberryPWM(gpioId: 12, alt: 0, channel:0, baseAddr: 0x20000000), .pin18: RaspberryPWM(gpioId: 18, alt: 5, channel:0, baseAddr: 0x20000000)],
+        1: [.pin13: RaspberryPWM(gpioId: 13, alt: 0, channel:1, baseAddr: 0x20000000), .pin19: RaspberryPWM(gpioId: 19, alt: 5, channel:1, baseAddr: 0x20000000)]
     ]
 
     // RaspberryPis ARMv7 (2-3) PWMs, only accessible ones, divided in channels (can use only one for each channel)
     static let PWMRPI23: [Int:[GPIOName:PWMOutput]] = [
-        0: [.P12: RaspberryPWM(gpioId: 12, alt: 0, channel:0, baseAddr: 0x3F000000), .P18: RaspberryPWM(gpioId: 18, alt: 5, channel:0, baseAddr: 0x3F000000)],
-        1: [.P13: RaspberryPWM(gpioId: 13, alt: 0, channel:1, baseAddr: 0x3F000000), .P19: RaspberryPWM(gpioId: 19, alt: 5, channel:1, baseAddr: 0x3F000000)]
+        0: [.pin12: RaspberryPWM(gpioId: 12, alt: 0, channel:0, baseAddr: 0x3F000000), .pin18: RaspberryPWM(gpioId: 18, alt: 5, channel:0, baseAddr: 0x3F000000)],
+        1: [.pin13: RaspberryPWM(gpioId: 13, alt: 0, channel:1, baseAddr: 0x3F000000), .pin19: RaspberryPWM(gpioId: 19, alt: 5, channel:1, baseAddr: 0x3F000000)]
     ]
 }
 
@@ -168,7 +168,7 @@ public class RaspberryPWM: PWMOutput {
         let highFreqSampleReduction: UInt32 = (ns < 750) ? 10 : 1
 
         let freq = UInt32( (1_000_000_000/UInt(ns)) * 100 / UInt(highFreqSampleReduction) )
-        let (idiv, scale) = calculateDIVI(base: .PLLD, desired: UInt32(freq))                                //Using the faster (with known freq) available clock to reduce jitter
+        let (idiv, scale) = calculateDIVI(base: .plld, desired: UInt32(freq))                                //Using the faster (with known freq) available clock to reduce jitter
 
         // Configure the clock and divisor that will be used to generate the signal
         clockBasePointer.advanced(by: 41).pointee = CLKM_PASSWD | (idiv << CLKM_DIV_DIVI)            //CM CTL DIV register: Set DIVI value
@@ -358,7 +358,7 @@ extension RaspberryPWM {
         //while (clockBasePointer.advanced(by: 40).pointee & (1 << 7)) != 0 {}
 
         // Configure clock
-        let idiv = calculateUnscaledDIVI(base: .PLLD, desired: UInt32(symbolBits * patternFrequency))
+        let idiv = calculateUnscaledDIVI(base: .plld, desired: UInt32(symbolBits * patternFrequency))
         clockBasePointer.advanced(by: 41).pointee = CLKM_PASSWD | (idiv << CLKM_DIV_DIVI)             //Set DIVI value
         clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_ENAB | CLKM_CTL_SRC_PLLD   //Enable clock, MASH 0, source PLLD
         usleep(10)
@@ -591,11 +591,11 @@ let PWMCTL_PWEN1: UInt32 =  (1 << 0)
 // 7     216 MHz  HDMI auxiliary
 // 8-15  0 Hz     Ground
 enum ClockSource: UInt32 {
-    case Oscillator = 19200000
-    case PLLA = 393216000
-    case PLLC = 1000000000
-    case PLLD = 500000000
-    case HDMI = 216000000
+    case oscillator = 19200000
+    case plla = 393216000
+    case pllc = 1000000000
+    case plld = 500000000
+    case hdmi = 216000000
 }
 
 // DMA Register

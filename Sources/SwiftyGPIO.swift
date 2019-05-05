@@ -218,8 +218,8 @@ fileprivate extension GPIO {
         let thread = Thread {
 
             let gpath = GPIOBASEPATH+"gpio"+String(self.id)+"/value"
-            self.direction = .IN
-            self.edge = .BOTH
+            self.direction = .input
+            self.edge = .both
 
             let fp = open(gpath, O_RDONLY)
             var buf: [Int8] = [0, 0, 0] //Dummy read to discard current value
@@ -305,7 +305,7 @@ public final class RaspberryGPIO: GPIO {
     public override var direction: GPIODirection {
         set(dir) {
             if !inited {initIO()}
-            if dir == .IN {
+            if dir == .input {
                 gpioAsInput()
             } else {
                 gpioAsOutput()
@@ -383,7 +383,7 @@ public final class RaspberryGPIO: GPIO {
     private func gpioGetDirection() -> GPIODirection {
         let ptr = gpioBasePointer.advanced(by: id/10)       // GPFSELn 0..5
         let d = (ptr.pointee & (7<<((UInt32(id)%10)*3)))
-        return (d == 0) ? .IN : .OUT
+        return (d == 0) ? .input : .output
     }
 
     func setGpioPull(_ value: GPIOPull){
@@ -451,66 +451,66 @@ public enum SupportedBoard: String {
 }
 
 public enum GPIOName: String {
-    case P0
-    case P1
-    case P2
-    case P3
-    case P4
-    case P5
-    case P6
-    case P7
-    case P8
-    case P9
-    case P10
-    case P11
-    case P12
-    case P13
-    case P14
-    case P15
-    case P16
-    case P17
-    case P18
-    case P19
-    case P20
-    case P21
-    case P22
-    case P23
-    case P24
-    case P25
-    case P26
-    case P27
-    case P28
-    case P29
-    case P30
-    case P31
-    case P32
-    case P33
-    case P34
-    case P35
-    case P36
-    case P37
-    case P38
-    case P39
-    case P40
-    case P41
-    case P42
-    case P43
-    case P44
-    case P45
-    case P46
-    case P47
+    case pin0
+    case pin1
+    case pin2
+    case pin3
+    case pin4
+    case pin5
+    case pin6
+    case pin7
+    case pin8
+    case pin9
+    case pin10
+    case pin11
+    case pin12
+    case pin13
+    case pin14
+    case pin15
+    case pin16
+    case pin17
+    case pin18
+    case pin19
+    case pin20
+    case pin21
+    case pin22
+    case pin23
+    case pin24
+    case pin25
+    case pin26
+    case pin27
+    case pin28
+    case pin29
+    case pin30
+    case pin31
+    case pin32
+    case pin33
+    case pin34
+    case pin35
+    case pin36
+    case pin37
+    case pin38
+    case pin39
+    case pin40
+    case pin41
+    case pin42
+    case pin43
+    case pin44
+    case pin45
+    case pin46
+    case pin47
 }
 
 public enum GPIODirection: String {
-    case IN="in"
-    case OUT="out"
+    case input
+    case output
 }
 
 public enum GPIOEdge: String {
-    case NONE="none"
-    case RISING="rising"
-    case FALLING="falling"
-    case BOTH="both"
+    case none
+    case rising
+    case falling
+    case both
 }
 
 public enum GPIOPull: UInt32 {
@@ -520,8 +520,8 @@ public enum GPIOPull: UInt32 {
 }
 
 public enum ByteOrder {
-    case MSBFIRST
-    case LSBFIRST
+    case msbfirst
+    case lsbfirst
 }
 
 // MARK: - Codable

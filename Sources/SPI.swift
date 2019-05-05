@@ -263,15 +263,15 @@ public final class VirtualSPI: SPIInterface {
 
     public init(mosiGPIO: GPIO, misoGPIO: GPIO, clockGPIO: GPIO, csGPIO: GPIO) {
         self.mosiGPIO = mosiGPIO
-        self.mosiGPIO.direction = .OUT
+        self.mosiGPIO.direction = .output
         self.mosiGPIO.value = 0
         self.misoGPIO = misoGPIO
-        self.misoGPIO.direction = .IN
+        self.misoGPIO.direction = .output
         self.clockGPIO = clockGPIO
-        self.clockGPIO.direction = .OUT
+        self.clockGPIO.direction = .output
         self.clockGPIO.value = 0
         self.csGPIO = csGPIO
-        self.csGPIO.direction = .OUT
+        self.csGPIO.direction = .output
         self.csGPIO.value = 1
     }
 

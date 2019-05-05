@@ -62,85 +62,85 @@ public protocol UARTInterface {
 }
 
 public enum ParityType {
-    case None
-    case Even
-    case Odd
+    case none
+    case even
+    case odd
 
     public func configure(_ cfg: inout termios) {
         switch self {
-        case .None:
+        case .none:
             cfg.c_cflag &= ~UInt32(PARENB | PARODD)
-        case .Even:
+        case .even:
             cfg.c_cflag &= ~UInt32(PARENB | PARODD)
             cfg.c_cflag |= UInt32(PARENB)
-        case .Odd:
+        case .odd:
             cfg.c_cflag |= UInt32(PARENB | PARODD)
         }
     }
 }
 
 public enum CharSize {
-    case Eight
-    case Seven
-    case Six
+    case eight
+    case seven
+    case six
 
     public func configure(_ cfg: inout termios) {
         cfg.c_cflag = (cfg.c_cflag & ~UInt32(CSIZE))
         switch self {
-        case .Eight:
+        case .eight:
             cfg.c_cflag |= UInt32(CS8)
-        case .Seven:
+        case .seven:
             cfg.c_cflag |= UInt32(CS7)
-        case .Six:
+        case .six:
             cfg.c_cflag |= UInt32(CS6)
         }
     }
 }
 
 public enum StopBits {
-    case One
-    case Two
+    case one
+    case two
 
     public func configure(_ cfg: inout termios) {
         switch self {
-        case .One:
+        case .one:
             cfg.c_cflag &= ~UInt32(CSTOPB)
-        case .Two:
+        case .two:
             cfg.c_cflag |= UInt32(CSTOPB)
         }
     }
 }
 
 public enum UARTSpeed {
-    case S2400
-    case S4800
-    case S9600
-    case S19200
-    case S38400
-    case S57600
-    case S115200
+    case s2400
+    case s4800
+    case s9600
+    case s19200
+    case s38400
+    case s57600
+    case s115200
 
     public func configure(_ cfg: inout termios) {
         switch self {
-        case .S2400:
+        case .s2400:
             cfsetispeed(&cfg, speed_t(B2400))
             cfsetospeed(&cfg, speed_t(B2400))
-        case .S4800:
+        case .s4800:
             cfsetispeed(&cfg, speed_t(B4800))
             cfsetospeed(&cfg, speed_t(B4800))
-        case .S9600:
+        case .s9600:
             cfsetispeed(&cfg, speed_t(B9600))
             cfsetospeed(&cfg, speed_t(B9600))
-        case .S19200:
+        case .s19200:
             cfsetispeed(&cfg, speed_t(B19200))
             cfsetospeed(&cfg, speed_t(B19200))
-        case .S38400:
+        case .s38400:
             cfsetispeed(&cfg, speed_t(B38400))
             cfsetospeed(&cfg, speed_t(B38400))
-        case .S57600:
+        case .s57600:
             cfsetispeed(&cfg, speed_t(B57600))
             cfsetospeed(&cfg, speed_t(B57600))
-        case .S115200:
+        case .s115200:
             cfsetispeed(&cfg, speed_t(B115200))
             cfsetospeed(&cfg, speed_t(B115200))
         }
