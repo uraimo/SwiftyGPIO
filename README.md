@@ -130,7 +130,7 @@ First, we need to retrieve the list of GPIOs available on the board and get a re
 import SwiftyGPIO
 
 let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi3)
-var gp = gpios[.P2]!
+var gp = gpios[.pin2]!
 ```
 
 The following are the possible values for the predefined boards:
@@ -150,13 +150,13 @@ The map returned by `GPIOs(for:)` contains all the GPIOs of a specific board as 
 Alternatively, if our board is not supported, each single GPIO object can be instantiated manually, using its SysFS GPIO Id:
 
 ```swift
-var gp = GPIO(name: "P2",id: 2)  // User defined name and GPIO Id
+var gp = GPIO(name: "PIN2",id: 2)  // User defined name and GPIO Id
 ```
     
-The next step is configuring the port direction, that can be either `GPIODirection.IN` or `GPIODirection.OUT`, in this case we'll choose .OUT:
+The next step is configuring the port direction, that can be either `GPIODirection.input` or `GPIODirection.output`, in this case we'll choose .output:
 
 ```swift
-gp.direction = .OUT
+gp.direction = .output
 ```
 
 Then we'll change the pin value to the HIGH value "1":
@@ -167,17 +167,17 @@ gp.value = 1
 
 That's it, the led will turn on.
 
-Now, suppose we have a switch or a button connected to P2 instead, to read the value coming in the P2 port, the direction must be configured as `.IN` and the value can be read from the `value` property:
+Now, suppose we have a switch or a button connected to PIN2 instead, to read the value coming in the PIN2 port, the direction must be configured as `.input` and the value can be read from the `value` property:
 
 ```swift
-gp.direction = .IN
+gp.direction = .input
 let current = gp.value
 ```
 
 Some boards like the RaspberryPi allow to enable a pull up/down resistance on some of the GPIO pins to connect a pin to 3.3V (.up), 0V (.down) or leave it floating (.neither) by default when external devices are disconnected, to enable it just set the `pull` property:
 
 ```swift
-gp.direction = .IN
+gp.direction = .input
 gp.pull = .up
 ```
 
@@ -189,7 +189,7 @@ The GPIO object also supports the execution of closures when the value of the pi
 
 ```swift
 let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi3)
-var gp = gpios[.P2]!
+var gp = gpios[.pin2]!
 
 
 gp.onRaising{
@@ -217,7 +217,7 @@ The following example allows only one transition every 500ms:
 
 ```swift
 let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi3)
-var gp = gpios[.P2]!
+var gp = gpios[.pin2]!
 
 gp.bounceTime = 0.5
 gp.onRaising{
@@ -248,10 +248,10 @@ Alternatively, we can create a software SPI using four GPIOs, one that will serv
 To create a software SPI, just retrieve two pins and create a `VirtualSPI` object:
 ```swift
 let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPi3)
-var cs = gpios[.P27]!
-var mosi = gpios[.P22]!
-var miso = gpios[.P4]!
-var clk = gpios[.P17]!
+var cs = gpios[.pin27]!
+var mosi = gpios[.pin22]!
+var miso = gpios[.pin4]!
+var clk = gpios[.pin17]!
 
 var spi = VirtualSPI(mosiGPIO: mosi, misoGPIO: miso, clockGPIO: clk, csGPIO: cs)
 ```
@@ -336,7 +336,7 @@ If your board has PWM ports and is supported (at the moment only RaspberryPi boa
 
 ```swift
 let pwms = SwiftyGPIO.hardwarePWMs(for:.RaspberryPi3)!
-let pwm = (pwms[0]?[.P18])!
+let pwm = (pwms[0]?[.pin18])!
 ```
 
 This method returns all the ports that support the PWM function, grouped by the PWM channel that controls them. 
@@ -405,7 +405,7 @@ First of all let's retrieve a `PWMOutput` object and then initialize it:
 
 ```swift
 let pwms = SwiftyGPIO.hardwarePWMs(for:.RaspberryPi3)!
-let pwm = (pwms[0]?[.P18])!
+let pwm = (pwms[0]?[.pin18])!
 
 // Initialize PWM
 pwm.initPWM()
@@ -510,14 +510,14 @@ The following example, built to run on the C.H.I.P. board, shows the current val
 
 ```Swift
 let gpios = SwiftyGPIO.GPIOs(for:.CHIP)
-var gp0 = gpios[.P0]!
+var gp0 = gpios[.pin0]!
 print("Current Status")
 print("Direction: "+gp0.direction.rawValue)
 print("Edge: "+gp0.edge.rawValue)
 print("Active Low: "+String(gp0.activeLow))
 print("Value: "+String(gp0.value))
 
-gp0.direction = .OUT
+gp0.direction = .output
 gp0.value = 1
 
 print("New Status")
@@ -533,8 +533,8 @@ This second example makes a led blink with a frequency of 150ms:
 import Glibc
 
 let gpios = SwiftyGPIO.GPIOs(for:.CHIP)
-var gp0 = gpios[.P0]!
-gp0.direction = .OUT
+var gp0 = gpios[.pin0]!
+gp0.direction = .output
 
 repeat{
 	gp0.value = (gp0.value == 0) ? 1 : 0
@@ -546,8 +546,8 @@ We can't test the hardware SPI with the CHIP but SwiftyGPIO also provide a bit b
 
 ```Swift
 let gpios = SwiftyGPIO.GPIOs(for:.CHIP)
-var sclk = gpios[.P0]!
-var dnmosi = gpios[.P1]!
+var sclk = gpios[.pin0]!
+var dnmosi = gpios[.pin1]!
 
 var spi = VirtualSPI(dataGPIO:dnmosi,clockGPIO:sclk) 
 
