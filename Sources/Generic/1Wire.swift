@@ -28,34 +28,6 @@
     import Darwin.C
 #endif
 
-
-// MARK: - 1-Wire Presets
-extension SwiftyGPIO {
-
-    public static func hardware1Wires(for board: SupportedBoard) -> [OneWireInterface]? {
-        switch board {
-        case .RaspberryPiRev1:
-            fallthrough
-        case .RaspberryPiRev2:
-            fallthrough
-        case .RaspberryPiPlusZero:
-            fallthrough
-        case .RaspberryPi2:
-            fallthrough
-        case .RaspberryPi3:
-            return [SysFSOneWire(masterId: 1)]
-        default:
-            return nil
-        }
-    }
-}
-
-// MARK: 1-Wire
-public protocol OneWireInterface {
-    func getSlaves() -> [String]
-    func readData(_ slaveId: String) -> [String]
-}
-
 /// Hardware 1-Wire via SysFS
 public final class SysFSOneWire: OneWireInterface {
 

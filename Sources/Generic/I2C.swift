@@ -28,63 +28,6 @@
     import Darwin.C
 #endif
 
-extension SwiftyGPIO {
-
-    public static func hardwareI2Cs(for board: SupportedBoard) -> [I2CInterface]? {
-        switch board {
-        case .CHIP:
-            return [I2CCHIP[1]!, I2CCHIP[2]!]
-        case .RaspberryPiRev1:
-            fallthrough
-        case .RaspberryPiRev2:
-            fallthrough
-        case .RaspberryPiPlusZero:
-            fallthrough
-        case .RaspberryPi2:
-            fallthrough
-        case .RaspberryPi3:
-            return [I2CRPI[0]!, I2CRPI[1]!]
-        default:
-            return nil
-        }
-    }
-}
-
-// MARK: - I2C Presets
-extension SwiftyGPIO {
-    // RaspberryPis I2Cs
-    static let I2CRPI: [Int:I2CInterface] = [
-        0: SysFSI2C(i2cId: 0),
-        1: SysFSI2C(i2cId: 1)
-    ]
-
-    // CHIP I2Cs
-    // i2c.0: connected to the AXP209 chip
-    // i2c.1: after 4.4.13-ntc-mlc connected to the U13 header I2C interface
-    // i2c.2: connected to the U14 header I2C interface, XIO gpios are connected on this bus
-    static let I2CCHIP: [Int:I2CInterface] = [
-        1: SysFSI2C(i2cId: 1),
-        2: SysFSI2C(i2cId: 2),
-    ]
-}
-
-// MARK: I2C
-
-public protocol I2CInterface {
-    func isReachable(_ address: Int) -> Bool
-    func setPEC(_ address: Int, enabled: Bool)
-    func readByte(_ address: Int) -> UInt8
-    func readByte(_ address: Int, command: UInt8) -> UInt8
-    func readWord(_ address: Int, command: UInt8) -> UInt16
-    func readData(_ address: Int, command: UInt8) -> [UInt8]
-    func writeQuick(_ address: Int)
-    func writeByte(_ address: Int, value: UInt8)
-    func writeByte(_ address: Int, command: UInt8, value: UInt8)
-    func writeWord(_ address: Int, command: UInt8, value: UInt16)
-    func writeData(_ address: Int, command: UInt8, values: [UInt8])
-    // One-shot rd/wr not provided
-}
-
 /// Hardware I2C(SMBus) via SysFS using I2C_SMBUS ioctl
 public final class SysFSI2C: I2CInterface {
 

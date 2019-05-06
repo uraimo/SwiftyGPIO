@@ -226,6 +226,7 @@ extension SwiftyGPIO {
     ]
 
     // OrangePi
+    // - SeeAlso: [SunXi Wiki](http://linux-sunxi.org/GPIO)
     // The pins are ordered by name: A0-A21(P0-P16), C0-C7(P17-P22), D14(P23), G6-G9(P24-P27)
     static let GPIOORANGEPI: [GPIOName:GPIO] = [
         .pin0: GPIO(sunXi:SunXiGPIO(letter: .A, pin:0)),
@@ -257,7 +258,7 @@ extension SwiftyGPIO {
         .pin26: GPIO(sunXi:SunXiGPIO(letter:.G, pin:8)),
         .pin27: GPIO(sunXi:SunXiGPIO(letter:.G, pin:9))
     ]
-
+    
     // OrangePiZero
     static let GPIOORANGEPIZERO: [GPIOName:GPIO] = [
         .pin2: GPIO(sunXi:SunXiGPIO(letter:.A, pin:12)),

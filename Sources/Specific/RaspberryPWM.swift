@@ -29,56 +29,7 @@
 #endif
 import Foundation
 
-extension SwiftyGPIO {
-
-    public static func hardwarePWMs(for board: SupportedBoard) -> [Int:[GPIOName:PWMOutput]]? {
-        switch board {
-        case .RaspberryPiRev1:
-            fallthrough
-        case .RaspberryPiRev2:
-            fallthrough
-        case .RaspberryPiPlusZero:
-            return PWMRPI1
-        case .RaspberryPi2:
-            fallthrough
-        case .RaspberryPi3:
-            return PWMRPI23
-        default:
-            return nil
-        }
-    }
-}
-
-// MARK: - SPI Presets
-extension SwiftyGPIO {
-
-    // RaspberryPis ARMv6 (all 1, Zero, Zero W) PWMs, only accessible ones, divided in channels (can use only one for each channel)
-    static let PWMRPI1: [Int:[GPIOName:PWMOutput]] = [
-        0: [.pin12: RaspberryPWM(gpioId: 12, alt: 0, channel:0, baseAddr: 0x20000000), .pin18: RaspberryPWM(gpioId: 18, alt: 5, channel:0, baseAddr: 0x20000000)],
-        1: [.pin13: RaspberryPWM(gpioId: 13, alt: 0, channel:1, baseAddr: 0x20000000), .pin19: RaspberryPWM(gpioId: 19, alt: 5, channel:1, baseAddr: 0x20000000)]
-    ]
-
-    // RaspberryPis ARMv7 (2-3) PWMs, only accessible ones, divided in channels (can use only one for each channel)
-    static let PWMRPI23: [Int:[GPIOName:PWMOutput]] = [
-        0: [.pin12: RaspberryPWM(gpioId: 12, alt: 0, channel:0, baseAddr: 0x3F000000), .pin18: RaspberryPWM(gpioId: 18, alt: 5, channel:0, baseAddr: 0x3F000000)],
-        1: [.pin13: RaspberryPWM(gpioId: 13, alt: 0, channel:1, baseAddr: 0x3F000000), .pin19: RaspberryPWM(gpioId: 19, alt: 5, channel:1, baseAddr: 0x3F000000)]
-    ]
-}
-
-// MARK: PWM
-
-public protocol PWMOutput {
-    func initPWM()
-    func startPWM(period ns: Int, duty percent: Float)
-    func stopPWM()
-
-    func initPWMPattern(bytes count: Int, at frequency: Int, with resetDelay: Int, dutyzero: Int, dutyone: Int)
-    func sendDataWithPattern(values: [UInt8])
-    func waitOnSendData()
-    func cleanupPattern()
-}
-
-public class RaspberryPWM: PWMOutput {
+public class RaspberryPWM: PWMInterface {
     let gpioId: UInt
     let alt: UInt
     let channel: Int

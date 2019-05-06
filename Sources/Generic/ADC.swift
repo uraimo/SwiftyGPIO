@@ -30,51 +30,6 @@
 
 import Foundation
 
-enum ADCError: Error {
-    case fileError
-    case readError
-    case conversionError
-}
-
-extension SwiftyGPIO {
-
-    public static func hardwareADCs(for board: SupportedBoard) -> [ADCInterface]? {
-        switch board {
-        case .BeagleBoneBlack:
-            return [ADCBBB[0]!, ADCBBB[1]!, ADCBBB[2]!, ADCBBB[3]!]
-        case .RaspberryPiRev1:
-            fallthrough
-        case .RaspberryPiRev2:
-            fallthrough
-        case .RaspberryPiPlusZero:
-            fallthrough
-        case .RaspberryPi2:
-            fallthrough
-        case .RaspberryPi3:
-            fallthrough
-        default:
-            return nil
-        }
-    }
-}
-
-// MARK: - ADC Presets
-extension SwiftyGPIO {
-    // Beaglebone Black ADCs
-    static let ADCBBB: [Int: ADCInterface] = [
-        0: SysFSADC(adcPath: "/sys/devices/platform/ocp/44e0d000.tscadc/TI-am335x-adc/iio:device1/in_voltage0_raw", id: 0),
-        1: SysFSADC(adcPath: "/sys/devices/platform/ocp/44e0d000.tscadc/TI-am335x-adc/iio:device1/in_voltage1_raw", id: 1),
-        2: SysFSADC(adcPath: "/sys/devices/platform/ocp/44e0d000.tscadc/TI-am335x-adc/iio:device1/in_voltage2_raw", id: 2),
-        3: SysFSADC(adcPath: "/sys/devices/platform/ocp/44e0d000.tscadc/TI-am335x-adc/iio:device1/in_voltage3_raw", id: 3)
-    ]
-}
-
-// MARK: ADC
-public protocol ADCInterface {
-    var id: Int { get }
-    func getSample() throws -> Int
-}
-
 /// Hardware ADC via SysFS
 public final class SysFSADC: ADCInterface {
     let adcPath: String
