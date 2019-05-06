@@ -28,40 +28,31 @@
     import Darwin.C
 #endif
 
-/// UART via SysFS
+/// UART via Linux SysFS
 public final class SysFSUART: UARTInterface {
     var device: String
     var tty: termios
     var fd: Int32
 
     public init?(_ uartIdList: [String]) {
-        // try all items in list until one works
+        // Try all items in list until one works
         for uartId in uartIdList {
-
             device = "/dev/"+uartId
             tty = termios()
 
             fd = open(device, O_RDWR | O_NOCTTY | O_SYNC)
             guard fd>0 else {
-                if errno == ENOENT {
-                    // silently return nil if no such device
-                    continue
-                }
-                perror("Couldn't open UART device")
+                // Couldn't open UART device, skip
                 continue
             }
 
             let ret = tcgetattr(fd, &tty)
-
             guard ret == 0 else {
-	        close(fd)
-                perror("Couldn't get terminal attributes")
+                // Couldn't get terminal attributes, skip
+                close(fd)
                 continue
             }
-
-            return
-	}
-
+        }
         return nil
     }
 
@@ -69,7 +60,7 @@ public final class SysFSUART: UARTInterface {
         self.init([uartId])
     }
 
-    public func configureInterface(speed: UARTSpeed, bitsPerChar: CharSize, stopBits: StopBits, parity: ParityType) {
+    public func configureInterface(speed: UARTSpeed, bitsPerChar: CharSize, stopBits: StopBits, parity: ParityType) throws {
         speed.configure(&tty)
 
         bitsPerChar.configure(&tty)
@@ -86,10 +77,10 @@ public final class SysFSUART: UARTInterface {
         parity.configure(&tty)
         stopBits.configure(&tty)
 
-        applyConfiguration()
+        try applyConfiguration()
     }
 
-    public func readLine() -> String {
+    public func readLine() throws -> String {
         var buf = [CChar](repeating:0, count: 4097) //4096 chars at max in canonical mode
         var ptr = UnsafeMutablePointer<CChar>(&buf)
         var pos = 0
@@ -97,8 +88,7 @@ public final class SysFSUART: UARTInterface {
         repeat {
             let n = read(fd, ptr, MemoryLayout<CChar>.stride)
             if n<0 {
-                perror("Error while reading from UART")
-                abort()
+                throw UARTError.IOError("Error while reading from UART")
             }
             ptr += 1
             pos += 1
@@ -108,19 +98,18 @@ public final class SysFSUART: UARTInterface {
         return String(cString: &buf)
     }
 
-    public func readString() -> String {
-        var buf = readData()
+    public func readString() throws -> String {
+        var buf = try readData()
         buf.append(0) //Add terminator to convert cString correctly
         return String(cString: &buf)
     }
 
-    public func readData() -> [CChar] {
+    public func readData() throws -> [CChar] {
         var buf = [CChar](repeating:0, count: 4096) //4096 chars at max in canonical mode
 
         let n = read(fd, &buf, buf.count * MemoryLayout<CChar>.stride)
         if n<0 {
-            perror("Error while reading from UART")
-            abort()
+            throw UARTError.IOError("Error while reading from UART")
         }
         return Array(buf[0..<n])
     }
@@ -138,10 +127,9 @@ public final class SysFSUART: UARTInterface {
         tcdrain(fd)
     }
 
-    private func applyConfiguration() {
+    private func applyConfiguration() throws {
         if tcsetattr (fd, TCSANOW, &tty) != 0 {
-            perror("Couldn't set terminal attributes")
-            abort()
+            throw UARTError.configError("Couldn't set terminal attributes")
         }
     }
 

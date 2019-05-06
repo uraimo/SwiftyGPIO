@@ -30,8 +30,13 @@ import Darwin.C
 #endif
 import Foundation
 
+enum GPIOError : Error {
+    case deviceError(String)
+    case IOError(String)
+}
 
 
+/// GPIOs via Linux SysFS
 public class GPIO {
     public var bounceTime: TimeInterval?
     

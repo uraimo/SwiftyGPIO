@@ -30,6 +30,7 @@ import Darwin.C
 #endif
 import Foundation
 
+/// Memory mapped GPIOs
 public final class RaspberryGPIO: GPIO {
     
     var setGetId: UInt32 = 0
@@ -45,7 +46,7 @@ public final class RaspberryGPIO: GPIO {
     
     public override init(id: Int) {
         self.setGetId = UInt32(1<<id)
-        super.init(id:id)
+        super.init(id: id)
     }
     
     public override var value: Bool {

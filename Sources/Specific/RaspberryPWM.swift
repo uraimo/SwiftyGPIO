@@ -70,19 +70,19 @@ public class RaspberryPWM: PWMInterface {
     }
 
     /// Init PWM on this pin, set alternative function
-    public func initPWM() {
+    public func initPWM() throws {
         var mem_fd: Int32 = 0
 
         //The only mem device that support PWM is /dev/mem
         mem_fd=open("/dev/mem", O_RDWR | O_SYNC)
 
         guard mem_fd > 0 else {
-            fatalError("Can't open /dev/mem , use sudo!")
+            throw PWMError.deviceError("Can't open /dev/mem , use sudo!")
         }
 
-        gpioBasePointer = memmap(from: mem_fd, at: GPIO_BASE)
-        pwmBasePointer = memmap(from: mem_fd, at: PWM_BASE)
-        clockBasePointer = memmap(from: mem_fd, at: CLOCK_BASE)
+        gpioBasePointer = try memmap(from: mem_fd, at: GPIO_BASE)
+        pwmBasePointer = try memmap(from: mem_fd, at: PWM_BASE)
+        clockBasePointer = try memmap(from: mem_fd, at: CLOCK_BASE)
 
         let DMAOffsets: [Int] = [0x00007000, 0x00007100, 0x00007200, 0x00007300,
                                  0x00007400, 0x00007500, 0x00007600, 0x00007700,
@@ -98,7 +98,7 @@ public class RaspberryPWM: PWMInterface {
         let pageOffset = dma_addr % PAGE_SIZE
         dma_addr -= pageOffset
 
-        let dma_map = UnsafeMutableRawPointer(memmap(from: mem_fd, at: dma_addr))
+        let dma_map = UnsafeMutableRawPointer(try memmap(from: mem_fd, at: dma_addr))
         dmaBasePointer = (dma_map + pageOffset).assumingMemoryBound(to: UInt32.self)
 
         close(mem_fd)
@@ -141,7 +141,7 @@ public class RaspberryPWM: PWMInterface {
     }
 
     /// Maps a block of memory and returns the pointer
-    internal func memmap(from mem_fd: Int32, at offset: Int) -> UnsafeMutablePointer<UInt32> {
+    internal func memmap(from mem_fd: Int32, at offset: Int) throws -> UnsafeMutablePointer<UInt32> {
         let m = mmap(
             nil,                 //Any adddress in our space will do
             PAGE_SIZE,          //Map length
@@ -152,8 +152,7 @@ public class RaspberryPWM: PWMInterface {
             )!
 
         if (Int(bitPattern: m) == -1) {    //MAP_FAILED not available, but its value is (void*)-1
-            perror("mmap error")
-            abort()
+            throw PWMError.deviceError("mmap error")
         }
         let pointer = m.assumingMemoryBound(to: UInt32.self)
 
@@ -225,7 +224,7 @@ public class RaspberryPWM: PWMInterface {
 extension RaspberryPWM {
 
     /// Start the DMA feeding the PWM FIFO.  This will stream the entire DMA buffer out of both PWM channels.
-    internal func dma_start(dmaCallback address: UInt) {
+    internal func dma_start(dmaCallback address: UInt) throws {
         dmaBasePointer.pointee = DMACS_RESET
         usleep(10)
         dmaBasePointer.pointee = DMACS_INT | DMACS_END
@@ -235,24 +234,24 @@ extension RaspberryPWM {
     }
 
     /// Wait for any executing DMA operation to complete before returning.
-    internal func dma_wait() {
+    internal func dma_wait() throws {
         while (dmaBasePointer.pointee & DMACS_ACTIVE > 0) && !(dmaBasePointer.pointee & DMACS_ERROR > 0) {
             usleep(10)
         }
 
         if (dmaBasePointer.pointee & DMACS_ERROR)>0 {
-            fatalError("DMA Error: \(dmaBasePointer.advanced(by: 8).pointee)")
+            throw PWMError.deviceError("DMA Error: \(dmaBasePointer.advanced(by: 8).pointee)")
         }
     }
 
     /// Wait for the last signal to be completely generated
-    public func waitOnSendData() {
-        dma_wait()
+    public func waitOnSendData() throws {
+        try dma_wait()
     }
 
     /// Stop the PWM and clean up any related structure
-    public func cleanupPattern() {
-        dma_wait()
+    public func cleanupPattern() throws{
+        try dma_wait()
         // Stop the PWM
         pwmBasePointer.pointee = 0
         usleep(10)
@@ -346,12 +345,12 @@ extension RaspberryPWM {
     }
 
     /// Send data using the pattern information already provided
-    public func sendDataWithPattern(values: [UInt8]) {
+    public func sendDataWithPattern(values: [UInt8]) throws {
 
         guard symbolBits > 0 else {fatalError("Couldn't generate a valid pattern for the provided duty cycle values, try with more spaced values.")}
 
         // Wait for the previous signal to end
-        dma_wait()
+        try dma_wait()
 
         // Convert from raw uint8 data to a sequence of patterns
         let stream = dataToBitStream(data: values, zero: zeroPattern, one: onePattern, width: symbolBits)
@@ -366,7 +365,7 @@ extension RaspberryPWM {
         }
 
         // Start the DMA transfer toward the PWM FIFO
-        dma_start(dmaCallback: mailbox.virtualTobaseBusAddress(mailbox.baseVirtualAddress))
+        try dma_start(dmaCallback: mailbox.virtualTobaseBusAddress(mailbox.baseVirtualAddress))
     }
 
     /// Calculate an approximated bit pattern representation n-bits wide and filled with ones from the left with the given % value.

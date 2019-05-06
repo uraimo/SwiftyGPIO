@@ -28,7 +28,7 @@
     import Darwin.C
 #endif
 
-/// Hardware 1-Wire via SysFS
+/// Hardware 1-Wire via Linux SysFS
 public final class SysFSOneWire: OneWireInterface {
 
     let masterId: Int
@@ -37,17 +37,16 @@ public final class SysFSOneWire: OneWireInterface {
         self.masterId = masterId
     }
 
-    public func getSlaves() -> [String] {
+    public func getSlaves() throws -> [String] {
             let listpath = ONEWIREBASEPATH+"w1_bus_master"+String(masterId)+"/w1_master_slaves"
 
             let fd = open(listpath, O_RDONLY | O_SYNC)
             guard fd>0 else {
-                perror("Couldn't open 1-Wire master device")
-                abort()
+                throw OneWireError.masterError("Couldn't open 1-Wire master device")
             }
 
             var slaves = [String]()
-            while let s = readLine(fd) {
+            while let s = try readLine(fd) {
                 slaves.append(s)
             }
 
@@ -55,17 +54,16 @@ public final class SysFSOneWire: OneWireInterface {
             return slaves
     }
 
-    public func readData(_ slaveId: String) -> [String] {
+    public func readData(_ slaveId: String) throws -> [String] {
         let devicepath = ONEWIREBASEPATH+slaveId+"/w1_slave"
             
         let fd = open(devicepath, O_RDONLY | O_SYNC)
         guard fd>0 else {
-            perror("Couldn't open 1-Wire slave device")
-            abort()
+            throw OneWireError.slaveError("Couldn't open 1-Wire slave device")
         }
 
         var lines = [String]()
-        while let s = readLine(fd) {
+        while let s = try readLine(fd) {
             lines.append(s)
         }
 
@@ -73,7 +71,7 @@ public final class SysFSOneWire: OneWireInterface {
         return lines      
     }
 
-    private func readLine(_ fd: Int32) -> String? {
+    private func readLine(_ fd: Int32) throws -> String? {
         var buf = [CChar](repeating:0, count: 128) 
         var ptr = UnsafeMutablePointer<CChar>(&buf)
         var pos = 0
@@ -81,8 +79,7 @@ public final class SysFSOneWire: OneWireInterface {
         repeat {
             let n = read(fd, ptr, MemoryLayout<CChar>.stride)
             if n<0 {
-                perror("Error while reading from 1-Wire interface")
-                abort()
+                throw OneWireError.IOError("Error while reading from 1-Wire interface")
             } else if n == 0 {
                 break
             }

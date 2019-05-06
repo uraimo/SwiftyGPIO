@@ -29,7 +29,7 @@ import Darwin.C
 #endif
 
 
-// MARK: 1-Wire
+// MARK: - 1-Wire
 
 extension SwiftyGPIO {
     
@@ -51,14 +51,20 @@ extension SwiftyGPIO {
     }
 }
 
-// MARK: - 1-Wire Types
+// MARK: 1-Wire Types
 
 public protocol OneWireInterface {
-    func getSlaves() -> [String]
-    func readData(_ slaveId: String) -> [String]
+    func getSlaves() throws -> [String]
+    func readData(_ slaveId: String) throws -> [String]
 }
 
-// MARK: ADC
+enum OneWireError: Error {
+    case masterError(String)
+    case slaveError(String)
+    case IOError(String)
+}
+
+// MARK: - ADC
 
 extension SwiftyGPIO {
     
@@ -90,7 +96,7 @@ extension SwiftyGPIO {
     ]
 }
 
-// MARK: - ADC Types
+// MARK: ADC Types
 
 public protocol ADCInterface {
     var id: Int { get }
@@ -98,12 +104,12 @@ public protocol ADCInterface {
 }
 
 enum ADCError: Error {
-    case fileError
-    case readError
-    case conversionError
+    case deviceError(String)
+    case readError(String)
+    case conversionError(String)
 }
 
-// MARK: I2C
+// MARK: - I2C
 
 extension SwiftyGPIO {
     
@@ -142,25 +148,30 @@ extension SwiftyGPIO {
     ]
 }
 
-// MARK: - I2C Types
+// MARK: I2C Types
+
+enum I2CError: Error {
+    case deviceError(String)
+    case IOError(String)
+}
 
 public protocol I2CInterface {
-    func isReachable(_ address: Int) -> Bool
-    func setPEC(_ address: Int, enabled: Bool)
-    func readByte(_ address: Int) -> UInt8
-    func readByte(_ address: Int, command: UInt8) -> UInt8
-    func readWord(_ address: Int, command: UInt8) -> UInt16
-    func readData(_ address: Int, command: UInt8) -> [UInt8]
-    func writeQuick(_ address: Int)
-    func writeByte(_ address: Int, value: UInt8)
-    func writeByte(_ address: Int, command: UInt8, value: UInt8)
-    func writeWord(_ address: Int, command: UInt8, value: UInt16)
-    func writeData(_ address: Int, command: UInt8, values: [UInt8])
-    // One-shot rd/wr not provided
+    func isReachable(_ address: Int) throws -> Bool
+    func setPEC(_ address: Int, enabled: Bool) throws
+    func readByte(_ address: Int) throws -> UInt8
+    func readByte(_ address: Int, command: UInt8) throws -> UInt8
+    func readWord(_ address: Int, command: UInt8) throws -> UInt16
+    func readData(_ address: Int, command: UInt8) throws -> [UInt8]
+    func writeQuick(_ address: Int) throws
+    func writeByte(_ address: Int, value: UInt8) throws
+    func writeByte(_ address: Int, command: UInt8, value: UInt8) throws
+    func writeWord(_ address: Int, command: UInt8, value: UInt16) throws
+    func writeData(_ address: Int, command: UInt8, values: [UInt8]) throws
+    // One-shot r/w not provided
 }
 
 
-//MARK: PWM
+//MARK: - PWM
 
 extension SwiftyGPIO {
     
@@ -194,20 +205,25 @@ extension SwiftyGPIO {
     ]
 }
 
-// MARK: - PWM Types
+// MARK: PWM Types
+
+enum PWMError : Error {
+    case deviceError(String)
+    case IOError(String)
+}
 
 public protocol PWMInterface {
-    func initPWM()
+    func initPWM() throws
     func startPWM(period ns: Int, duty percent: Float)
     func stopPWM()
     
     func initPWMPattern(bytes count: Int, at frequency: Int, with resetDelay: Int, dutyzero: Int, dutyone: Int)
-    func sendDataWithPattern(values: [UInt8])
-    func waitOnSendData()
-    func cleanupPattern()
+    func sendDataWithPattern(values: [UInt8]) throws
+    func waitOnSendData() throws
+    func cleanupPattern() throws
 }
 
-//MARK: SPI
+//MARK: - SPI
 
 extension SwiftyGPIO {
     
@@ -245,22 +261,27 @@ extension SwiftyGPIO {
     ]
 }
 
-// MARK: - SPI Types
+// MARK: SPI Types
+
+enum SPIError : Error {
+    case deviceError(String)
+    case IOError(String)
+}
 
 public protocol SPIInterface {
     // Send data at the requested frequency (from 500Khz to 20 Mhz)
-    func sendData(_ values: [UInt8], frequencyHz: UInt)
+    func sendData(_ values: [UInt8], frequencyHz: UInt) throws
     // Send data at the default frequency
-    func sendData(_ values: [UInt8])
+    func sendData(_ values: [UInt8]) throws
     // Send data and then receive a chunck of data at the requested frequency (from 500Khz to 20 Mhz)
-    func sendDataAndRead(_ values: [UInt8], frequencyHz: UInt) -> [UInt8]
+    func sendDataAndRead(_ values: [UInt8], frequencyHz: UInt) throws -> [UInt8]
     // Send data and then receive a chunck of data at the default frequency
-    func sendDataAndRead(_ values: [UInt8]) -> [UInt8]
+    func sendDataAndRead(_ values: [UInt8]) throws -> [UInt8]
     // Returns true if the SPIInterface is using a real SPI pin, false if performing bit-banging
     var isHardware: Bool { get }
 }
 
-//MARK: UART
+//MARK: - UART
 
 extension SwiftyGPIO {
     
@@ -285,12 +306,19 @@ extension SwiftyGPIO {
     }
 }
 
-// MARK: - UART Types
+// MARK: UART Types
+
+enum UARTError : Error {
+    case deviceError(String)
+    case IOError(String)
+    case configError(String)
+}
+
 public protocol UARTInterface {
-    func configureInterface(speed: UARTSpeed, bitsPerChar: CharSize, stopBits: StopBits, parity: ParityType)
-    func readString() -> String
-    func readLine() -> String
-    func readData() -> [CChar]
+    func configureInterface(speed: UARTSpeed, bitsPerChar: CharSize, stopBits: StopBits, parity: ParityType) throws
+    func readString() throws -> String
+    func readLine() throws -> String
+    func readData() throws -> [CChar]
     func writeString(_ value: String)
     func writeData(_ values: [CChar])
 }

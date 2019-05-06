@@ -48,23 +48,23 @@ public final class RaspberryVirtualSPI: SPIInterface {
     
     public var isHardware =  true
     
-    public func sendData(_ values: [UInt8], frequencyHz: UInt = 500000) {
+    public func sendData(_ values: [UInt8], frequencyHz: UInt = 500000) throws {
         sendDataGPIOObj(values, frequencyHz: frequencyHz, read: false)
     }
     
-    public func sendData(_ values: [UInt8]) {
-        sendData(values, frequencyHz: 0)
+    public func sendData(_ values: [UInt8]) throws {
+        try sendData(values, frequencyHz: 0)
     }
     
-    public func sendDataAndRead(_ values: [UInt8], frequencyHz: UInt = 500000) -> [UInt8] {
+    public func sendDataAndRead(_ values: [UInt8], frequencyHz: UInt = 500000) throws -> [UInt8] {
         var rx = [UInt8]()
         
         rx = sendDataGPIOObj(values, frequencyHz: frequencyHz, read: true)
         return rx
     }
     
-    public func sendDataAndRead(_ values: [UInt8]) -> [UInt8] {
-        return sendDataAndRead(values, frequencyHz: 0)
+    public func sendDataAndRead(_ values: [UInt8]) throws -> [UInt8] {
+        return try sendDataAndRead(values, frequencyHz: 0)
     }
     
     @discardableResult

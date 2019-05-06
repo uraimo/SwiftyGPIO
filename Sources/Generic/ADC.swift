@@ -30,7 +30,7 @@
 
 import Foundation
 
-/// Hardware ADC via SysFS
+/// Hardware ADC via Linux SysFS
 public final class SysFSADC: ADCInterface {
     let adcPath: String
     public let id: Int
@@ -42,24 +42,23 @@ public final class SysFSADC: ADCInterface {
     }
 
     public func getSample() throws -> Int {
-        if fd <= 0 { self.openADC() }
+        if fd <= 0 { try self.openADC() }
 
         guard fd > 0 else {
-            throw ADCError.fileError
+            throw ADCError.deviceError("Couldn't open ADC device: \(String(describing: strerror(errno)))")
         }
 
         var returnData = [CChar].init(repeating: 0, count: 16)
         let count = read(fd, &returnData, 16)
 
         guard count > 0 else {
-            print("Unable to read from ADC: \(String(describing: strerror(errno)))")
             self.closeADC()
-            throw ADCError.readError
+            throw ADCError.readError("Unable to read from ADC: \(String(describing: strerror(errno)))")
         }
 
         guard let sampleString = String(cString: returnData, encoding: .utf8) else {
             self.closeADC()
-            throw ADCError.conversionError
+            throw ADCError.conversionError("Conversion error")
         }
 
         if let sampleInt = Int(sampleString.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)) {
@@ -67,7 +66,7 @@ public final class SysFSADC: ADCInterface {
             return sampleInt
         } else {
             self.closeADC()
-            throw ADCError.conversionError
+            throw ADCError.conversionError("Conversion error")
         }
 
     }
@@ -78,12 +77,12 @@ public final class SysFSADC: ADCInterface {
         }
     }
 
-    private func openADC() {
+    private func openADC() throws {
         let fd  = open(adcPath, O_RDONLY)
         self.fd = fd
 
         if fd < 0 {
-            fatalError("Couldn't open ADC device: \(String(describing: strerror(errno)))")
+            throw ADCError.deviceError("Couldn't open ADC device: \(String(describing: strerror(errno)))")
         }
     }
 
