@@ -82,11 +82,11 @@ public class GPIO {
     public var activeLow: Bool {
         set(act) {
             if !exported {enableIO(id)}
-            performSetting("gpio"+String(id)+"/active_low", value: act ? "1":"0")
+            performSetting("gpio"+String(id)+"/active_low", value: act)
         }
         get {
             if !exported {enableIO(id)}
-            return getIntValue("gpio"+String(id)+"/active_low")==0
+            return getBoolValue("gpio"+String(id)+"/active_low")!
         }
     }
 
@@ -99,14 +99,14 @@ public class GPIO {
         }
     }
 
-    public var value: Int {
+    public var value: Bool {
         set(val) {
             if !exported {enableIO(id)}
             performSetting("gpio"+String(id)+"/value", value: val)
         }
         get {
             if !exported {enableIO(id)}
-            return getIntValue("gpio"+String(id)+"/value")!
+            return getBoolValue("gpio"+String(id)+"/value")!
         }
     }
 
@@ -155,23 +155,23 @@ fileprivate extension GPIO {
         exported = true
     }
 
+    func performSetting(_ filename: String, value: Bool) {
+        writeToFile(GPIOBASEPATH+filename, value: String(value ? 1 : 0))
+    }
+
+    func getBoolValue(_ filename: String) -> Bool? {
+        if let res = readFromFile(GPIOBASEPATH+filename) {
+            return Int(res)==1
+        }
+        return nil
+    }
+    
     func performSetting(_ filename: String, value: String) {
         writeToFile(GPIOBASEPATH+filename, value:value)
     }
-
-    func performSetting(_ filename: String, value: Int) {
-        writeToFile(GPIOBASEPATH+filename, value: String(value))
-    }
-
+    
     func getStringValue(_ filename: String) -> String? {
         return readFromFile(GPIOBASEPATH+filename)
-    }
-
-    func getIntValue(_ filename: String) -> Int? {
-        if let res = readFromFile(GPIOBASEPATH+filename) {
-            return Int(res)
-        }
-        return nil
     }
 
     func writeToFile(_ path: String, value: String) {
@@ -293,7 +293,7 @@ public final class RaspberryGPIO: GPIO {
         super.init(id:id)
     }
 
-    public override var value: Int {
+    public override var value: Bool {
         set(val) {
             if !inited {initIO()}
             gpioSet(val)
@@ -404,12 +404,12 @@ public final class RaspberryGPIO: GPIO {
         usleep(10);                                 // 150 cycles or more
     }
 
-    private func gpioGet() -> Int {
-        return ((gpioGetPointer.pointee & setGetId)>0) ? 1 : 0
+    private func gpioGet() -> Bool {
+        return ((gpioGetPointer.pointee & setGetId)>0) ? true : false
     }
 
-    private func gpioSet(_ value: Int) {
-        let ptr = value==1 ? gpioSetPointer : gpioClearPointer
+    private func gpioSet(_ value: Bool) {
+        let ptr = value ? gpioSetPointer : gpioClearPointer
         ptr!.pointee = setGetId
     }
     

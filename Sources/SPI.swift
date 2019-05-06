@@ -264,15 +264,15 @@ public final class VirtualSPI: SPIInterface {
     public init(mosiGPIO: GPIO, misoGPIO: GPIO, clockGPIO: GPIO, csGPIO: GPIO) {
         self.mosiGPIO = mosiGPIO
         self.mosiGPIO.direction = .output
-        self.mosiGPIO.value = 0
+        self.mosiGPIO.value = false
         self.misoGPIO = misoGPIO
         self.misoGPIO.direction = .output
         self.clockGPIO = clockGPIO
         self.clockGPIO.direction = .output
-        self.clockGPIO.value = 0
+        self.clockGPIO.value = false
         self.csGPIO = csGPIO
         self.csGPIO.direction = .output
-        self.csGPIO.value = 1
+        self.csGPIO.value = true
     }
 
     public var isHardware =  true
@@ -310,11 +310,11 @@ public final class VirtualSPI: SPIInterface {
     private func sendDataGPIOObj(_ values: [UInt8], frequencyHz: UInt, read: Bool) -> [UInt8] {
         var rx: [UInt8] = [UInt8]()
 
-        var bit: Int = 0
+        var bit: UInt8 = 0
         var rbit: UInt8 = 0
 
         //Begin transmission cs=LOW
-        csGPIO.value = 0
+        csGPIO.value = false
 
         for value in values {
             rbit = 0
@@ -322,8 +322,8 @@ public final class VirtualSPI: SPIInterface {
             for i in 0...7 {
                 bit = ((value & UInt8(1 << (7-i))) == 0) ? 0 : 1
 
-                mosiGPIO.value = bit
-                clockGPIO.value = 1
+                mosiGPIO.value = bit.toBool()
+                clockGPIO.value = true
                 if frequencyHz > 0 {
                     let amount = UInt32(1_000_000/Double(frequencyHz))
                     // Calling usleep introduces significant delay, don't sleep for small values
@@ -331,9 +331,9 @@ public final class VirtualSPI: SPIInterface {
                         usleep(amount)
                     }
                 }
-                clockGPIO.value = 0
+                clockGPIO.value = false
                 if read {
-                    rbit |= ( UInt8(misoGPIO.value) << (7-UInt8(i)) )
+                    rbit |= ( misoGPIO.value.toUInt8() << (7-UInt8(i)) )
                 }
             }
             if read {
@@ -342,7 +342,7 @@ public final class VirtualSPI: SPIInterface {
         }
 
         //End transmission cs=HIGH
-        csGPIO.value = 1
+        csGPIO.value = true
         return rx
     }
 
@@ -356,7 +356,7 @@ public final class VirtualSPI: SPIInterface {
         let HIGH = "1"
         let LOW = "0"
         //Begin transmission cs=LOW
-        csGPIO.value = 0
+        csGPIO.value = false
 
         let fpmosi: UnsafeMutablePointer<FILE>! = fopen(mosipath, "w")
         let fpmiso: UnsafeMutablePointer<FILE>! = fopen(misopath, "r")
@@ -401,7 +401,7 @@ public final class VirtualSPI: SPIInterface {
         fclose(fpsclk)
 
         //End transmission cs=HIGH
-        csGPIO.value = 1
+        csGPIO.value = true
         return rx
     }
 
@@ -428,6 +428,20 @@ public final class VirtualSPI: SPIInterface {
     }
 
 }
+
+
+extension UInt8{
+     @inlinable public func toBool() -> Bool {
+        return self != 0
+    }
+}
+
+extension Bool{
+    @inlinable public func toUInt8() -> UInt8 {
+        return self ? UInt8(1) : UInt8(0)
+    }
+}
+
 
 // MARK: - SPI Constants
 internal let SPI_IOC_WR_MODE: UInt = 0x40016b01
