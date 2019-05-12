@@ -192,9 +192,9 @@ public final class RaspberryGPIO: GPIO {
             guard current.isEmpty else {return current}
             
             var name = utsname()
-            guard uname(&name)>0 else { fatalError("Couldn't retrieve the current system information.") }
+            guard uname(&name)==0 else { fatalError("Couldn't retrieve the current system information.") }
             
-            let archstr = withUnsafeBytes(of: &name, { (p) -> String in
+            let archstr = withUnsafeBytes(of: &name.machine, { (p) -> String in
                 let charPtr = p.baseAddress!.assumingMemoryBound(to: CChar.self)
                 return String(cString: charPtr).lowercased()
             })
