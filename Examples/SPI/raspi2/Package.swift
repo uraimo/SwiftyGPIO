@@ -2,14 +2,13 @@
 import PackageDescription
 
 let package = Package(
-    name: "SPI",
+    name: "SPIDemo",
     dependencies: [
         .package(url: "https://github.com/uraimo/SwiftyGPIO.git", from: "1.0.0"),
     ],
     targets: [
         .target(
-            name: "SPI",
-            dependencies: ["SwiftyGPIO"],
-            sources: ["Sources"])
+            name: "SPIDemo",
+            dependencies: ["SwiftyGPIO"])
     ]
 )

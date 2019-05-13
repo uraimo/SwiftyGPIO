@@ -9,7 +9,6 @@ let package = Package(
     targets: [
         .target(
             name: "BasicGPIO",
-            dependencies: ["SwiftyGPIO"],
-            sources: ["Sources"])
+            dependencies: ["SwiftyGPIO"])
     ]
 )

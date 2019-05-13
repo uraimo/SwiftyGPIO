@@ -9,7 +9,7 @@ let package = Package(
     targets: [
         .target(
             name: "OneWire",
-            dependencies: ["SwiftyGPIO"],
-            sources: ["Sources"])
+            dependencies: ["SwiftyGPIO"]
+            )
     ]
 )

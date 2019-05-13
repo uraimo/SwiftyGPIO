@@ -2,14 +2,13 @@
 import PackageDescription
 
 let package = Package(
-    name: "PWM",
+    name: "PWMDemo",
     dependencies: [
         .package(url: "https://github.com/uraimo/SwiftyGPIO.git", from: "1.0.0"),
     ],
     targets: [
         .target(
-            name: "PWM",
-            dependencies: ["SwiftyGPIO"],
-            sources: ["Sources"])
+            name: "PWMDemo",
+            dependencies: ["SwiftyGPIO"])
     ]
 )

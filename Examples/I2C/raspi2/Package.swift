@@ -2,14 +2,13 @@
 import PackageDescription
 
 let package = Package(
-    name: "I2C",
+    name: "I2CDetect",
     dependencies: [
         .package(url: "https://github.com/uraimo/SwiftyGPIO.git", from: "1.0.0"),
     ],
     targets: [
         .target(
-            name: "I2C",
-            dependencies: ["SwiftyGPIO"],
-            sources: ["Sources"])
+            name: "I2CDetect",
+            dependencies: ["SwiftyGPIO"])
     ]
 )
