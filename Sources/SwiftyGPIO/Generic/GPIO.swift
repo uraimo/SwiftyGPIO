@@ -58,33 +58,33 @@ public class SysFSGPIO : GPIOInterface {
     public var direction: GPIODirection {
         set(dir) {
             if !exported {enableIO(id)}
-            performSetting("gpio" + String(id) + "/direction", value: dir.rawValue)
+            try! performSetting("gpio" + String(id) + "/direction", value: dir.rawValue)
         }
         get {
             if !exported { enableIO(id)}
-            return GPIODirection(rawValue: getStringValue("gpio"+String(id)+"/direction")!)!
+            return GPIODirection(rawValue: try! getStringValue("gpio"+String(id)+"/direction")!)!
         }
     }
     
     public var edge: GPIOEdge {
         set(dir) {
             if !exported {enableIO(id)}
-            performSetting("gpio"+String(id)+"/edge", value: dir.rawValue)
+            try! performSetting("gpio"+String(id)+"/edge", value: dir.rawValue)
         }
         get {
             if !exported {enableIO(id)}
-            return GPIOEdge(rawValue: getStringValue("gpio"+String(id)+"/edge")!)!
+            return GPIOEdge(rawValue: try! getStringValue("gpio"+String(id)+"/edge")!)!
         }
     }
     
     public var activeLow: Bool {
         set(act) {
             if !exported {enableIO(id)}
-            performSetting("gpio"+String(id)+"/active_low", value: act)
+            try! performSetting("gpio"+String(id)+"/active_low", value: act)
         }
         get {
             if !exported {enableIO(id)}
-            return getBoolValue("gpio"+String(id)+"/active_low")!
+            return try! getBoolValue("gpio"+String(id)+"/active_low")!
         }
     }
     
@@ -100,11 +100,11 @@ public class SysFSGPIO : GPIOInterface {
     public var value: Bool {
         set(val) {
             if !exported {enableIO(id)}
-            performSetting("gpio"+String(id)+"/value", value: val)
+            try! performSetting("gpio"+String(id)+"/value", value: val)
         }
         get {
             if !exported {enableIO(id)}
-            return getBoolValue("gpio"+String(id)+"/value")!
+            return try! getBoolValue("gpio"+String(id)+"/value")!
         }
     }
     
@@ -112,12 +112,23 @@ public class SysFSGPIO : GPIOInterface {
         return false
     }
     
-    func enableIO(_ id: Int) {
-        writeToFile(GPIOBASEPATH+"export", value:String(id))
+    public func enable() throws {
+        try writeToFile(GPIOBASEPATH+"export", value:String(id))
+        _ = try getStringValue("gpio"+String(id)+"/direction")
+        _ = try getStringValue("gpio"+String(id)+"/edge")
+        _ = try getBoolValue("gpio"+String(id)+"/active_low")
+        _ = try getBoolValue("gpio"+String(id)+"/value")
         exported = true
     }
     
-    public func onFalling(_ closure: @escaping (GPIO) -> Void) {
+    func enableIO(_ id: Int) {
+        guard !exported else {return}
+        
+        try! writeToFile(GPIOBASEPATH+"export", value:String(id))
+        exported = true
+    }
+    
+    public func onFalling(_ closure: @escaping (GPIOInterface) -> Void) {
         intFalling = (func: closure, lastCall: nil)
         if intThread == nil {
             intThread = makeInterruptThread()
@@ -152,43 +163,42 @@ public class SysFSGPIO : GPIOInterface {
 }
 
 
-fileprivate extension GPIO {
+fileprivate extension SysFSGPIO {
     
-    func performSetting(_ filename: String, value: Bool) {
-        writeToFile(GPIOBASEPATH+filename, value: String(value ? 1 : 0))
+    func performSetting(_ filename: String, value: Bool) throws {
+        try writeToFile(GPIOBASEPATH+filename, value: String(value ? 1 : 0))
     }
     
-    func getBoolValue(_ filename: String) -> Bool? {
-        if let res = readFromFile(GPIOBASEPATH+filename) {
+    func getBoolValue(_ filename: String) throws -> Bool? {
+        if let res = try readFromFile(GPIOBASEPATH+filename) {
             return Int(res)==1
         }
         return nil
     }
     
-    func performSetting(_ filename: String, value: String) {
-        writeToFile(GPIOBASEPATH+filename, value:value)
+    func performSetting(_ filename: String, value: String) throws {
+        try writeToFile(GPIOBASEPATH+filename, value:value)
     }
     
-    func getStringValue(_ filename: String) -> String? {
-        return readFromFile(GPIOBASEPATH+filename)
+    func getStringValue(_ filename: String) throws -> String? {
+        return try readFromFile(GPIOBASEPATH+filename)
     }
     
-    func writeToFile(_ path: String, value: String) {
+    func writeToFile(_ path: String, value: String) throws {
         let fp = fopen(path, "w")
         if fp != nil {
             let len = value.count
             let ret = fwrite(value, MemoryLayout<CChar>.stride, len, fp)
             if ret<len {
                 if ferror(fp) != 0 {
-                    perror("Error while writing to file")
-                    abort()
+                    throw GPIOError.IOError("Error while writing to file")
                 }
             }
             fclose(fp)
         }
     }
     
-    func readFromFile(_ path: String) -> String? {
+    func readFromFile(_ path: String) throws -> String? {
         let MAXLEN = 8
         
         let fp = fopen(path, "r")
@@ -198,8 +208,7 @@ fileprivate extension GPIO {
             let len = fread(buf, MemoryLayout<CChar>.stride, MAXLEN, fp)
             if len < MAXLEN {
                 if ferror(fp) != 0 {
-                    perror("Error while reading from file")
-                    abort()
+                    throw GPIOError.IOError("Error while reading from file")
                 }
             }
             fclose(fp)
