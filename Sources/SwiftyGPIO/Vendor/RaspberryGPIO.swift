@@ -77,7 +77,7 @@ public final class RaspberryGPIO: GPIO {
     
     public override var pull: GPIOPull {
         set(pull) {
-            if !inited {enableIO(id)}
+            if !inited {initIO()}
             setGpioPull(pull)
         }
         get{
