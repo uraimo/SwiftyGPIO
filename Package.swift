@@ -12,9 +12,9 @@ let package = Package(
     dependencies: [
     ],
     targets: [
-        .target(
-            name: "SwiftyGPIO",
-            path: "Sources"
-        )
+        .target(name: "SwiftyGPIO"),
+        .testTarget(
+            name: "SwiftyGPIOTests",
+            dependencies: ["SwiftyGPIO"]),
     ]
 )
