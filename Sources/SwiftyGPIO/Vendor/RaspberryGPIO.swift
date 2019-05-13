@@ -31,7 +31,7 @@ import Darwin.C
 import Foundation
 
 /// Memory mapped GPIOs
-public final class RaspberryGPIO: GPIO {
+public final class RaspberryGPIO: SysFSGPIO {
     
     var setGetId: UInt32 = 0
     var inited = false

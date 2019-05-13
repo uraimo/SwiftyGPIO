@@ -30,14 +30,9 @@ import Darwin.C
 #endif
 import Foundation
 
-enum GPIOError : Error {
-    case deviceError(String)
-    case IOError(String)
-}
-
 
 /// GPIOs via Linux SysFS
-public class GPIO {
+public class SysFSGPIO : GPIOInterface {
     public var bounceTime: TimeInterval?
     
     public private(set) var name: String = ""
@@ -45,9 +40,9 @@ public class GPIO {
     var exported = false
     var listening = false
     var intThread: Thread?
-    var intFalling: (func: ((GPIO) -> Void), lastCall: Date?)?
-    var intRaising: (func: ((GPIO) -> Void), lastCall: Date?)?
-    var intChange: (func: ((GPIO) -> Void), lastCall: Date?)?
+    var intFalling: (func: ((GPIOInterface) -> Void), lastCall: Date?)?
+    var intRaising: (func: ((GPIOInterface) -> Void), lastCall: Date?)?
+    var intChange: (func: ((GPIOInterface) -> Void), lastCall: Date?)?
     
     public init(name: String,
                 id: Int) {
@@ -131,7 +126,7 @@ public class GPIO {
         }
     }
     
-    public func onRaising(_ closure: @escaping (GPIO) -> Void) {
+    public func onRaising(_ closure: @escaping (GPIOInterface) -> Void) {
         intRaising = (func: closure, lastCall: nil)
         if intThread == nil {
             intThread = makeInterruptThread()
@@ -140,7 +135,7 @@ public class GPIO {
         }
     }
     
-    public func onChange(_ closure: @escaping (GPIO) -> Void) {
+    public func onChange(_ closure: @escaping (GPIOInterface) -> Void) {
         intChange = (func: closure, lastCall: nil)
         if intThread == nil {
             intThread = makeInterruptThread()
@@ -259,7 +254,7 @@ fileprivate extension GPIO {
         return thread
     }
     
-    func interrupt(type: inout (func: ((GPIO) -> Void), lastCall: Date?)?) {
+    func interrupt(type: inout (func: ((GPIOInterface) -> Void), lastCall: Date?)?) {
         guard let itype = type else {
             return
         }
@@ -271,7 +266,7 @@ fileprivate extension GPIO {
     }
 }
 
-extension GPIO: CustomStringConvertible {
+extension SysFSGPIO: CustomStringConvertible {
     public var description: String {
         return "\(name)<\(id)> with direction:<\(direction), edge:\(edge), active:\(activeLow),pull:\(pull)>: \(value)"
     }

@@ -33,9 +33,14 @@ import Foundation
 
 // MARK: - GPIO
 
+enum GPIOError : Error {
+    case deviceError(String)
+    case IOError(String)
+}
+
 public struct SwiftyGPIO {
 
-    public static func GPIOs(for board: SupportedBoard) -> [GPIOName: GPIO] {
+    public static func GPIOs(for board: SupportedBoard) -> [GPIOName: SysFSGPIO] {
         switch board {
         case .RaspberryPiRev1:
             return GPIORPIRev1
@@ -74,6 +79,21 @@ public enum SupportedBoard: String {
 }
 
 // MARK: GPIO Types
+
+public protocol GPIOInterface {
+    var direction: GPIODirection {get set}
+    var edge: GPIOEdge {get set}
+    var activeLow: Bool {get set}
+    var pull: GPIOPull {get set}
+    var value: Bool {get set}
+    func isMemoryMapped() -> Bool
+    func enable() throws
+    func onFalling(_ closure: @escaping (GPIOInterface) -> Void)
+    func onRaising(_ closure: @escaping (GPIOInterface) -> Void)
+    func onChange(_ closure: @escaping (GPIOInterface) -> Void)
+    func clearListeners()
+}
+
 
 public enum GPIOName: String {
     case pin0

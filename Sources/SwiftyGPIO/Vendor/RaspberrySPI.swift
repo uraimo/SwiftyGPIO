@@ -30,9 +30,9 @@ import Darwin.C
 
 /// Bit-banging virtual SPI implementation, output only
 public final class RaspberryVirtualSPI: SPIInterface {
-    let mosiGPIO, misoGPIO, clockGPIO, csGPIO: GPIO
+    let mosiGPIO, misoGPIO, clockGPIO, csGPIO: SysFSGPIO
     
-    public init(mosiGPIO: GPIO, misoGPIO: GPIO, clockGPIO: GPIO, csGPIO: GPIO) {
+    public init(mosiGPIO: SysFSGPIO, misoGPIO: SysFSGPIO, clockGPIO: SysFSGPIO, csGPIO: SysFSGPIO) {
         self.mosiGPIO = mosiGPIO
         self.mosiGPIO.direction = .output
         self.mosiGPIO.value = false
