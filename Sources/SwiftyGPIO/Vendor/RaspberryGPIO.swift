@@ -88,6 +88,39 @@ public final class RaspberryGPIO: SysFSGPIO {
     public override func isMemoryMapped() -> Bool {
         return true
     }
+
+    public override func enable() throws {
+        var mem_fd: Int32 = 0
+        
+        self.BCM2708_PERI_BASE = getbaseAddr()
+        self.GPIO_BASE = BCM2708_PERI_BASE + 0x200000 /* GPIO controller */
+        
+        //Try to open one of the mem devices
+        for device in ["/dev/gpiomem", "/dev/mem"] {
+            mem_fd=open(device, O_RDWR | O_SYNC)
+            if mem_fd>0 {
+                break
+            }
+        }
+        guard mem_fd > 0 else {
+            throw GPIOError.deviceError("Can't open /dev/mem , use sudo!")
+        }
+        
+        let gpio_map = mmap(
+            nil,                 //Any adddress in our space will do
+            PAGE_SIZE,          //Map length
+            PROT_READ|PROT_WRITE, // Enable reading & writting to mapped memory
+            MAP_SHARED,          //Shared with other processes
+            mem_fd,              //File to map
+            off_t(GPIO_BASE)     //Offset to GPIO peripheral, i.e. GPFSEL0
+            )!
+        
+        close(mem_fd)
+        
+        if (Int(bitPattern: gpio_map) == -1) {    //MAP_FAILED not available, but its value is (void*)-1
+            throw GPIOError.deviceError("Can't open /dev/mem, mmap error")
+        }
+    }
     
     private func initIO() {
         var mem_fd: Int32 = 0
@@ -121,6 +154,7 @@ public final class RaspberryGPIO: SysFSGPIO {
             perror("mmap error")
             abort()
         }
+        
         gpioBasePointer = gpio_map.assumingMemoryBound(to: UInt32.self)
         
         gpioGetPointer = gpioBasePointer.advanced(by: 13)   // GPLEV0

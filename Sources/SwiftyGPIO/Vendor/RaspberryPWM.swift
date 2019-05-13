@@ -70,7 +70,7 @@ public class RaspberryPWM: PWMInterface {
     }
 
     /// Init PWM on this pin, set alternative function
-    public func initPWM() throws {
+    public func enable() throws {
         var mem_fd: Int32 = 0
 
         //The only mem device that support PWM is /dev/mem
@@ -110,7 +110,7 @@ public class RaspberryPWM: PWMInterface {
     /// Start a PWM signal with specific period in ns and duty cycle from 0 to 100.
     /// The signal starts, asynchronously(manged by a device external to the CPU), once this method is called and
     /// needs to be stopped manually calling `stopPWM()`.
-    public func startPWM(period ns: Int, duty percent: Float) {
+    public func start(period ns: Int, duty percent: Float) {
         // Kill the clock
         clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_KILL     //CM CTL register: Set KILL flag
         usleep(10)
@@ -136,7 +136,7 @@ public class RaspberryPWM: PWMInterface {
         pwmBasePointer.pointee = PWMCTL_MSEN | PWMCTL_PWEN                                                              //PWM CTL register, channel enabled, M/S mode
     }
 
-    public func stopPWM() {
+    public func stop() {
         pwmBasePointer.pointee = 0      //PWM CTL register, everything at 0, enable flag included
     }
 
@@ -270,7 +270,7 @@ extension RaspberryPWM {
     /// - Parameter dutyzero: duty cycle of the pattern for zero
     /// - Parameter dutyone: duty cycle of the pattern for one
     ///
-    public func initPWMPattern(bytes count: Int, at frequency: Int, with resetDelay: Int, dutyzero: Int, dutyone: Int) {
+    public func initPattern(bytes count: Int, at frequency: Int, with resetDelay: Int, dutyzero: Int, dutyone: Int) {
 
         (zeroPattern, onePattern, symbolBits) = getRepresentation(zero: dutyzero, one: dutyone)
         guard symbolBits > 0 else {fatalError("Couldn't generate a valid pattern for the provided duty cycle values, try with more spaced values.")}

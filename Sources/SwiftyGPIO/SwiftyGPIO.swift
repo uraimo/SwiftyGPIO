@@ -363,11 +363,11 @@ enum PWMError : Error {
 }
 
 public protocol PWMInterface {
-    func initPWM() throws
-    func startPWM(period ns: Int, duty percent: Float)
-    func stopPWM()
+    func enable() throws
+    func start(period ns: Int, duty percent: Float)
+    func stop()
     
-    func initPWMPattern(bytes count: Int, at frequency: Int, with resetDelay: Int, dutyzero: Int, dutyone: Int)
+    func initPattern(bytes count: Int, at frequency: Int, with resetDelay: Int, dutyzero: Int, dutyone: Int)
     func sendDataWithPattern(values: [UInt8]) throws
     func waitOnSendData() throws
     func cleanupPattern() throws
