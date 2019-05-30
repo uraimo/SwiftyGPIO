@@ -21,7 +21,7 @@ matrix:
           sudo: required
         - os:   Linux
           dist: trusty
-          env:  SWIFT_SNAPSHOT_NAME="https://swift.org/builds/swift-5.0-release/ubuntu1404/swift-5.0-RELEASE/swift-5.0-RELEASE-ubuntu14.04.tar.gz"
+          env:  SWIFT_SNAPSHOT_NAME="https://swift.org/builds/swift-5.0.1-release/ubuntu1404/swift-5.0.1-RELEASE/swift-5.0.1-RELEASE-ubuntu14.04.tar.gz"
           sudo: required
         - os:   osx
           osx_image: xcode9
@@ -29,6 +29,8 @@ matrix:
           osx_image: xcode9.2
         - os:   osx
           osx_image: xcode9.3
+        - os:   osx
+          osx_image: xcode10.2
 
 before_install:
     - ./.travis.d/before-install.sh
