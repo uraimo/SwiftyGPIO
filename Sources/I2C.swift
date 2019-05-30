@@ -222,7 +222,21 @@ public final class SysFSI2C: I2CInterface {
     public func isReachable(_ address: Int) -> Bool {
         setSlaveAddress(address)
 
-        let r =  i2c_smbus_read_byte()
+        var r: Int32 =  -1
+        switch(address){
+            case 0x3...0x2f:
+                r =  i2c_smbus_write_quick(value: 0)
+            case 0x30...0x37:
+                r =  i2c_smbus_read_byte()
+            case 0x38...0x4f:
+                r = i2c_smbus_write_quick(value: 0)
+            case 0x50...0x5f:
+                r =  i2c_smbus_read_byte()
+            case 0x60...0x77:
+                r =  i2c_smbus_write_quick(value: 0)
+            default:
+                r =  i2c_smbus_read_byte()
+        }
 
         guard r >= 0 else { return false }
 
