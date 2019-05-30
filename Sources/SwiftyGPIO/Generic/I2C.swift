@@ -146,6 +146,8 @@ public final class SysFSI2C: I2CInterface {
         try setSlaveAddress(address)
 
         var r: Int32 =  -1
+        
+        // Mimic the behaviour of i2cdetect, performing bogus read/quickwrite depending on the address
         switch(address){
             case 0x3...0x2f:
                 r =  i2c_smbus_write_quick(value: 0)
