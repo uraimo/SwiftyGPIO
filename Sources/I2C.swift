@@ -459,10 +459,9 @@ public final class SysFSI2C: I2CInterface {
 
     private func i2c_smbus_write_block_data(command: UInt8, values: [UInt8]) -> Int32 {
 
-        guard values.count<I2C_MAX_PAYLOAD_LENGTH else { fatalError("Invalid data length!") }
-        let len = (values.count<I2C_DEFAULT_PAYLOAD_LENGTH) ? I2C_DEFAULT_PAYLOAD_LENGTH : values.count+1
+        guard values.count<=I2C_DEFAULT_PAYLOAD_LENGTH else { fatalError("Invalid data length, can't send more than \(I2C_DEFAULT_PAYLOAD_LENGTH) bytes!") }
         
-        var data = [UInt8](repeating:0, count: len)
+        var data = [UInt8](repeating:0, count: values.count+1)
 
         for i in 1...values.count {
             data[i] = values[i-1]
@@ -477,10 +476,9 @@ public final class SysFSI2C: I2CInterface {
 
     private func i2c_smbus_write_i2c_block_data(command: UInt8, values: [UInt8]) -> Int32 {
 
-        guard values.count<I2C_MAX_PAYLOAD_LENGTH else { fatalError("Invalid data length!") }
-        let len = (values.count<I2C_DEFAULT_PAYLOAD_LENGTH) ? I2C_DEFAULT_PAYLOAD_LENGTH : values.count+1
+        guard values.count<=I2C_DEFAULT_PAYLOAD_LENGTH else { fatalError("Invalid data length, can't send more than \(I2C_DEFAULT_PAYLOAD_LENGTH) bytes!") }
         
-        var data = [UInt8](repeating:0, count: len)
+        var data = [UInt8](repeating:0, count: values.count+1)
 
         for i in 1...values.count {
             data[i] = values[i-1]
@@ -514,7 +512,6 @@ internal let I2C_RDWR: UInt = 0x707
 internal let I2C_PEC: UInt = 0x708
 internal let I2C_SMBUS: UInt = 0x720
 internal let I2C_DEFAULT_PAYLOAD_LENGTH: Int = 32
-internal let I2C_MAX_PAYLOAD_LENGTH: Int = 255
 internal let I2CBASEPATH="/dev/i2c-"
 
 // MARK: - Darwin / Xcode Support
