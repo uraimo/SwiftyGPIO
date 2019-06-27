@@ -296,14 +296,17 @@ func isReachable(_ address: Int) -> Bool
 func setPEC(_ address: Int, enabled: Bool)
 ```
 
-You should choose the read method to use depending on the fact that your device supports multiple registers (`command` in SMBus parlance) and depending of the size of the register you are going to read from:
+You should choose the read method to use depending on whatever of not your device supports multiple registers (`command` in SMBus parlance) and depending of the size of the register you are going to read from:
 
 ```swift
 func readByte(_ address: Int) -> UInt8
 func readByte(_ address: Int, command: UInt8) -> UInt8
 func readWord(_ address: Int, command: UInt8) -> UInt16
 func readData(_ address: Int, command: UInt8) -> [UInt8]
+func readI2CData(_ address: Int, command: UInt8) -> [UInt8]
 ```
+
+Reading and writing data blocks supports two modes, a standard SMBus mode (`readData` and `writeData`) that prepends the length of the block before the actual data, and an old style I2C mode (`readI2CData` and `writeI2CData`) that just send the data without additional metadata. Depending on the device, only one of the two modes will be supported.
 
 Let's suppose that we want to read the seconds register (id 0) from a DS1307 RTC clock, that has an I2C address of 0x68:
 
@@ -320,6 +323,7 @@ func writeByte(_ address: Int, value: UInt8)
 func writeByte(_ address: Int, command: UInt8, value: UInt8)
 func writeWord(_ address: Int, command: UInt8, value: UInt16)
 func writeData(_ address: Int, command: UInt8, values: [UInt8])
+func writeI2CData(_ address: Int, command: UInt8, values: [UInt8])
 ```
 
 While using the I2C functionality doesn't require additional software to function, the tools contained in `i2c-tools` are useful to perform I2C transactions manually to verify that everything is working correctly.
@@ -327,6 +331,8 @@ While using the I2C functionality doesn't require additional software to functio
 For example, I recommend to always check if your device has been connected correctly running `i2cdetect -y 1`. More information on I2C, and configuration instruction for the Raspberry Pi, are available [on Sparkfun](https://learn.sparkfun.com/tutorials/raspberry-pi-spi-and-i2c-tutorial).  
 
 The `Example/` directory contains a Swift implementation of *i2cdetect* and could be a good place to start experimenting.
+
+The `docs/` directory contains instead a simple guide to [debug communication issues with I2C devices](https://github.com/uraimo/SwiftyGPIO/blob/master/docs/i2c-debugging.md).
 
 ### PWM
 
