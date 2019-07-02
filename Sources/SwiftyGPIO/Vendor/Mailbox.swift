@@ -174,12 +174,17 @@ public struct MailBox {
         filename = "/tmp/swifty-mailbox-" + String(getpid())
         unlink(filename)
 
-      #if os(Linux)
+      #if arch(arm) 
         if mknod(filename, S_IFCHR|0600, swift_makedev(100, 0)) < 0 {
             perror("Failed to create mailbox device\n")
             return -1
         }
-        #endif
+      #elseif os(Linux) 
+        if mknod(filename, S_IFCHR|0600, UInt(swift_makedev(100, 0))) < 0 {
+            perror("Failed to create mailbox device\n")
+            return -1
+        }
+      #endif
 
         file_desc = open(filename, 0)
         if file_desc < 0 {
