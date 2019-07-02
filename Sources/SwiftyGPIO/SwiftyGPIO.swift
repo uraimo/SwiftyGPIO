@@ -312,15 +312,16 @@ public protocol I2CInterface {
     func readByte(_ address: Int, command: UInt8) throws -> UInt8
     func readWord(_ address: Int, command: UInt8) throws -> UInt16
     func readData(_ address: Int, command: UInt8) throws -> [UInt8]
+    func readI2CData(_ address: Int, command: UInt8) throws -> [UInt8]
     func writeQuick(_ address: Int) throws
     func writeByte(_ address: Int, value: UInt8) throws
     func writeByte(_ address: Int, command: UInt8, value: UInt8) throws
     func writeWord(_ address: Int, command: UInt8, value: UInt16) throws
     func writeData(_ address: Int, command: UInt8, values: [UInt8]) throws
+    func writeI2CData(_ address: Int, command: UInt8, values: [UInt8]) throws
     // One-shot r/w not provided
 }
-
-
+                 
 //MARK: - PWM
 
 extension SwiftyGPIO {
