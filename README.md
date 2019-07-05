@@ -2,7 +2,7 @@
     <img width="500" height="200" src="logo.svg" alt="SwiftyGPIO"/>
     <br/>
 	<a href="https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/LICENSE"><img src="http://img.shields.io/badge/License-MIT-blue.svg?style=flat"/></a>
-	<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/Swift-4.x-orange.svg?style=flat"/></a> 
+	<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/Swift-5.x-orange.svg?style=flat"/></a> 
 	<a href="https://slackpass.io/swift-arm"><img src="https://img.shields.io/badge/Slack-swift/arm-red.svg?style=flat"/></a>
 	<a href="https://travis-ci.org/uraimo/SwiftyGPIO"><img src="https://travis-ci.org/uraimo/SwiftyGPIO.svg?branch=master" /></a>
 </p>
@@ -49,7 +49,8 @@ Examples of  *[device libraries](#libraries)* and *[complete projects](#awesome-
 
 The following boards are supported and have been tested with recent releases of Swift:
 
-* Raspberry Pi 3, 3B+
+* Raspberry Pi 4
+* Raspberry Pi 3, 3A+, 3B+
 * Raspberry Pi 2 (Thanks to [@iachievedit](https://twitter.com/iachievedit))
 * Raspberry Pi Zero W
 * Raspberry Pi Zero (Thanks to [@MacmeDan](https://twitter.com/MacmeDan))
@@ -67,11 +68,11 @@ Please keep in mind that Swift on ARM is a completely community-driven effort, a
 
 ## Installation
 
-To use this library, you'll need a Linux ARM(ARMv7/8 or ARMv6) board with Swift 3.x/4.x.
+To use this library, you'll need a Linux ARM(ARMv7/8 or ARMv6) board with Swift 3.x/4.x/5.x.
 
-If you have a RaspberryPi (A,B,A+,B+,Zero,ZeroW,2,3) with Ubuntu or Raspbian, get Swift 4.2.x from [here](https://github.com/uraimo/buildSwiftOnARM/releases/latest) or follow the instruction from [buildSwiftOnARM](https://github.com/uraimo/buildSwiftOnARM) to build it yourself in a few hours.
+If you have a RaspberryPi (A,B,A+,B+,Zero,ZeroW,2,3,4) with Ubuntu or Raspbian, get Swift 5.x from [here](https://github.com/uraimo/buildSwiftOnARM/releases/latest) or follow the instruction from [buildSwiftOnARM](https://github.com/uraimo/buildSwiftOnARM) to build it yourself in a few hours.
 
-I always recommend to try one of the latest binaries available (either Ubuntu Mate or Raspbian) before putting in the time to compile it yourself, those binaries could(and do most of the times) also work on seemingly different OSes and on different boards.
+I always recommend to try one of the latest binaries available (either Ubuntu or Raspbian) before putting in the time to compile it yourself, those binaries could(and do most of the times) also work on other Debian-bases distibutions and on different boards.
 
 And alternatively, you can setup a cross-compiling toolchain and build ARM binaries (Ubuntu/Raspbian) from a Mac, thanks again to the work of Helge Heß (and Johannes Weiß for implementing it in SPM), read more about that [here](https://github.com/AlwaysRightInstitute/swift-mac2arm-x-compile-toolchain).
 
@@ -139,7 +140,7 @@ The following are the possible values for the predefined boards:
 * .RaspberryPiRev2 (Pi A,B Revision 2, post-2012, 26 pin header) 
 * .RaspberryPiPlusZero (Raspberry Pi A+ and B+, Raspberry Zero/W, all with a 40 pin header)
 * .RaspberryPi2 (Raspberry Pi 2 with a 40 pin header)
-* .RaspberryPi3 (Raspberry Pi 3 with a 40 pin header)
+* .RaspberryPi3 (Raspberry Pi 3/4 with a 40 pin header)
 * .BeagleBoneBlack (BeagleBone Black)
 * .CHIP (the $9 C.H.I.P. computer).
 * .OrangePi
