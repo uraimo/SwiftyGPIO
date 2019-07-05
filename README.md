@@ -74,7 +74,9 @@ If you have a RaspberryPi (A,B,A+,B+,Zero,ZeroW,2,3,4) with Ubuntu or Raspbian, 
 
 I always recommend to try one of the latest binaries available (either Ubuntu or Raspbian) before putting in the time to compile it yourself, those binaries could(and do most of the times) also work on other Debian-bases distibutions and on different boards.
 
-And alternatively, you can setup a cross-compiling toolchain and build ARM binaries (Ubuntu/Raspbian) from a Mac, thanks again to the work of Helge Heß (and Johannes Weiß for implementing it in SPM), read more about that [here](https://github.com/AlwaysRightInstitute/swift-mac2arm-x-compile-toolchain).
+An alternative way to get these Swift binaries on your Raspberry Pi is through the [Swift on Balena](https://github.com/wlisac/swift-on-balena) project that provides well organized IoT focused Docker images.
+
+You can also setup a cross-compiling toolchain and build ARM binaries (Ubuntu/Raspbian) from a Mac, thanks again to the work of Helge Heß (and Johannes Weiß for implementing it in SPM), read more about that [here](https://github.com/AlwaysRightInstitute/swift-mac2arm-x-compile-toolchain).
 
 To start your project add SwiftyGPIO as a dependency in your `Package.swift`:
 
