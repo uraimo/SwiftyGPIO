@@ -42,6 +42,7 @@ Examples of  *[device libraries](#libraries)* and *[complete projects](#awesome-
 - [Built with SwiftyGPIO](#built-with-swiftygpio)
     - [Device Libraries](#libraries)
     - [Awesome Projects](#awesome-projects)
+    - [Support Libraries](#support-libraries)
 - [Additional documentation](#additional-documentation)
 
 
@@ -570,7 +571,9 @@ Notice that we are converting the 0x9F `Int` using the constructor `UInt8(trunca
 A few projects and libraries built using SwiftyGPIO. Have you built something that you want to share? Let me know!
 
 ### Libraries
+*Libraries for specific devices.*
 
+* [SwiftyOLED](https://github.com/3Qax/SwiftyOLED) - A Swift library for OLED displays based on SSD1306 and SSD1305.
 * [SHT20](https://github.com/samco182/SwiftySHT20) - A Swift library for the I2C SHT20 Humidity and Temperature Sensor.
 * [LSM303](https://github.com/flx/LSM303) - Triple-axis Accelerometer+Magnetometer (Compass) I2C board library.
 * [PCA9685](https://github.com/Kaiede/PCA9685/tree/swiftyGpio) - 16-Channel 12-bit PWM/Servo Driver PCA9685 I2C board library.
@@ -590,8 +593,9 @@ A few projects and libraries built using SwiftyGPIO. Have you built something th
 * [RCWL-0516](https://github.com/uraimo/RCWL-0516-Radar.swift) - A Swift library for the RCWL-0516 Microwave Radar.
 * [DS18B20](https://github.com/uraimo/DS18B20.swift) - A library for the DS18B20 temperature sensor.
 
-
 ### Awesome Projects
+*Complete IoT projects.*
+
 * [SwiftyLinkerKit](https://github.com/SwiftyLinkerKit) - Swift Modules to build LinkerKit Projects.
 * [Swifty Adafruit Servo HAT](https://github.com/ezrover/SwiftyServo) - Control the Adafruit Servo HAT with PCA9685 and I2C with Swift.
 * [Experimental Swift on the Raspberry Pi](https://medium.com/@piotr.gorzelany/experimental-swift-8c9131b62a9d) [(GH)](https://github.com/pgorzelany/experimental-swift-server) - Experimenting with Swift and a few different devices.
@@ -603,6 +607,11 @@ A few projects and libraries built using SwiftyGPIO. Have you built something th
 * [Swift... Swift Everywhere](https://medium.com/@darthpelo/swift-swift-everywhere-eba445ef2bcd) - A tutorial that builds a complete platform, an iOS app controlling leds through a Vapor-based REST service.
 * [Bluetooth Smart Lock](https://github.com/colemancda/Lock) - A smart lock controller with companion iOS app that unlocks 12v solenoid locks via Bluetooth.
  
+### Support libraries
+*Additional libraries that could be useful for your IoT projects.*
+
+* [SwiftyGFX](https://github.com/3Qax/SwiftyGFX) - A library with generic graphical functions useful when working with dot matrix displays.
+* [PureSwift's Bluetooth](https://github.com/PureSwift/Bluetooth) - A suite of projects to add Bluetooth functionality to your  Linux projects.
 
 ## Additional documentation
 
