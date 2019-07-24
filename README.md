@@ -573,25 +573,26 @@ A few projects and libraries built using SwiftyGPIO. Have you built something th
 ### Libraries
 *Libraries for specific devices.*
 
-* [SwiftyOLED](https://github.com/3Qax/SwiftyOLED) - A Swift library for OLED displays based on SSD1306 and SSD1305.
-* [SHT20](https://github.com/samco182/SwiftySHT20) - A Swift library for the I2C SHT20 Humidity and Temperature Sensor.
+* [SwiftyXBee](https://github.com/samco182/SwiftyXBee) - Library for the XBee module to communicate with Zigbee devices in API mode.
+* [SwiftyOLED](https://github.com/3Qax/SwiftyOLED) - Library for OLED displays based on SSD1306 and SSD1305.
+* [SHT20](https://github.com/samco182/SwiftySHT20) - Library for the I2C SHT20 Humidity and Temperature Sensor.
 * [LSM303](https://github.com/flx/LSM303) - Triple-axis Accelerometer+Magnetometer (Compass) I2C board library.
 * [PCA9685](https://github.com/Kaiede/PCA9685/tree/swiftyGpio) - 16-Channel 12-bit PWM/Servo Driver PCA9685 I2C board library.
 * [TM1637](https://github.com/AlwaysRightInstitute/SwiftyTM1637) - Library for the TM1637 7-segment driver chip.
-* [HC-SR04 Ultrasonic sensors](https://github.com/konifer44/HCSR04.swift) - A library for the HC-SR04 ultrasonic ranging sensor.
-* [HT16K33 Leds](https://github.com/jrahaim/swift-raspberry-pi-adafruit-led) - A project that uses the HT16K33 to drive led matrices and segment displays via I2C.
-* [WS281x Leds](https://github.com/uraimo/WS281x.swift) - A library for WS2812x (WS2811,WS2812,WS2812B) RGB led strips, rings, sticks, matrices, etc...
+* [HC-SR04 Ultrasonic sensors](https://github.com/konifer44/HCSR04.swift) - Library for the HC-SR04 ultrasonic ranging sensor.
+* [HT16K33 Leds](https://github.com/jrahaim/swift-raspberry-pi-adafruit-led) - Project that uses the HT16K33 to drive led matrices and segment displays via I2C.
+* [WS281x Leds](https://github.com/uraimo/WS281x.swift) - Library for WS2812x (WS2811,WS2812,WS2812B) RGB led strips, rings, sticks, matrices, etc...
 * [Nokia5110(PCD8544) 128x64 LCD](http://github.com/uraimo/5110lcd_pcd8544.swift) - Show text and graphics on a Nokia 3110/5110 LCD display.
 * [HD44780U Character LCD](https://github.com/uraimo/HD44780CharacterLCD.swift) - Show text on character LCDs controlled by the HD44780 or one of its clones.
 * DHTxx Temperature Sensor [#1](https://github.com/micheltlutz/DHT-SwiftyGPIO), [#2](https://github.com/pj4533/dhtxx) - Read temperature and humidity values from sensors of the DHT family (DHT11, DHT22, AM2303).
 * [SG90 Servo Motor](https://github.com/uraimo/SG90Servo.swift) - Drives a SG90 servo motor via PWM but can be easily modified to use other kind of servos.
 * [MCP3008 10 bits ADC](https://github.com/uraimo/MCP3008.swift) - Convert analog values to integers with this SPI-driven ADC.
 * [u-Blox GPS Receivers](https://github.com/uraimo/UBloxGPS.swift) - Get location data from boards with the u-Blox 6/7/8 family of A-GPS receivers with an UART serial connection (e.g. NEO6M).
-* [MPU-6050 Accelerometer/Gyro](https://github.com/uraimo/MPU-6050.swift) - A library for the MPU-6050 (and MPU-6000 family) Accelerometer and Gyroscope.
-* [DS1307 RTC](https://github.com/uraimo/DS1307.swift) - A library for the DS1307 (DS1302, DS3231) I2C Real-Time Clock.
-* [Wii Nunchuck](https://github.com/uraimo/Nunchuck.swift) - A library for the Wii Nunchuck controller.
-* [RCWL-0516](https://github.com/uraimo/RCWL-0516-Radar.swift) - A Swift library for the RCWL-0516 Microwave Radar.
-* [DS18B20](https://github.com/uraimo/DS18B20.swift) - A library for the DS18B20 temperature sensor.
+* [MPU-6050 Accelerometer/Gyro](https://github.com/uraimo/MPU-6050.swift) - Library for the MPU-6050 (and MPU-6000 family) Accelerometer and Gyroscope.
+* [DS1307 RTC](https://github.com/uraimo/DS1307.swift) - Library for the DS1307 (DS1302, DS3231) I2C Real-Time Clock.
+* [Wii Nunchuck](https://github.com/uraimo/Nunchuck.swift) - Library for the Wii Nunchuck controller.
+* [RCWL-0516](https://github.com/uraimo/RCWL-0516-Radar.swift) - Library for the RCWL-0516 Microwave Radar.
+* [DS18B20](https://github.com/uraimo/DS18B20.swift) - Library for the DS18B20 temperature sensor.
 
 ### Awesome Projects
 *Complete IoT projects.*
