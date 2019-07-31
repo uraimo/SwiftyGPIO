@@ -52,6 +52,7 @@ public final class SysFSUART: UARTInterface {
                 close(fd)
                 continue
             }
+            return
         }
         return nil
     }
