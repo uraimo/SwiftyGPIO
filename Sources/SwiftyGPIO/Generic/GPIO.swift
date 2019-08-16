@@ -277,7 +277,7 @@ fileprivate extension SysFSGPIO {
 
 extension SysFSGPIO: CustomStringConvertible {
     public var description: String {
-        return "\(name)<\(id)> with direction:<\(direction), edge:\(edge), active:\(activeLow),pull:\(pull)>: \(value)"
+        return "\(name)<\(id)> with direction:<\(direction), edge:\(edge), active:\(activeLow)>: \(value)"
     }
 }
 
