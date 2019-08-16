@@ -272,7 +272,7 @@ fileprivate extension GPIO {
 
 extension GPIO: CustomStringConvertible {
     public var description: String {
-        return "\(name)<\(direction),\(edge),\(activeLow),\(pull)>: \(value)"
+        return "\(name)<\(direction),\(edge),\(activeLow)>: \(value)"
     }
 }
 
