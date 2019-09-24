@@ -597,6 +597,9 @@ A few projects and libraries built using SwiftyGPIO. Have you built something th
 
 
 ### Awesome Projects
+_Complete IoT projects._
+
+* [Hey Siri, Open my garage door](https://pfandrade.me/blog/hey-siri-open-my-garage-door/) - A complete project to open a garage door via HomeKit.
 * [SwiftyLinkerKit](https://github.com/SwiftyLinkerKit) - Swift Modules to build LinkerKit Projects.
 * [Swifty Adafruit Servo HAT](https://github.com/ezrover/SwiftyServo) - Control the Adafruit Servo HAT with PCA9685 and I2C with Swift.
 * [Experimental Swift on the Raspberry Pi](https://medium.com/@piotr.gorzelany/experimental-swift-8c9131b62a9d) [(GH)](https://github.com/pgorzelany/experimental-swift-server) - Experimenting with Swift and a few different devices.
