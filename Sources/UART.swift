@@ -54,6 +54,7 @@ extension SwiftyGPIO {
 // MARK: UART
 public protocol UARTInterface {
     func configureInterface(speed: UARTSpeed, bitsPerChar: CharSize, stopBits: StopBits, parity: ParityType)
+    func hasAvailableData() throws -> Bool
     func readString() -> String
     func readLine() -> String
     func readData() -> [CChar]
@@ -147,6 +148,10 @@ public enum UARTSpeed {
     }
 }
 
+public enum IOCTLError: Error {
+    case callExecutionFailed(detail: String)
+}
+
 /// UART via SysFS
 public final class SysFSUART: UARTInterface {
     var device: String
@@ -206,6 +211,14 @@ public final class SysFSUART: UARTInterface {
         stopBits.configure(&tty)
 
         applyConfiguration()
+    }
+    
+    public func hasAvailableData() throws -> Bool {
+        var bytesToRead = 0
+        let result = ioctl(fd, UInt(FIONREAD), &bytesToRead)
+        
+        guard result >= 0 else { throw IOCTLError.callExecutionFailed(detail: String(format: "%s", strerror(errno))) }
+        return bytesToRead > 0
     }
 
     public func readLine() -> String {
@@ -272,6 +285,8 @@ public final class SysFSUART: UARTInterface {
 
 // MARK: - Darwin / Xcode Support
 #if os(OSX) || os(iOS)
+    private let FIONREAD = 0x541B // Cannot be found on Darwin, only on Glibc. Added this to get it to compile with XCode.
+
     private var O_SYNC: CInt { fatalError("Linux only") }
     private var CRTSCTS: CInt { fatalError("Linux only") }
 
