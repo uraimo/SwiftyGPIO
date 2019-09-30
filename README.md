@@ -491,10 +491,11 @@ func readData() -> [CChar]
 func writeString(_ value: String)
 func writeData(_ values: [CChar])
 
+func hasAvailableData() throws -> Bool
 func readLine() -> String
 ```
 
-A specific method that reads lines of text (`\n` is used as line terminator, the serial read is still non-canonical) is also provided.
+A method to know if there is available data on the UART serial port and a specific method that reads lines of text (`\n` is used as line terminator, the serial read is still non-canonical) are also provided.
 
 ### 1-Wire
 
