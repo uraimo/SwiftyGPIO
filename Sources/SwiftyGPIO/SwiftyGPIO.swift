@@ -467,6 +467,7 @@ enum UARTError : Error {
 
 public protocol UARTInterface {
     func configureInterface(speed: UARTSpeed, bitsPerChar: CharSize, stopBits: StopBits, parity: ParityType) throws
+    func hasAvailableData() throws -> Bool
     func readString() throws -> String
     func readLine() throws -> String
     func readData() throws -> [CChar]

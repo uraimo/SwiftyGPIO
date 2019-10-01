@@ -11,6 +11,8 @@
 <i>A Swift library for hardware projects on Linux/ARM boards with support for GPIOs/SPI/I2C/PWM/UART/1Wire.</i>
 </p>
 
+//TODO: Fix examples!
+
 ![](images/banner.jpg)
 
 ## Summary
@@ -482,18 +484,21 @@ Before we can start trasmitting data, you need to configure the serial port, spe
 uart.configureInterface(speed: .S9600, bitsPerChar: .Eight, stopBits: .One, parity: .None)
 ```
 
-Once the port is configured you can start reading or writing strings of sequence of `UInt8` with one of the specific methods of `UARTInterface`:
+Once the port is configured you can start reading or writing strings of sequence of `UInt8` with one of the specific methods (all of them are blocking calls) of `UARTInterface`:
 
 ```swift
-func readString() -> String
-func readData() -> [CChar]
-func writeString(_ value: String)
-func writeData(_ values: [CChar])
-
-func readLine() -> String
+    func readString() throws -> String
+    func readData() throws -> [CChar]
+    func writeString(_ value: String)
+    func writeData(_ values: [CChar])
 ```
 
-A specific method that reads lines of text (`\n` is used as line terminator, the serial read is still non-canonical) is also provided.
+A method to check if there is available data on the UART serial port (non-blocking) and one that reads lines of text (`\n` is used as line terminator, the serial read is still non-canonical) is also provided.
+
+```swift
+    func hasAvailableData() throws -> Bool
+    func readLine() throws -> String
+```
 
 ### 1-Wire
 

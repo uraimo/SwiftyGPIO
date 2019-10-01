@@ -81,6 +81,14 @@ public final class SysFSUART: UARTInterface {
         try applyConfiguration()
     }
 
+    public func hasAvailableData() throws -> Bool {
+        var bytesToRead = 0
+        let result = ioctl(fd, UInt(FIONREAD), &bytesToRead)
+
+        guard result >= 0 else { throw UARTError.IOError(String(format: "%s", strerror(errno))) }
+        return bytesToRead > 0
+    }
+
     public func readLine() throws -> String {
         var buf = [CChar](repeating:0, count: 4097) //4096 chars at max in canonical mode
         var ptr = UnsafeMutablePointer<CChar>(&buf)
@@ -142,6 +150,8 @@ public final class SysFSUART: UARTInterface {
 
 // MARK: - Darwin / Xcode Support
 #if os(OSX) || os(iOS)
+    private let FIONREAD = 0x541B // Cannot be found on Darwin, only on Glibc. Added this to get it to compile with XCode.
+
     private var O_SYNC: CInt { fatalError("Linux only") }
     private var CRTSCTS: CInt { fatalError("Linux only") }
 
