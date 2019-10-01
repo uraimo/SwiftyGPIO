@@ -1,0 +1,19 @@
+on: [push]
+
+jobs:
+  armv7_job:
+    runs-on: ubuntu-18.04
+    name: Build on ARMv7 
+    steps:
+    - name: Build with Swift on ARMv7
+      uses: uraimo/run-on-arch-action@master
+      with:
+        architecture: armv7
+        distribution: ubuntu18.04
+        run: |
+          apt update
+          apt install -y libatomic1 libbsd0 clang libicu-dev libcurl4-nss-dev
+          apt install -y curl
+          curl -OL https://github.com/uraimo/buildSwiftOnARM/releases/download/5.0.3/swift-5.0.3-armv7-Ubuntu1804.tgz
+          tar xzf swift-5.0.3-armv7-Ubuntu1804.tgz
+          ./usr/bin/swift build
