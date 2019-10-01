@@ -6,7 +6,7 @@ jobs:
     name: Build on ARMv7 
     steps:
       - uses: actions/checkout@v1.0.0
-      - uses: uraimo/run-on-arch-action@v1.0.2
+      - uses: uraimo/run-on-arch-action@v1.0.3
         with:
           architecture: armv7
           distribution: ubuntu18.04
