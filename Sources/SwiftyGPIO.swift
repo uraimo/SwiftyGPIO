@@ -225,9 +225,9 @@ fileprivate extension GPIO {
             self.direction = .IN
             self.edge = .BOTH
 
-            let fp = open(gpath, O_RDONLY)
-            var buf: [Int8] = [0, 0, 0] //Dummy read to discard current value
-            read(fp, &buf, 3)
+            let fp = open(gpath, O_RDWR)
+            var buf: [Int8] = [0, 0, 0]
+            read(fp, &buf, 3) //Dummy read to discard current value
 
           #if swift(>=4.0)
             var pfd = pollfd(fd:fp, events:Int16(truncatingIfNeeded:POLLPRI), revents:0)
