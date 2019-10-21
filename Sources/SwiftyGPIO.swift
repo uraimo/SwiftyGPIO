@@ -222,7 +222,7 @@ fileprivate extension GPIO {
         //Ignored by Linux
         guard #available(iOS 10.0, macOS 10.12, *) else {return nil}
 
-        usleep(100000) //100ms sleep: Workaround for poll blocking forever the first time the poll a gpio after boot
+        usleep(100000) //100ms sleep: Workaround for poll blocking forever the first time we poll a gpio after the initial export
 
         let thread = Thread {
 
