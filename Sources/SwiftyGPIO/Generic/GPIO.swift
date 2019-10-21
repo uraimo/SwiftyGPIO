@@ -131,6 +131,7 @@ public class SysFSGPIO : GPIOInterface {
     public func onFalling(_ closure: @escaping (GPIOInterface) -> Void) {
         intFalling = (func: closure, lastCall: nil)
         if intThread == nil {
+            if !exported {enableIO(id)}
             intThread = makeInterruptThread()
             listening = true
             intThread?.start()
@@ -140,6 +141,7 @@ public class SysFSGPIO : GPIOInterface {
     public func onRaising(_ closure: @escaping (GPIOInterface) -> Void) {
         intRaising = (func: closure, lastCall: nil)
         if intThread == nil {
+            if !exported {enableIO(id)}
             intThread = makeInterruptThread()
             listening = true
             intThread?.start()
@@ -149,6 +151,7 @@ public class SysFSGPIO : GPIOInterface {
     public func onChange(_ closure: @escaping (GPIOInterface) -> Void) {
         intChange = (func: closure, lastCall: nil)
         if intThread == nil {
+            if !exported {enableIO(id)}
             intThread = makeInterruptThread()
             listening = true
             intThread?.start()
