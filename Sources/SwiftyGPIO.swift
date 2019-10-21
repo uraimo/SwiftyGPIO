@@ -112,6 +112,7 @@ public class GPIO {
     public func onFalling(_ closure: @escaping (GPIO) -> Void) {
         intFalling = (func: closure, lastCall: nil)
         if intThread == nil {
+            if !exported {enableIO(id)}
             intThread = makeInterruptThread()
             listening = true
             intThread?.start()
@@ -121,6 +122,7 @@ public class GPIO {
     public func onRaising(_ closure: @escaping (GPIO) -> Void) {
         intRaising = (func: closure, lastCall: nil)
         if intThread == nil {
+            if !exported {enableIO(id)}
             intThread = makeInterruptThread()
             listening = true
             intThread?.start()
@@ -130,6 +132,7 @@ public class GPIO {
     public func onChange(_ closure: @escaping (GPIO) -> Void) {
         intChange = (func: closure, lastCall: nil)
         if intThread == nil {
+            if !exported {enableIO(id)}
             intThread = makeInterruptThread()
             listening = true
             intThread?.start()
