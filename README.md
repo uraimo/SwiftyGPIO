@@ -237,7 +237,7 @@ This functionality is extremely useful when using switches, that tend to generat
 
 If your board has a SPI connection and SwiftyGPIO has it among its presets, a list of the available SPI channels can be obtained by calling `hardwareSPIs(for:)` with one of the predefined boards.
 
-On RaspberryPi and other boards the hardware SPI SysFS interface is not enabled by default, check out the setup guide on [wiki](https://github.com/uraimo/SwiftyGPIO/wiki/Enabling-SPI-on-RaspberryPi-and-others).
+On RaspberryPi and other boards the hardware SPI SysFS interface is not enabled by default, check out the setup guide on [wiki](https://github.com/uraimo/SwiftyGPIO/wiki/Enabling-SPI-on-RaspberryPi-and-others) to enable it if needed using `raspi-config`.
 
 Let's see some examples using a RaspberryPi 3 that has two bidirectional SPIs, managed by SwiftyGPIO as two SPIObjects:
  
@@ -293,6 +293,8 @@ To obtain a reference to the `I2CInterface` object, call the `hardwareI2Cs(for:)
 let i2cs = SwiftyGPIO.hardwareI2Cs(for:.RaspberryPi3)!
 let i2c = i2cs[1]
 ```
+
+On Raspberry Pi and other boards this interface could not enabled by default, always verify its state checking the setup guide on the [wiki](https://github.com/uraimo/SwiftyGPIO/wiki/Enabling-I2C-on-the-Raspberry-Pi) to enable it if needed using `raspi-config`.
 
 This object provide methods to read and write registers of different sizes and to verify that a device at a certain address is reachable or to enable a CRC on the protocol's messages:
 
@@ -477,6 +479,8 @@ If your board support the UART serial ports feature (disable the login on serial
 let uarts = SwiftyGPIO.UARTs(for:.RaspberryPi3)!
 var uart = uarts[0]
 ```
+
+On Raspberry Pi and other boards this interface could not enabled by default, always verify its state checking the setup guide on the [wiki](https://github.com/uraimo/SwiftyGPIO/wiki/UART-Setup) to enable it if needed using `raspi-config`.
 
 Before we can start trasmitting data, you need to configure the serial port, specifying: the speed (from 9600bps to 115200bps), the character size (6,7 or 8 bits per character), the number of stop bits (1 or 2) and the parity of your signal (no parity, odd or even). Software and hardware flow control are both disabled when using this library.
 
