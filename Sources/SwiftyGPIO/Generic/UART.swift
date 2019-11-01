@@ -101,7 +101,7 @@ public final class SysFSUART: UARTInterface {
             }
             ptr += 1
             pos += 1
-        } while buf[pos-1] != CChar(UInt8(ascii: "\n"))
+        } while (buf[pos-1] != CChar(UInt8(ascii: "\n"))) && (pos < buf.count-1)
 
         buf[pos] = 0
         return String(cString: &buf)
