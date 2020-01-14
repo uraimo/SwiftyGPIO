@@ -117,9 +117,13 @@ public final class SysFSUART: UARTInterface {
         var buf = [CChar](repeating:0, count: 4096) //4096 chars at max in canonical mode
 
         let n = read(fd, &buf, buf.count * MemoryLayout<CChar>.stride)
+        
+        usleep(100_000) //100ms sleep. Workaround for random: Index out of range: .../ContiguousArrayBuffer.swift error
+
         if n<0 {
             throw UARTError.IOError("Error while reading from UART")
         }
+        
         return Array(buf[0..<n])
     }
 
