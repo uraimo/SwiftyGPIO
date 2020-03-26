@@ -579,6 +579,7 @@ A few projects and libraries built using SwiftyGPIO. Have you built something th
 ### Libraries
 *Libraries for specific devices.*
 
+* [SwiftFlowMeter](https://github.com/samco182/SwiftFlowMeter) - A Swift library for using Hall effect based water flow sensors.
 * [SwiftyXBee](https://github.com/samco182/SwiftyXBee) - Library for the XBee module to communicate with Zigbee devices in API mode.
 * [SwiftyOLED](https://github.com/3Qax/SwiftyOLED) - Library for OLED displays based on SSD1306 and SSD1305.
 * [SHT20](https://github.com/samco182/SwiftySHT20) - Library for the I2C SHT20 Humidity and Temperature Sensor.
