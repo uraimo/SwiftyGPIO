@@ -28,7 +28,6 @@
     import Darwin.C
 #endif
 
-
 // MARK: - 1-Wire Presets
 extension SwiftyGPIO {
 
@@ -102,27 +101,26 @@ public final class SysFSOneWire: OneWireInterface {
     }
 
     private func readLine(_ fd: Int32) -> String? {
-        var buf = [CChar](repeating:0, count: 128) 
-        var ptr = UnsafeMutablePointer<CChar>(&buf)
-        var pos = 0
-
-        repeat {
-            let n = read(fd, ptr, MemoryLayout<CChar>.stride)
-            if n<0 {
-                perror("Error while reading from 1-Wire interface")
-                abort()
-            } else if n == 0 {
-                break
+        var buf = [CChar](repeating:0, count: 128)
+        return buf.withUnsafeMutableBufferPointer  { ptr -> String? in
+            let newLineChar = CChar(UInt8(ascii: "\n"))
+            var pos = 0
+            repeat {
+                let n = read(fd, ptr.baseAddress! + pos, MemoryLayout<CChar>.stride)
+                if n<0 {
+                    perror("Error while reading from 1-Wire interface")
+                    abort()
+                } else if n == 0 {
+                    break
+                }
+                pos += 1
+            } while ptr[pos-1] != newLineChar
+            if pos == 0 {
+                return nil
+            } else {
+                ptr[pos-1] = 0
+                return String(cString: ptr.baseAddress!)
             }
-            ptr += 1
-            pos += 1
-        } while buf[pos-1] != CChar(UInt8(ascii: "\n"))
-
-        if pos == 0 {
-            return nil
-        } else {
-            buf[pos-1] = 0
-            return String(cString: &buf)
         }
     }
 

@@ -223,21 +223,20 @@ public final class SysFSUART: UARTInterface {
 
     public func readLine() -> String {
         var buf = [CChar](repeating:0, count: 4097) //4096 chars at max in canonical mode
-        var ptr = UnsafeMutablePointer<CChar>(&buf)
-        var pos = 0
-
-        repeat {
-            let n = read(fd, ptr, MemoryLayout<CChar>.stride)
-            if n<0 {
-                perror("Error while reading from UART")
-                abort()
-            }
-            ptr += 1
-            pos += 1
-        } while (buf[pos-1] != CChar(UInt8(ascii: "\n"))) && (pos < buf.count-1)
-
-        buf[pos] = 0
-        return String(cString: &buf)
+        return buf.withUnsafeMutableBufferPointer  { ptr -> String in
+            let newLineChar = CChar(UInt8(ascii: "\n"))
+            var pos = 0
+            repeat {
+                let n = read(fd, ptr.baseAddress! + pos, MemoryLayout<CChar>.stride)
+                if n<0 {
+                    perror("Error while reading from UART")
+                    abort()
+                }
+                pos += 1
+            } while (ptr[pos-1] != newLineChar) && (pos < ptr.count-1)
+            ptr[pos] = 0
+            return String(cString: ptr.baseAddress!)
+        }
     }
 
     public func readString() -> String {
