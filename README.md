@@ -144,7 +144,8 @@ The following are the possible values for the predefined boards:
 * .RaspberryPiRev2 (Pi A,B Revision 2, post-2012, 26 pin header) 
 * .RaspberryPiPlusZero (Raspberry Pi A+ and B+, Raspberry Zero/W, all with a 40 pin header)
 * .RaspberryPi2 (Raspberry Pi 2 with a 40 pin header)
-* .RaspberryPi3 (Raspberry Pi 3/4 with a 40 pin header)
+* .RaspberryPi3 (Raspberry Pi 3 with a 40 pin header)
+* .RaspberryPi4 (Raspberry Pi 4 with a 40 pin header)
 * .BeagleBoneBlack (BeagleBone Black)
 * .CHIP (the $9 C.H.I.P. computer).
 * .OrangePi
