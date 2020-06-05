@@ -28,8 +28,6 @@
     import Darwin.C
 #endif
 
-import Foundation
-
 // MARK: - 1-Wire Presets
 extension SwiftyGPIO {
 
