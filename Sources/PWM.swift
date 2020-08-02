@@ -91,12 +91,12 @@ public class RaspberryPWM: PWMOutput {
     let channel: Int
     let pwmdma: Int
 
-    let BCM2708_PERI_BASE: Int
-    let GPIO_BASE: Int  // GPIO Register
-    let PWM_BASE: Int   // PWM Register
-    let CLOCK_BASE: Int // Clock Manager Register
-    let BCM2708_PHY_BASE: Int = 0x7e000000
-    let PWM_PHY_BASE: Int
+    let BCM2708_PERI_BASE: UInt
+    let GPIO_BASE: UInt  // GPIO Register
+    let PWM_BASE: UInt   // PWM Register
+    let CLOCK_BASE: UInt // Clock Manager Register
+    let BCM2708_PHY_BASE: UInt = 0x7e000000
+    let PWM_PHY_BASE: UInt
 
     var gpioBasePointer: UnsafeMutablePointer<UInt32>!
     var pwmBasePointer: UnsafeMutablePointer<UInt32>!
@@ -113,7 +113,7 @@ public class RaspberryPWM: PWMOutput {
     var patternDelay: Int = 0
     var dataLength: Int = 0
 
-    public init(gpioId: UInt, alt: UInt, channel: Int, baseAddr: Int, dmanum: Int = 5) {
+    public init(gpioId: UInt, alt: UInt, channel: Int, baseAddr: UInt, dmanum: Int = 5) {
         self.gpioId = gpioId
         self.alt = alt
         self.channel = channel
@@ -140,18 +140,18 @@ public class RaspberryPWM: PWMOutput {
         pwmBasePointer = memmap(from: mem_fd, at: PWM_BASE)
         clockBasePointer = memmap(from: mem_fd, at: CLOCK_BASE)
 
-        let DMAOffsets: [Int] = [0x00007000, 0x00007100, 0x00007200, 0x00007300,
+        let DMAOffsets: [UInt] = [0x00007000, 0x00007100, 0x00007200, 0x00007300,
                                  0x00007400, 0x00007500, 0x00007600, 0x00007700,
                                  0x00007800, 0x00007900, 0x00007a00, 0x00007b00,
                                  0x00007c00, 0x00007d00, 0x00007e00, 0x00e05000]
 
-        func dmanumToPhysicalAddress(_ dmanum: Int) -> Int {
+        func dmanumToPhysicalAddress(_ dmanum: Int) -> UInt {
             guard dmanum < DMAOffsets.count else { return 0 }
             return BCM2708_PERI_BASE + DMAOffsets[dmanum]
         }
 
         var dma_addr = dmanumToPhysicalAddress(pwmdma) // Address of a specific DMA Channel registers set
-        let pageOffset = dma_addr % PAGE_SIZE
+        let pageOffset = dma_addr % UInt(PAGE_SIZE)
         dma_addr -= pageOffset
 
         let dma_map = UnsafeMutableRawPointer(memmap(from: mem_fd, at: dma_addr))
@@ -197,7 +197,7 @@ public class RaspberryPWM: PWMOutput {
     }
 
     /// Maps a block of memory and returns the pointer
-    internal func memmap(from mem_fd: Int32, at offset: Int) -> UnsafeMutablePointer<UInt32> {
+    internal func memmap(from mem_fd: Int32, at offset: UInt) -> UnsafeMutablePointer<UInt32> {
         let m = mmap(
             nil,                 //Any adddress in our space will do
             PAGE_SIZE,          //Map length
