@@ -151,8 +151,8 @@ public class RaspberryPWM: PWMOutput {
         }
 
         var dma_addr = dmanumToPhysicalAddress(pwmdma) // Address of a specific DMA Channel registers set
-        let pageOffset = dma_addr % UInt(PAGE_SIZE)
-        dma_addr -= pageOffset
+        let pageOffset = Int( dma_addr % UInt(PAGE_SIZE) )
+        dma_addr -= UInt(pageOffset)
 
         let dma_map = UnsafeMutableRawPointer(memmap(from: mem_fd, at: dma_addr))
         dmaBasePointer = (dma_map + pageOffset).assumingMemoryBound(to: UInt32.self)
