@@ -43,6 +43,8 @@ extension SwiftyGPIO {
             fallthrough
         case .RaspberryPi3:
             return PWMRPI23
+        case .RaspberryPi4:
+            return PWMRPI4
         default:
             return nil
         }
@@ -63,6 +65,11 @@ extension SwiftyGPIO {
         0: [.P12: RaspberryPWM(gpioId: 12, alt: 0, channel:0, baseAddr: 0x3F000000), .P18: RaspberryPWM(gpioId: 18, alt: 5, channel:0, baseAddr: 0x3F000000)],
         1: [.P13: RaspberryPWM(gpioId: 13, alt: 0, channel:1, baseAddr: 0x3F000000), .P19: RaspberryPWM(gpioId: 19, alt: 5, channel:1, baseAddr: 0x3F000000)]
     ]
+    // RaspberryPi 4 PWMs, only accessible ones, divided in channels (can use only one for each channel)
+    static let PWMRPI4: [Int:[GPIOName:PWMOutput]] = [
+        0: [.P12: RaspberryPWM(gpioId: 12, alt: 0, channel:0, baseAddr: 0xFE000000), .P18: RaspberryPWM(gpioId: 18, alt: 5, channel:0, baseAddr: 0xFE000000)],
+        1: [.P13: RaspberryPWM(gpioId: 13, alt: 0, channel:1, baseAddr: 0xFE000000), .P19: RaspberryPWM(gpioId: 19, alt: 5, channel:1, baseAddr: 0xFE000000)]
+    ] 
 }
 
 // MARK: PWM
