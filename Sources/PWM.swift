@@ -204,7 +204,7 @@ public class RaspberryPWM: PWMOutput {
             PROT_READ|PROT_WRITE, // Enable reading & writting to mapped memory
             MAP_SHARED,          //Shared with other processes
             mem_fd,              //File to map
-            off_t(offset)     //Offset to GPIO peripheral
+            off_t(Int(bitPattern: offset))     //Offset to GPIO peripheral
             )!
 
         if (Int(bitPattern: m) == -1) {    //MAP_FAILED not available, but its value is (void*)-1
