@@ -175,7 +175,8 @@ public class RaspberryPWM: PWMOutput {
         let highFreqSampleReduction: UInt32 = (ns < 750) ? 10 : 1
 
         let freq = UInt32( (1_000_000_000/UInt(ns)) * 100 / UInt(highFreqSampleReduction) )
-        let (idiv, scale) = calculateDIVI(base: .PLLD, desired: UInt32(freq))                                //Using the faster (with known freq) available clock to reduce jitter
+        let clkSrc = (BCM2708_PERI_BASE != 0xFE000000)? .PLLD : .PLLDPi4 //Differend Oscillator/PLLD freq for Pi4
+        let (idiv, scale) = calculateDIVI(base: clkSrc, desired: UInt32(freq))                                //Using the faster (with known freq) available clock to reduce jitter
 
         // Configure the clock and divisor that will be used to generate the signal
         clockBasePointer.advanced(by: 41).pointee = CLKM_PASSWD | (idiv << CLKM_DIV_DIVI)            //CM CTL DIV register: Set DIVI value
@@ -365,7 +366,8 @@ extension RaspberryPWM {
         //while (clockBasePointer.advanced(by: 40).pointee & (1 << 7)) != 0 {}
 
         // Configure clock
-        let idiv = calculateUnscaledDIVI(base: .PLLD, desired: UInt32(symbolBits * patternFrequency))
+        let clkSrc = (BCM2708_PERI_BASE != 0xFE000000)? .PLLD : .PLLDPi4 //Differend Oscillator/PLLD freq for Pi4
+        let idiv = calculateUnscaledDIVI(base: clkSrc, desired: UInt32(symbolBits * patternFrequency))
         clockBasePointer.advanced(by: 41).pointee = CLKM_PASSWD | (idiv << CLKM_DIV_DIVI)             //Set DIVI value
         clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_ENAB | CLKM_CTL_SRC_PLLD   //Enable clock, MASH 0, source PLLD
         usleep(10)
@@ -561,10 +563,10 @@ extension RaspberryPWM {
 let CLKM_PASSWD: UInt32 = 0x5A000000
 let CLKM_CTL_KILL: UInt32 = (1 << 5)
 let CLKM_CTL_ENAB: UInt32 = (1 << 4)
-let CLKM_CTL_SRC_OSC: UInt32 = 1    // 19.2 MHz oscillator
+let CLKM_CTL_SRC_OSC: UInt32 = 1    // 19.2/54 MHz oscillator
 let CLKM_CTL_SRC_PLLA: UInt32 = 4   // ~393.216 MHz PLLA (Audio)
 let CLKM_CTL_SRC_PLLC: UInt32 = 5   // 1000 MHz PLLC (changes with overclock settings)
-let CLKM_CTL_SRC_PLLD: UInt32 = 6   // 500 MHz  PLLD
+let CLKM_CTL_SRC_PLLD: UInt32 = 6   // 500/750 MHz  PLLD
 let CLKM_CTL_SRC_HDMI: UInt32 = 7   // 216 MHz  HDMI auxiliary
 // Constants for the Clock Manager General Purpose Divisors Register
 let CLKM_DIV_DIVI: UInt32 = 12
@@ -599,12 +601,14 @@ let PWMCTL_PWEN1: UInt32 =  (1 << 0)
 // 8-15  0 Hz     Ground
 enum ClockSource: UInt32 {
     case Oscillator = 19200000
+    case OscillatorPi4 = 54000000
     case PLLA = 393216000
     case PLLC = 1000000000
     case PLLD = 500000000
+    case PLLDPi4 = 750000000
     case HDMI = 216000000
 }
-
+ 
 // DMA Register
 let DMACS_RESET: UInt32 = (1 << 31)
 let DMACS_ABORT: UInt32 = (1 << 30)
