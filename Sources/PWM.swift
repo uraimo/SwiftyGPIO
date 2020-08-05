@@ -175,7 +175,7 @@ public class RaspberryPWM: PWMOutput {
         let highFreqSampleReduction: UInt32 = (ns < 750) ? 10 : 1
 
         let freq = UInt32( (1_000_000_000/UInt(ns)) * 100 / UInt(highFreqSampleReduction) )
-        let clkSrc: ClockSource = (BCM2708_PERI_BASE != 0xFE000000) ? .PLLD : .PLLDPi4 //Differend Oscillator/PLLD freq for Pi4
+        let clkSrc: ClockSource = (BCM2708_PERI_BASE != UInt(0xFE000000)) ? .PLLD : .PLLDPi4 //Differend Oscillator/PLLD freq for Pi4
         let (idiv, scale) = calculateDIVI(base: clkSrc, desired: UInt32(freq))                                //Using the faster (with known freq) available clock to reduce jitter
 
         // Configure the clock and divisor that will be used to generate the signal
@@ -366,7 +366,7 @@ extension RaspberryPWM {
         //while (clockBasePointer.advanced(by: 40).pointee & (1 << 7)) != 0 {}
 
         // Configure clock
-        let clkSrc: ClockSource = (BCM2708_PERI_BASE != 0xFE000000) ? .PLLD : .PLLDPi4 //Differend Oscillator/PLLD freq for Pi4
+        let clkSrc: ClockSource = (BCM2708_PERI_BASE != UInt(0xFE000000)) ? .PLLD : .PLLDPi4 //Differend Oscillator/PLLD freq for Pi4
         let idiv = calculateUnscaledDIVI(base: clkSrc, desired: UInt32(symbolBits * patternFrequency))
         clockBasePointer.advanced(by: 41).pointee = CLKM_PASSWD | (idiv << CLKM_DIV_DIVI)             //Set DIVI value
         clockBasePointer.advanced(by: 40).pointee = CLKM_PASSWD | CLKM_CTL_ENAB | CLKM_CTL_SRC_PLLD   //Enable clock, MASH 0, source PLLD
