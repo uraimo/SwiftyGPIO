@@ -1,19 +1,28 @@
-on: [push]
+on: [push, pull_request]
 
 jobs:
   armv7_job:
+    # The host should always be Linux
     runs-on: ubuntu-18.04
-    name: Build on ARMv7 
+    name: Build on ubuntu-18.04 armv7
     steps:
-      - uses: actions/checkout@v1.0.0
-      - uses: uraimo/run-on-arch-action@v1.0.4
+      - uses: actions/checkout@v2.1.0
+      - uses: uraimo/run-on-arch-action@v2.0.2
+        name: Run commands
+        id: runcmd
         with:
-          architecture: armv7
-          distribution: ubuntu18.04
-          run: |
+          arch: armv7
+          distro: ubuntu18.04
+
+          githubToken: ${{ github.token }}
+
+          install: |
             apt update
             apt install -y libatomic1 libbsd0 clang libicu-dev libcurl4-nss-dev
             apt install -y curl
             curl -OL https://github.com/uraimo/buildSwiftOnARM/releases/download/5.0.3/swift-5.0.3-armv7-Ubuntu1804.tgz
             tar xzf swift-5.0.3-armv7-Ubuntu1804.tgz
+            
+          run: |
+            cd /root
             ./usr/bin/swift build
