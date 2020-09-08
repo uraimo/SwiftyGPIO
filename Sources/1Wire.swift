@@ -73,7 +73,7 @@ public final class SysFSOneWire: OneWireInterface {
     private func readFile(_ pathname: String) -> [String] {
         let fd = open(pathname, O_RDONLY | O_SYNC)
         guard fd > 0, let file = fdopen(fd, "r") else {
-            perror("Couldn't open 1-Wire slave device")
+            perror("Couldn't open 1-Wire device: "+pathname)
             abort()
         }
 
