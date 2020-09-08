@@ -33,15 +33,11 @@ extension SwiftyGPIO {
 
     public static func hardware1Wires(for board: SupportedBoard) -> [OneWireInterface]? {
         switch board {
-        case .RaspberryPiRev1:
-            fallthrough
-        case .RaspberryPiRev2:
-            fallthrough
-        case .RaspberryPiPlusZero:
-            fallthrough
-        case .RaspberryPi2:
-            fallthrough
-        case .RaspberryPi3:
+        case .RaspberryPiRev1,
+             .RaspberryPiRev2,
+             .RaspberryPiPlusZero,
+             .RaspberryPi2,
+             .RaspberryPi3:
             return [SysFSOneWire(masterId: 1)]
         default:
             return nil
@@ -65,34 +61,24 @@ public final class SysFSOneWire: OneWireInterface {
     }
 
     public func getSlaves() -> [String] {
-            let listpath = ONEWIREBASEPATH+"w1_bus_master"+String(masterId)+"/w1_master_slaves"
-
-            let fd = open(listpath, O_RDONLY | O_SYNC)
-            guard fd>0 else {
-                perror("Couldn't open 1-Wire master device")
-                abort()
-            }
-
-            var slaves = [String]()
-            while let s = readLine(fd) {
-                slaves.append(s)
-            }
-
-            close(fd)
-            return slaves
+        let listpath = ONEWIREBASEPATH + "w1_bus_master" + String(masterId) + "/w1_master_slaves"
+        return readFile(listpath)
     }
 
     public func readData(_ slaveId: String) -> [String] {
-        let devicepath = ONEWIREBASEPATH+slaveId+"/w1_slave"
-            
-        let fd = open(devicepath, O_RDONLY | O_SYNC)
-        guard fd>0 else {
-            perror("Couldn't open 1-Wire slave device")
+        let devicepath = ONEWIREBASEPATH + slaveId + "/w1_slave"
+        return readFile(devicepath)
+    }
+
+    private func readFile(_ pathname: String) -> [String] {
+        let fd = open(pathname, O_RDONLY | O_SYNC)
+        guard fd > 0, let file = fdopen(fd, "r") else {
+            perror("Couldn't open 1-Wire device: "+pathname)
             abort()
         }
 
         var lines = [String]()
-        while let s = readLine(fd) {
+        while let s = readLine(maxLength: 128, file: file) {
             lines.append(s)
         }
 
@@ -100,28 +86,17 @@ public final class SysFSOneWire: OneWireInterface {
         return lines      
     }
 
-    private func readLine(_ fd: Int32) -> String? {
-        var buf = [CChar](repeating:0, count: 128)
-        return buf.withUnsafeMutableBufferPointer  { ptr -> String? in
-            let newLineChar = CChar(UInt8(ascii: "\n"))
-            var pos = 0
-            repeat {
-                let n = read(fd, ptr.baseAddress! + pos, MemoryLayout<CChar>.stride)
-                if n<0 {
-                    perror("Error while reading from 1-Wire interface")
-                    abort()
-                } else if n == 0 {
-                    break
-                }
-                pos += 1
-            } while ptr[pos-1] != newLineChar
-            if pos == 0 {
+    func readLine(maxLength: Int = 128, file: UnsafeMutablePointer<FILE>!) -> String? {
+        var buffer = [CChar](repeating: 0, count: maxLength)
+        guard fgets(&buffer, Int32(maxLength), file) != nil else {
+            if feof(file) != 0 {
                 return nil
             } else {
-                ptr[pos-1] = 0
-                return String(cString: ptr.baseAddress!)
+                perror("Error while reading from 1-Wire interface")
+                abort()
             }
         }
+        return String(cString: buffer)
     }
 
 }
