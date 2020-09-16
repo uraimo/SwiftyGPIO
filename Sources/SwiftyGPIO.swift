@@ -433,9 +433,7 @@ public struct SwiftyGPIO {
             return GPIORPIRev2
         case .RaspberryPiPlusZero:
             return GPIORPIPlusZERO
-        case .RaspberryPi2:
-            fallthrough
-        case .RaspberryPi3:
+        case .RaspberryPi2, .RaspberryPi3:
             return GPIORPI2
         case .RaspberryPi4:
             return GPIORPI4

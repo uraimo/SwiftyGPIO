@@ -34,15 +34,11 @@ extension SwiftyGPIO {
         switch board {
         case .CHIP:
             return [I2CCHIP[1]!, I2CCHIP[2]!]
-        case .RaspberryPiRev1:
-            fallthrough
-        case .RaspberryPiRev2:
-            fallthrough
-        case .RaspberryPiPlusZero:
-            fallthrough
-        case .RaspberryPi2:
-            fallthrough
-        case .RaspberryPi3:
+        case .RaspberryPiRev1,
+             .RaspberryPiRev2,
+             .RaspberryPiPlusZero,
+             .RaspberryPi2,
+             .RaspberryPi3:
             return [I2CRPI[0]!, I2CRPI[1]!]
         default:
             return nil

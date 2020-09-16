@@ -34,13 +34,10 @@ extension SwiftyGPIO {
         switch board {
         case .CHIP:
             return [SysFSUART(["serial0","ttyAMA0"])!]
-        case .RaspberryPiRev1:
-            fallthrough
-        case .RaspberryPiRev2:
-            fallthrough
-        case .RaspberryPiPlusZero:
-            fallthrough
-        case .RaspberryPi2:
+        case .RaspberryPiRev1,
+             .RaspberryPiRev2,
+             .RaspberryPiPlusZero,
+             .RaspberryPi2:
             return [SysFSUART(["serial0","ttyAMA0"])!]
         case .RaspberryPi3:
             return [SysFSUART(["serial0","ttyS0"])!,
