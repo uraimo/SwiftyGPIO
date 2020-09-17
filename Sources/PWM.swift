@@ -33,15 +33,9 @@ extension SwiftyGPIO {
 
     public static func hardwarePWMs(for board: SupportedBoard) -> [Int:[GPIOName:PWMOutput]]? {
         switch board {
-        case .RaspberryPiRev1:
-            fallthrough
-        case .RaspberryPiRev2:
-            fallthrough
-        case .RaspberryPiPlusZero:
+        case .RaspberryPiRev1, .RaspberryPiRev2, .RaspberryPiPlusZero:
             return PWMRPI1
-        case .RaspberryPi2:
-            fallthrough
-        case .RaspberryPi3:
+        case .RaspberryPi2, .RaspberryPi3:
             return PWMRPI23
         case .RaspberryPi4:
             return PWMRPI4

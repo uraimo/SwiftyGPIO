@@ -42,16 +42,6 @@ extension SwiftyGPIO {
         switch board {
         case .BeagleBoneBlack:
             return [ADCBBB[0]!, ADCBBB[1]!, ADCBBB[2]!, ADCBBB[3]!]
-        case .RaspberryPiRev1:
-            fallthrough
-        case .RaspberryPiRev2:
-            fallthrough
-        case .RaspberryPiPlusZero:
-            fallthrough
-        case .RaspberryPi2:
-            fallthrough
-        case .RaspberryPi3:
-            fallthrough
         default:
             return nil
         }
