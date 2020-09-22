@@ -37,8 +37,8 @@ internal let GPIOBASEPATH="/sys/class/gpio/"
 public class GPIO {
     public var bounceTime: TimeInterval?
 
-    public private(set) var name: String = ""
-    public private(set) var id: Int = 0
+    public private(set) var name: String
+    public private(set) var id: Int
     var exported = false
     var listening = false
     var intThread: Thread?
@@ -86,10 +86,10 @@ public class GPIO {
     }
 
     public var pull: GPIOPull {
-        set(dir) {
+        set {
             fatalError("Unsupported parameter.")
         }
-        get{
+        get {
             fatalError("Parameter cannot be read.")
         }
     }
@@ -174,20 +174,17 @@ fileprivate extension GPIO {
 
     func writeToFile(_ path: String, value: String) {
         let fp = fopen(path, "w")
-        if fp != nil {
-          #if swift(>=3.2)
-            let len = value.count
-          #else
-            let len = value.characters.count
-          #endif
-            let ret = fwrite(value, MemoryLayout<CChar>.stride, len, fp)
-            if ret<len {
-                if ferror(fp) != 0 {
-                    perror("Error while writing to file")
-                    abort()
-                }
+        guard fp != nil else { return }
+        defer { fclose(fp) }
+        var value = value
+        let res = value.withUTF8 { buffer in
+            return fwrite(buffer.baseAddress, buffer.count, 1, fp) - buffer.count
+        }
+        if res < 0 {
+            if ferror(fp) != 0 {
+                perror("Error while writing to file")
+                abort()
             }
-            fclose(fp)
         }
     }
 
