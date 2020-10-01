@@ -228,7 +228,7 @@ fileprivate extension GPIO {
             self.edge = .BOTH
 
             let fp = open(gpath, O_RDWR)
-            var buf: [Int8] = [0, 0, 0]
+            var buf: [UInt8] = [0, 0, 0]
             read(fp, &buf, 3) //Dummy read to discard current value
 
           #if swift(>=4.0)
@@ -242,13 +242,10 @@ fileprivate extension GPIO {
                 if ready > -1 {
                     lseek(fp, 0, SEEK_SET)
                     read(fp, &buf, 2)
-                    buf[1]=0
-
-                    let res = String(validatingUTF8: buf)!
-                    switch res {
-                    case "0":
+                    switch buf[0] {
+                    case Character("0").asciiValue:
                         self.interrupt(type: &(self.intFalling))
-                    case "1":
+                    case Character("1").asciiValue:
                         self.interrupt(type: &(self.intRaising))
                     default:
                         break
