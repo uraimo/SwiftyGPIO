@@ -166,10 +166,7 @@ fileprivate extension GPIO {
     }
 
     func getIntValue(_ filename: String) -> Int? {
-        if let res = readFromFile(GPIOBASEPATH+filename) {
-            return Int(res)
-        }
-        return nil
+        return readFromFile(GPIOBASEPATH+filename).flatMap(Int.init)
     }
 
     func writeToFile(_ path: String, value: String) {
@@ -192,27 +189,23 @@ fileprivate extension GPIO {
         let MAXLEN = 8
 
         let fp = fopen(path, "r")
-        var res: String?
-        if fp != nil {
-            let buf = UnsafeMutablePointer<CChar>.allocate(capacity: MAXLEN)
-            let len = fread(buf, MemoryLayout<CChar>.stride, MAXLEN, fp)
+        guard fp != nil else { return nil }
+        defer { fclose(fp) }
+        var buf = (CChar(0), CChar(0), CChar(0), CChar(0),
+                   CChar(0), CChar(0), CChar(0), CChar(0))
+        return withUnsafeMutableBytes(of: &buf) { buffer in
+            precondition(buffer.count == MAXLEN)
+            let len = fread(buffer.baseAddress, MAXLEN, 1, fp)
             if len < MAXLEN {
                 if ferror(fp) != 0 {
                     perror("Error while reading from file")
                     abort()
                 }
             }
-            fclose(fp)
-            //Remove the trailing \n
-            buf[len-1]=0
-            res = String.init(validatingUTF8: buf)
-        #if swift(>=4.1)
-            buf.deallocate()
-        #else
-            buf.deallocate(capacity: MAXLEN)
-        #endif
+            // Remove the trailing \n
+            buffer[len-1] = 0
+            return String(validatingUTF8: buffer.baseAddress!.assumingMemoryBound(to: CChar.self))
         }
-        return res
     }
 
     func makeInterruptThread() -> Thread? {
