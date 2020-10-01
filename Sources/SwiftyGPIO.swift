@@ -236,9 +236,9 @@ fileprivate extension GPIO {
                     lseek(fp, 0, SEEK_SET)
                     read(fp, &buf, 2)
                     switch buf[0] {
-                    case Character("0").asciiValue:
+                    case UInt8(ascii: "0"):
                         self.interrupt(type: &(self.intFalling))
-                    case Character("1").asciiValue:
+                    case UInt8(ascii: "1"):
                         self.interrupt(type: &(self.intRaising))
                     default:
                         break
