@@ -444,7 +444,7 @@ public enum SupportedBoard: String {
     case RaspberryPiPlusZero // Pi A+,B+,Zero with 40 pin header
     case RaspberryPi2 // Pi 2 with 40 pin header
     case RaspberryPi3 // Pi 3 with 40 pin header
-    case RaspberryPi4 // Pi 3 with 40 pin header
+    case RaspberryPi4 // Pi 4 with 40 pin header
     case CHIP
     case BeagleBoneBlack
     case OrangePi

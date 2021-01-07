@@ -50,7 +50,7 @@ Examples of  *[device libraries](#libraries)* and *[complete projects](#awesome-
 
 The following boards are supported and have been tested with recent releases of Swift:
 
-* Raspberry Pi 4
+* Raspberry Pi 4, 4B
 * Raspberry Pi 3, 3A+, 3B+
 * Raspberry Pi 2 (Thanks to [@iachievedit](https://twitter.com/iachievedit))
 * Raspberry Pi Zero W

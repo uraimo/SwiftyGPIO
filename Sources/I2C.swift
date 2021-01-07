@@ -38,7 +38,8 @@ extension SwiftyGPIO {
              .RaspberryPiRev2,
              .RaspberryPiPlusZero,
              .RaspberryPi2,
-             .RaspberryPi3:
+             .RaspberryPi3,
+             .RaspberryPi4:
             return [I2CRPI[0]!, I2CRPI[1]!]
         default:
             return nil
