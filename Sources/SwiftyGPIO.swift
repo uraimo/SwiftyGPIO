@@ -202,9 +202,8 @@ fileprivate extension GPIO {
                     abort()
                 }
             }
-            // Remove the trailing \n
-            buffer[len-1] = 0
-            return String(validatingUTF8: buffer.baseAddress!.assumingMemoryBound(to: CChar.self))
+
+            return String(validatingUTF8: buffer.baseAddress!.assumingMemoryBound(to: CChar.self))?.trimmingCharacters(in: .newlines)
         }
     }
 
