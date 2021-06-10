@@ -38,7 +38,7 @@ extension SwiftyGPIO {
              .RaspberryPiRev2,
              .RaspberryPiPlusZero,
              .RaspberryPi2,
-             .RaspberryPi3:
+             .RaspberryPi3,
              .RaspberryPi4:
             return [SPIRPI[0]!, SPIRPI[1]!]
         default:
