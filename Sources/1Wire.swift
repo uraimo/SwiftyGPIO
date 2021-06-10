@@ -38,6 +38,7 @@ extension SwiftyGPIO {
              .RaspberryPiPlusZero,
              .RaspberryPi2,
              .RaspberryPi3:
+             .RaspberryPi4:
             return [SysFSOneWire(masterId: 1)]
         default:
             return nil
