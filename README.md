@@ -601,6 +601,7 @@ A few projects and libraries built using SwiftyGPIO. Have you built something th
 * [Wii Nunchuck](https://github.com/uraimo/Nunchuck.swift) - Library for the Wii Nunchuck controller.
 * [RCWL-0516](https://github.com/uraimo/RCWL-0516-Radar.swift) - Library for the RCWL-0516 Microwave Radar.
 * [DS18B20](https://github.com/uraimo/DS18B20.swift) - Library for the DS18B20 temperature sensor.
+* [AMG88xx](https://github.com/emorydunn/AMG88xx.swift) - Library for AMG88 thermopile sensors.
 
 ### Awesome Projects
 *Complete IoT projects.*
