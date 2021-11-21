@@ -40,8 +40,8 @@ extension SwiftyGPIO {
              .RaspberryPi2:
             return [SysFSUART(["serial0","ttyAMA0"])!]
         case .RaspberryPi3,
-             .RaspberryPi4:
-             .RaspberryPiZero2,
+             .RaspberryPi4,
+             .RaspberryPiZero2:
             return [SysFSUART(["serial0","ttyS0"])!,
                     SysFSUART(["serial1","ttyAMA0"])!]
         default:
