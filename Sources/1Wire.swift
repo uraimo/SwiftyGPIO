@@ -36,6 +36,7 @@ extension SwiftyGPIO {
         case .RaspberryPiRev1,
              .RaspberryPiRev2,
              .RaspberryPiPlusZero,
+             .RaspberryPiZero2,
              .RaspberryPi2,
              .RaspberryPi3,
              .RaspberryPi4:

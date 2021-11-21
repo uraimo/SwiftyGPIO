@@ -35,7 +35,7 @@ extension SwiftyGPIO {
         switch board {
         case .RaspberryPiRev1, .RaspberryPiRev2, .RaspberryPiPlusZero:
             return PWMRPI1
-        case .RaspberryPi2, .RaspberryPi3:
+        case .RaspberryPi2, .RaspberryPi3, .RaspberryPiZero2:
             return PWMRPI23
         case .RaspberryPi4:
             return PWMRPI4
