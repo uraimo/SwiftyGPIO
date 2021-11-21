@@ -53,6 +53,7 @@ The following boards are supported and have been tested with recent releases of 
 * Raspberry Pi 4, 4B
 * Raspberry Pi 3, 3A+, 3B+
 * Raspberry Pi 2 (Thanks to [@iachievedit](https://twitter.com/iachievedit))
+* Raspberry Pi Zero 2 W
 * Raspberry Pi Zero W
 * Raspberry Pi Zero (Thanks to [@MacmeDan](https://twitter.com/MacmeDan))
 * Raspberry Pi Classic A,B,A+,B+ Rev1/Rev2
@@ -61,7 +62,6 @@ The following boards are supported and have been tested with recent releases of 
 * OrangePi Zero (Thanks to [@eugeniobaglieri](https://github.com/eugeniobaglieri)) 
 * Asus Tinkerboard (Thanks to Ernesto Lo Valvo)
 * C.H.I.P.
-* BananaPi M1/2/3
 
 But basically everything that has an ARMv7/8+Ubuntu/Debian/Raspbian or an ARMv6+Raspbian/Debian should work if you can run Swift on it.
 
