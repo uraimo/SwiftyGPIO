@@ -143,6 +143,8 @@ extension SwiftyGPIO {
         .P7: RaspberryGPIO(name:"GPIO7", id:7, baseAddr:0x7E000000),
         .P8: RaspberryGPIO(name:"GPIO8", id:8, baseAddr:0x7E000000),
         .P9: RaspberryGPIO(name:"GPIO9", id:9, baseAddr:0x7E000000),
+        .P10: RaspberryGPIO(name:"GPIO10", id:10, baseAddr:0x7E000000),
+        .P11: RaspberryGPIO(name:"GPIO11", id:11, baseAddr:0x7E000000),
         .P12: RaspberryGPIO(name:"GPIO12", id:12, baseAddr:0x7E000000),
         .P13: RaspberryGPIO(name:"GPIO13", id:13, baseAddr:0x7E000000),
         .P14: RaspberryGPIO(name:"GPIO14", id:14, baseAddr:0x7E000000),
