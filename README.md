@@ -27,22 +27,24 @@ Examples of  *[device libraries](#libraries)* and *[complete projects](#awesome-
 
 
 ##### Content:
+- [Summary](#summary)
+      - [Content:](#content)
 - [Supported Boards](#supported-boards)
 - [Installation](#installation)
-- [Your First Project: Blinking Leds And Sensors](#your-first-project-blinking-leds-and-sensors)
+- [Your First Project: Blinking leds and sensors](#your-first-project-blinking-leds-and-sensors)
 - [Usage](#usage)
-    - [GPIO](#gpio)
-    - [SPI](#spi)
-    - [I2C](#i2c)
-    - [PWM](#pwm)
-    - [Pattern-based signal generator via PWM](#pattern-based-signal-generator-via-pwm)
-    - [UART](#uart)
-    - [1-Wire](#1-wire)
+  - [GPIO](#gpio)
+  - [SPI](#spi)
+  - [I2C](#i2c)
+  - [PWM](#pwm)
+  - [Pattern-based signal generator via PWM](#pattern-based-signal-generator-via-pwm)
+  - [UART](#uart)
+  - [1-Wire](#1-wire)
 - [Examples](#examples)
 - [Built with SwiftyGPIO](#built-with-swiftygpio)
-    - [Device Libraries](#libraries)
-    - [Awesome Projects](#awesome-projects)
-    - [Support Libraries](#support-libraries)
+  - [Libraries](#libraries)
+  - [Awesome Projects](#awesome-projects)
+  - [Support libraries](#support-libraries)
 - [Additional documentation](#additional-documentation)
 
 
@@ -314,6 +316,16 @@ func readData(_ address: Int, command: UInt8) -> [UInt8]
 func readI2CData(_ address: Int, command: UInt8) -> [UInt8]
 ```
 
+There are also versions of the read functions that return an optional value with `nil` indicating a read failure:
+
+```swift
+func tryReadByte(_ address: Int) -> UInt8?
+func tryReadByte(_ address: Int, command: UInt8) -> UInt8?
+func tryReadWord(_ address: Int, command: UInt8) -> UInt16?
+func tryReadData(_ address: Int, command: UInt8) -> [UInt8]?
+func tryReadI2CData(_ address: Int, command: UInt8) -> [UInt8]?
+```
+
 Reading and writing data blocks supports two modes, a standard SMBus mode (`readData` and `writeData`) that prepends the length of the block before the actual data, and an old style I2C mode (`readI2CData` and `writeI2CData`) that just send the data without additional metadata. Depending on the device, only one of the two modes will be supported.
 
 Let's suppose that we want to read the seconds register (id 0) from a DS1307 RTC clock, that has an I2C address of 0x68:
@@ -322,16 +334,16 @@ Let's suppose that we want to read the seconds register (id 0) from a DS1307 RTC
 print(i2c.readByte(0x68, command: 0)) //Prints the value of the 8bit register
 ```
 
-You should choose the same way one of the write functions available, just note that `writeQuick` is used to perform quick commands and does not perform a normal write. SMBus's quick commands are usually used to turn on/off devices or perform similar tasks that don't require additional parameters.
+You should choose the same way one of the write functions available, just note that `writeQuick` is used to perform quick commands and does not perform a normal write. SMBus's quick commands are usually used to turn on/off devices or perform similar tasks that don't require additional parameters.  The write functions return `true` on success and `false` on failure.
 
 ```swift
-func writeQuick(_ address: Int)
+func writeQuick(_ address: Int) -> Bool
 
-func writeByte(_ address: Int, value: UInt8)
-func writeByte(_ address: Int, command: UInt8, value: UInt8)
-func writeWord(_ address: Int, command: UInt8, value: UInt16)
-func writeData(_ address: Int, command: UInt8, values: [UInt8])
-func writeI2CData(_ address: Int, command: UInt8, values: [UInt8])
+func writeByte(_ address: Int, value: UInt8) -> Bool
+func writeByte(_ address: Int, command: UInt8, value: UInt8) -> Bool
+func writeWord(_ address: Int, command: UInt8, value: UInt16) -> Bool
+func writeData(_ address: Int, command: UInt8, values: [UInt8]) -> Bool
+func writeI2CData(_ address: Int, command: UInt8, values: [UInt8]) -> Bool
 ```
 
 While using the I2C functionality doesn't require additional software to function, the tools contained in `i2c-tools` are useful to perform I2C transactions manually to verify that everything is working correctly.
