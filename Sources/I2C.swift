@@ -329,7 +329,7 @@ public final class SysFSI2C: I2CInterface {
 
         let r =  ioctl(fd, I2C_PEC, enabled ? 1 : 0)
 
-        return r >= 0
+        return r == 0
     }
 
     private func setSlaveAddress(_ to: Int) {
