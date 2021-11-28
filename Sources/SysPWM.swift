@@ -102,14 +102,14 @@ public class RaspberrySysPWM
     public enum Polarity : String { case normal, inverse }
 
     /// Error set with functions return false
-    public var error     : Error? = nil
+    public var error : Error? = nil
 
-    let channel    : String
+    let channel      : String
 
-    let exportPath = "/sys/class/pwm/pwmchip0/export"
-    let pwmPath    : String
+    let exportPath   : String = "/sys/class/pwm/pwmchip0/export"
+    let pwmPath      : String
 
-    var exported   = false
+    var exported     = false
 
 
     // ------------------------------------------------------------------------
@@ -128,7 +128,7 @@ public class RaspberrySysPWM
     // ------------------------------------------------------------------------
     //  Public Function initPWM
     // ------------------------------------------------------------------------
-    /// Initialize the PWM
+    /// Initialise the PWM
     ///
     /// Must be called at least once before starting the PWM.
     /// If called a second time the PWM output will stop until
@@ -141,8 +141,8 @@ public class RaspberrySysPWM
     @discardableResult
     public func initPWM( polarity: Polarity = .normal ) -> Bool
     {
-        let enablePath   = pwmPath + "enable"
-        let polarityPath = pwmPath + "polarity"
+        let enablePath   : String = pwmPath + "enable"
+        let polarityPath : String = pwmPath + "polarity"
 
         do
         {
@@ -183,11 +183,11 @@ public class RaspberrySysPWM
     {
         guard duty >= 0.0  &&  duty <= 100.00 else { return false }
 
-        let active = UInt( Float( period ) * (duty / 100.0) )
+        let active : UInt = UInt( Float( period ) * (duty / 100.0) )
 
-        let periodPath    = pwmPath + "period"
-        let dutyCyclePath = pwmPath + "duty_cycle"
-        let enablePath    = pwmPath + "enable"
+        let periodPath    : String = pwmPath + "period"
+        let dutyCyclePath : String = pwmPath + "duty_cycle"
+        let enablePath    : String = pwmPath + "enable"
 
         do
         {
@@ -217,7 +217,7 @@ public class RaspberrySysPWM
     @discardableResult
     public func stopPWM() -> Bool
     {
-        let enablePath    = pwmPath + "enable"
+        let enablePath :String = pwmPath + "enable"
 
         do
         {
@@ -245,14 +245,14 @@ public class RaspberrySysPWM
 
     func write( _ value : String, _ path : String ) throws
     {
-        let output = FileHandle( forWritingAtPath: path )
+        let output : FileHandle? = FileHandle( forWritingAtPath: path )
 
-        guard let output = output else
+        guard let output : FileHandle = output else
         {
           throw  POSIXError( .EACCES, userInfo: [:] )
         }
 
-        if let data = value.data( using: .utf8 )
+        if let data : Data = value.data( using: .utf8 )
         {
           try output.write( contentsOf: data )
         }
