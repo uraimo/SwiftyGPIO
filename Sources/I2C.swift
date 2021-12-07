@@ -76,11 +76,15 @@ public protocol I2CInterface {
     func readWord(_ address: Int, command: UInt8) -> UInt16
     func readData(_ address: Int, command: UInt8) -> [UInt8]
     func readI2CData(_ address: Int, command: UInt8) -> [UInt8]
+    func readRaw(_ address: Int, length: Int) -> [UInt8]
+
     func tryReadByte(_ address: Int) -> UInt8?
     func tryReadByte(_ address: Int, command: UInt8) -> UInt8?
     func tryReadWord(_ address: Int, command: UInt8) -> UInt16?
     func tryReadData(_ address: Int, command: UInt8) -> [UInt8]?
     func tryReadI2CData(_ address: Int, command: UInt8) -> [UInt8]?
+    func tryReadRaw(_ address: Int, length: Int) -> [UInt8]?
+
     @discardableResult func writeQuick(_ address: Int) -> Bool
     @discardableResult func writeByte(_ address: Int, value: UInt8) -> Bool
     @discardableResult func writeByte(_ address: Int, command: UInt8, value: UInt8) -> Bool
@@ -128,7 +132,7 @@ public final class SysFSI2C: I2CInterface {
 
         let r =  i2c_smbus_read_byte()
 
-        if r < 0 { return nil }
+        guard r >= 0 else { return nil }
 
       #if swift(>=4.0)
         return UInt8(truncatingIfNeeded: r)
@@ -158,7 +162,7 @@ public final class SysFSI2C: I2CInterface {
 
         let r =  i2c_smbus_read_byte_data(command: command)
 
-        if r < 0 { return nil; }
+        guard r >= 0 else { return nil }
 
       #if swift(>=4.0)
         return UInt8(truncatingIfNeeded: r)
@@ -188,7 +192,7 @@ public final class SysFSI2C: I2CInterface {
 
         let r =  i2c_smbus_read_word_data(command: command)
 
-        if r < 0 { return nil }
+        guard r >= 0 else { return nil }
 
       #if swift(>=4.0)
         return UInt16(truncatingIfNeeded: r)
@@ -216,9 +220,9 @@ public final class SysFSI2C: I2CInterface {
 
         setSlaveAddress(address)
 
-        let r =  i2c_smbus_read_block_data(command: command, values: &buf)
+        let r = i2c_smbus_read_block_data(command: command, values: &buf)
 
-        if r < 0 { return nil }
+        guard r >= 0 else { return nil }
 
         return buf
     }
@@ -243,13 +247,39 @@ public final class SysFSI2C: I2CInterface {
 
         setSlaveAddress(address)
 
-        let r =  i2c_smbus_read_i2c_block_data(command: command, values: &buf)
+        let r = i2c_smbus_read_i2c_block_data(command: command, values: &buf)
 
-        if r < 0 { return nil }
+        guard r >= 0 else { return nil }
 
         return buf
     }
- 
+
+    public func readRaw(_ address: Int, length: Int) -> [UInt8] {
+        var buf: [UInt8] = [UInt8](repeating:0, count: length)
+
+        setSlaveAddress(address)
+
+        let r =  read( fd, &buf, length )
+
+        if r < 0 {
+            perror("I2C read failed")
+            abort()
+        }
+        return buf
+    }
+
+    public func tryReadRaw(_ address: Int, length: Int) -> [UInt8]? {
+        var buf: [UInt8] = [UInt8](repeating:0, count: length)
+
+        setSlaveAddress(address)
+
+        let r =  read( fd, &buf, length )
+
+        guard r >= 0 else { return nil }
+
+        return buf
+    }
+
     public func writeQuick(_ address: Int) -> Bool {
         setSlaveAddress(address)
 
