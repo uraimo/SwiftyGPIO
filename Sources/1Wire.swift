@@ -28,6 +28,8 @@
     import Darwin.C
 #endif
 
+import Foundation
+
 // MARK: - 1-Wire Presets
 extension SwiftyGPIO {
 
@@ -98,7 +100,7 @@ public final class SysFSOneWire: OneWireInterface {
                 abort()
             }
         }
-        return String(cString: buffer)
+        return String(cString: buffer).trimmingCharacters(in: CharacterSet.newlines)
     }
 
 }
