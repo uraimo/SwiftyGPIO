@@ -314,16 +314,22 @@ func readByte(_ address: Int, command: UInt8) -> UInt8
 func readWord(_ address: Int, command: UInt8) -> UInt16
 func readData(_ address: Int, command: UInt8) -> [UInt8]
 func readI2CData(_ address: Int, command: UInt8) -> [UInt8]
+func readRaw(_ address: Int, length: Int) -> [UInt8]
+func writeAndRead(_ address: Int, write: [UInt8], readLength: UInt) -> [UInt8]
+
 ```
 
-There are also versions of the read functions that return an optional value with `nil` indicating a read failure:
+There are also versions of the read functions that throw an error to indicate a read failure:
 
 ```swift
-func tryReadByte(_ address: Int) -> UInt8?
-func tryReadByte(_ address: Int, command: UInt8) -> UInt8?
-func tryReadWord(_ address: Int, command: UInt8) -> UInt16?
-func tryReadData(_ address: Int, command: UInt8) -> [UInt8]?
-func tryReadI2CData(_ address: Int, command: UInt8) -> [UInt8]?
+func tryReadByte(_ address: Int) throws -> UInt8
+func tryReadByte(_ address: Int, command: UInt8) throws -> UInt8
+func tryReadWord(_ address: Int, command: UInt8) throws -> UInt16
+func tryReadData(_ address: Int, command: UInt8) throws -> [UInt8]
+func tryReadI2CData(_ address: Int, command: UInt8) throws -> [UInt8]
+func tryReadRaw(_ address: Int, length: Int) throws -> [UInt8]
+func tryWriteAndRead(_ address: Int, write: [UInt8], readLength: UInt) throws -> [UInt8]
+
 ```
 
 Reading and writing data blocks supports two modes, a standard SMBus mode (`readData` and `writeData`) that prepends the length of the block before the actual data, and an old style I2C mode (`readI2CData` and `writeI2CData`) that just send the data without additional metadata. Depending on the device, only one of the two modes will be supported.
