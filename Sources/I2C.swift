@@ -28,6 +28,8 @@
     import Darwin.C
 #endif
 
+import Foundation
+
 extension SwiftyGPIO {
 
     public static func hardwareI2Cs(for board: SupportedBoard) -> [I2CInterface]? {
@@ -77,13 +79,15 @@ public protocol I2CInterface {
     func readData(_ address: Int, command: UInt8) -> [UInt8]
     func readI2CData(_ address: Int, command: UInt8) -> [UInt8]
     func readRaw(_ address: Int, length: Int) -> [UInt8]
+    func writeAndRead(_ address: Int, write: [UInt8], readLength: UInt) -> [UInt8]
 
-    func tryReadByte(_ address: Int) -> UInt8?
-    func tryReadByte(_ address: Int, command: UInt8) -> UInt8?
-    func tryReadWord(_ address: Int, command: UInt8) -> UInt16?
-    func tryReadData(_ address: Int, command: UInt8) -> [UInt8]?
-    func tryReadI2CData(_ address: Int, command: UInt8) -> [UInt8]?
-    func tryReadRaw(_ address: Int, length: Int) -> [UInt8]?
+    func tryReadByte(_ address: Int) throws -> UInt8
+    func tryReadByte(_ address: Int, command: UInt8) throws -> UInt8
+    func tryReadWord(_ address: Int, command: UInt8) throws -> UInt16
+    func tryReadData(_ address: Int, command: UInt8) throws -> [UInt8]
+    func tryReadI2CData(_ address: Int, command: UInt8) throws -> [UInt8]
+    func tryReadRaw(_ address: Int, length: Int) throws -> [UInt8]
+    func tryWriteAndRead(_ address: Int, write: [UInt8], readLength: UInt) throws -> [UInt8]
 
     @discardableResult func writeQuick(_ address: Int) -> Bool
     @discardableResult func writeByte(_ address: Int, value: UInt8) -> Bool
@@ -127,12 +131,12 @@ public final class SysFSI2C: I2CInterface {
       #endif
     }
 
-    public func tryReadByte(_ address: Int) -> UInt8? {
+    public func tryReadByte(_ address: Int) throws -> UInt8 {
         setSlaveAddress(address)
 
         let r =  i2c_smbus_read_byte()
 
-        guard r >= 0 else { return nil }
+        guard r >= 0 else { throw POSIXError( POSIXError.Code( rawValue: errno ) ?? POSIXError.EIO ) }
 
       #if swift(>=4.0)
         return UInt8(truncatingIfNeeded: r)
@@ -157,12 +161,12 @@ public final class SysFSI2C: I2CInterface {
       #endif
     }
 
-    public func tryReadByte(_ address: Int, command: UInt8) -> UInt8? {
+    public func tryReadByte(_ address: Int, command: UInt8) throws -> UInt8 {
         setSlaveAddress(address)
 
         let r =  i2c_smbus_read_byte_data(command: command)
 
-        guard r >= 0 else { return nil }
+        guard r >= 0 else { throw POSIXError( POSIXError.Code( rawValue: errno ) ?? POSIXError.EIO ) }
 
       #if swift(>=4.0)
         return UInt8(truncatingIfNeeded: r)
@@ -187,12 +191,12 @@ public final class SysFSI2C: I2CInterface {
       #endif
     }
 
-    public func tryReadWord(_ address: Int, command: UInt8) -> UInt16? {
+    public func tryReadWord(_ address: Int, command: UInt8) throws -> UInt16 {
         setSlaveAddress(address)
 
         let r =  i2c_smbus_read_word_data(command: command)
 
-        guard r >= 0 else { return nil }
+        guard r >= 0 else { throw POSIXError( POSIXError.Code( rawValue: errno ) ?? POSIXError.EIO ) }
 
       #if swift(>=4.0)
         return UInt16(truncatingIfNeeded: r)
@@ -215,14 +219,14 @@ public final class SysFSI2C: I2CInterface {
         return buf
     }
 
-    public func tryReadData(_ address: Int, command: UInt8) -> [UInt8]? {
+    public func tryReadData(_ address: Int, command: UInt8) throws -> [UInt8] {
         var buf: [UInt8] = [UInt8](repeating:0, count: 32)
 
         setSlaveAddress(address)
 
         let r = i2c_smbus_read_block_data(command: command, values: &buf)
 
-        guard r >= 0 else { return nil }
+        guard r >= 0 else { throw POSIXError( POSIXError.Code( rawValue: errno ) ?? POSIXError.EIO ) }
 
         return buf
     }
@@ -242,14 +246,14 @@ public final class SysFSI2C: I2CInterface {
         return buf
     }
  
-    public func tryReadI2CData(_ address: Int, command: UInt8) -> [UInt8]? {
+    public func tryReadI2CData(_ address: Int, command: UInt8) throws -> [UInt8] {
         var buf: [UInt8] = [UInt8](repeating:0, count: 32)
 
         setSlaveAddress(address)
 
         let r = i2c_smbus_read_i2c_block_data(command: command, values: &buf)
 
-        guard r >= 0 else { return nil }
+        guard r >= 0 else { throw POSIXError( POSIXError.Code( rawValue: errno ) ?? POSIXError.EIO ) }
 
         return buf
     }
@@ -268,17 +272,47 @@ public final class SysFSI2C: I2CInterface {
         return buf
     }
 
-    public func tryReadRaw(_ address: Int, length: Int) -> [UInt8]? {
-        var buf: [UInt8] = [UInt8](repeating:0, count: length)
+    public func tryReadRaw(_ address: Int, length: Int) throws -> [UInt8] {
+        var buf: [UInt8] = [UInt8](repeating:0, count: Int( length ))
 
         setSlaveAddress(address)
 
         let r =  read( fd, &buf, length )
 
-        guard r >= 0 else { return nil }
+        guard r >= 0 else { throw POSIXError( POSIXError.Code( rawValue: errno ) ?? POSIXError.EIO ) }
 
         return buf
     }
+
+
+    public func writeAndRead(_ address: Int, write: [UInt8], readLength: UInt) -> [UInt8] {
+        var readBuf: [UInt8] = [UInt8](repeating:0, count: Int( readLength ) )
+
+        setSlaveAddress(address)
+
+        let r = i2c_write_and_read (write: write, read: &readBuf )
+
+
+        if r < 0 {
+            perror("I2C read failed")
+            abort()
+        }
+        return readBuf
+    }
+
+
+    public func tryWriteAndRead(_ address: Int, write: [UInt8], readLength: UInt) throws -> [UInt8]  {
+        var readBuf: [UInt8] = [UInt8](repeating:0, count: Int( readLength ))
+
+        setSlaveAddress(address)
+
+        let r = i2c_write_and_read (write: write, read: &readBuf )
+
+        guard r >= 0 else { throw POSIXError( POSIXError.Code( rawValue: errno ) ?? POSIXError.EIO ) }
+
+        return readBuf
+    }
+
 
     public func writeQuick(_ address: Int) -> Bool {
         setSlaveAddress(address)
@@ -401,6 +435,7 @@ public final class SysFSI2C: I2CInterface {
         var size: Int32
         var data: UnsafeMutablePointer<UInt8>? //union: UInt8, UInt16, [UInt8]33
     }
+
 
     private func smbus_ioctl(rw: UInt8, command: UInt8, size: Int32, data: UnsafeMutablePointer<UInt8>?) -> Int32 {
         if fd == -1 {
@@ -570,6 +605,51 @@ public final class SysFSI2C: I2CInterface {
                            data: &data)
     }
  
+    // Swift implementation of the i2c RW ioctl
+
+    struct i2c_rw_msg {
+        var addr:  UInt16
+        var flags: UInt16
+        var len:   UInt16
+        var buf:   UnsafeMutablePointer<UInt8>
+    }
+
+    struct i2c_rdwr_ioctl_data
+    {
+        var msgs:  UnsafePointer<i2c_rw_msg>
+        var nmsgs: UInt32
+    };
+
+    private func i2c_write_and_read (write: [UInt8], read: inout [UInt8] ) -> Int32
+    {
+        guard write.count<=I2C_DEFAULT_PAYLOAD_LENGTH && read.count<=I2C_DEFAULT_PAYLOAD_LENGTH else { fatalError("Invalid data length, can't send more than \(I2C_DEFAULT_PAYLOAD_LENGTH) bytes!") }
+        
+        var writeData = write
+
+        return writeData.withUnsafeMutableBufferPointer { writePtr in
+            return read.withUnsafeMutableBufferPointer { readPtr in
+
+                let msgs = [ i2c_rw_msg( addr: UInt16( currentSlave ),
+                                         flags: 0,
+                                         len:   UInt16( writePtr.count ),
+                                         buf:   writePtr.baseAddress! ),
+                             i2c_rw_msg( addr:  UInt16( currentSlave ),
+                                         flags: I2C_M_RD,
+                                         len:   UInt16( readPtr.count ),
+                                         buf:   readPtr.baseAddress! )
+                           ]
+
+                return msgs.withUnsafeBufferPointer { msgsPtr in
+
+                    var cmd = i2c_rdwr_ioctl_data( msgs: msgsPtr.baseAddress!, nmsgs: 2 )
+
+                    return ioctl( fd, I2C_RDWR, &cmd )
+
+                }
+            }
+        }                    
+    }
+
 }
 
 // MARK: - I2C/SMBUS Constants
@@ -592,6 +672,9 @@ internal let I2C_PEC: UInt = 0x708
 internal let I2C_SMBUS: UInt = 0x720
 internal let I2C_DEFAULT_PAYLOAD_LENGTH: Int = 32
 internal let I2CBASEPATH="/dev/i2c-"
+
+internal let I2C_M_RD: UInt16 = 0x0001
+
 
 // MARK: - Darwin / Xcode Support
 #if os(OSX) || os(iOS)
