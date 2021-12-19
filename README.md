@@ -313,7 +313,7 @@ func readByte(_ address: Int) -> UInt8
 func readByte(_ address: Int, command: UInt8) -> UInt8
 func readWord(_ address: Int, command: UInt8) -> UInt16
 func readData(_ address: Int, command: UInt8) -> [UInt8]
-func readI2CData(_ address: Int, command: UInt8) -> [UInt8]
+func readI2CData(_ address: Int, command: UInt8, length: UInt8) -> [UInt8]
 func readRaw(_ address: Int, length: Int) -> [UInt8]
 func writeAndRead(_ address: Int, write: [UInt8], readLength: UInt) -> [UInt8]
 
@@ -326,7 +326,7 @@ func tryReadByte(_ address: Int) throws -> UInt8
 func tryReadByte(_ address: Int, command: UInt8) throws -> UInt8
 func tryReadWord(_ address: Int, command: UInt8) throws -> UInt16
 func tryReadData(_ address: Int, command: UInt8) throws -> [UInt8]
-func tryReadI2CData(_ address: Int, command: UInt8) throws -> [UInt8]
+func tryReadI2CData(_ address: Int, command: UInt8, length: UInt8) throws -> [UInt8]
 func tryReadRaw(_ address: Int, length: Int) throws -> [UInt8]
 func tryWriteAndRead(_ address: Int, write: [UInt8], readLength: UInt) throws -> [UInt8]
 
