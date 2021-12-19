@@ -233,11 +233,11 @@ public final class SysFSI2C: I2CInterface {
 
 
     public func readI2CData(_ address: Int, command: UInt8, length: UInt8) -> [UInt8] {
-        var buf: [UInt8] = [UInt8](repeating:0, count: 32)
+        var buf: [UInt8] = [UInt8](repeating:0, count: Int(length))
 
         setSlaveAddress(address)
 
-        let r =  i2c_smbus_read_i2c_block_data(command: command, values: &buf, length)
+        let r =  i2c_smbus_read_i2c_block_data(command: command, values: &buf, length: length)
 
         if r < 0 {
             perror("I2C read failed")
@@ -250,11 +250,11 @@ public final class SysFSI2C: I2CInterface {
 
         guard length <= I2C_DEFAULT_PAYLOAD_LENGTH else { throw POSIXError( POSIXError.EINVAL ) }
 
-        var buf: [UInt8] = [UInt8](repeating:0, count: 32)
+        var buf: [UInt8] = [UInt8](repeating:0, count: Int(length))
 
         setSlaveAddress(address)
 
-        let r = i2c_smbus_read_i2c_block_data(command: command, values: &buf, length)
+        let r = i2c_smbus_read_i2c_block_data(command: command, values: &buf, length: length)
 
         guard r >= 0 else { throw POSIXError( POSIXError.Code( rawValue: errno ) ?? POSIXError.EIO ) }
 
@@ -585,6 +585,7 @@ public final class SysFSI2C: I2CInterface {
         for i in 1...values.count {
             data[i] = values[i-1]
         }
+
         data[0] = UInt8(values.count)
 
         return smbus_ioctl(rw: I2C_SMBUS_WRITE,
