@@ -3,7 +3,7 @@ import Glibc
 import SwiftyGPIO
  
 
-let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPiRevPlusZero)
+let gpios = SwiftyGPIO.GPIOs(for:.RaspberryPiPlusZero)
 
 gpios[.P3]!.direction = .OUT
 while true {    
