@@ -132,7 +132,7 @@ extension SwiftyGPIO {
         .P27: RaspberryGPIO(name:"GPIO27", id:27, baseAddr:0x3F000000)
     ]
  
-     // RaspberryPi 4
+    // RaspberryPi 4, with classic numbering scheme, see https://github.com/raspberrypi/linux/issues/6037
     // 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
     static let GPIORPI4: [GPIOName:GPIO] = [
         .P2: RaspberryGPIO(name:"GPIO2", id:2, baseAddr:0x7E000000),
@@ -161,6 +161,37 @@ extension SwiftyGPIO {
         .P25: RaspberryGPIO(name:"GPIO25", id:25, baseAddr:0x7E000000),
         .P26: RaspberryGPIO(name:"GPIO26", id:26, baseAddr:0x7E000000),
         .P27: RaspberryGPIO(name:"GPIO27", id:27, baseAddr:0x7E000000)
+    ]
+
+    // RaspberryPi 4 with new GPIOs numbering scheme, see https://github.com/raspberrypi/linux/issues/6037
+    // 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+    static let GPIORPI4New: [GPIOName:GPIO] = [
+        .P2: RaspberryGPIO(name:"GPIO2", id:514, baseAddr:0x7E000000),
+        .P3: RaspberryGPIO(name:"GPIO3", id:515, baseAddr:0x7E000000),
+        .P4: RaspberryGPIO(name:"GPIO4", id:516, baseAddr:0x7E000000),
+        .P5: RaspberryGPIO(name:"GPIO5", id:517, baseAddr:0x7E000000),
+        .P6: RaspberryGPIO(name:"GPIO6", id:518, baseAddr:0x7E000000),
+        .P7: RaspberryGPIO(name:"GPIO7", id:519, baseAddr:0x7E000000),
+        .P8: RaspberryGPIO(name:"GPIO8", id:520, baseAddr:0x7E000000),
+        .P9: RaspberryGPIO(name:"GPIO9", id:521, baseAddr:0x7E000000),
+        .P10: RaspberryGPIO(name:"GPIO10", id:522, baseAddr:0x7E000000),
+        .P11: RaspberryGPIO(name:"GPIO11", id:523, baseAddr:0x7E000000),
+        .P12: RaspberryGPIO(name:"GPIO12", id:524, baseAddr:0x7E000000),
+        .P13: RaspberryGPIO(name:"GPIO13", id:525, baseAddr:0x7E000000),
+        .P14: RaspberryGPIO(name:"GPIO14", id:526, baseAddr:0x7E000000),
+        .P15: RaspberryGPIO(name:"GPIO15", id:527, baseAddr:0x7E000000),
+        .P16: RaspberryGPIO(name:"GPIO16", id:528, baseAddr:0x7E000000),
+        .P17: RaspberryGPIO(name:"GPIO17", id:529, baseAddr:0x7E000000),
+        .P18: RaspberryGPIO(name:"GPIO18", id:530, baseAddr:0x7E000000),
+        .P19: RaspberryGPIO(name:"GPIO19", id:531, baseAddr:0x7E000000),
+        .P20: RaspberryGPIO(name:"GPIO20", id:532, baseAddr:0x7E000000),
+        .P21: RaspberryGPIO(name:"GPIO21", id:533, baseAddr:0x7E000000),
+        .P22: RaspberryGPIO(name:"GPIO22", id:534, baseAddr:0x7E000000),
+        .P23: RaspberryGPIO(name:"GPIO23", id:535, baseAddr:0x7E000000),
+        .P24: RaspberryGPIO(name:"GPIO24", id:536, baseAddr:0x7E000000),
+        .P25: RaspberryGPIO(name:"GPIO25", id:537, baseAddr:0x7E000000),
+        .P26: RaspberryGPIO(name:"GPIO26", id:538, baseAddr:0x7E000000),
+        .P27: RaspberryGPIO(name:"GPIO27", id:539, baseAddr:0x7E000000)
     ]
 
     // C.H.I.P.
