@@ -423,6 +423,8 @@ public struct SwiftyGPIO {
             return GPIORPI2
         case .RaspberryPi4:
             return GPIORPI4
+        case .RaspberryPi4_2024:
+            return GPIORPI4New
         case .CHIP:
             return GPIOCHIP
         case .BeagleBoneBlack:
@@ -445,6 +447,7 @@ public enum SupportedBoard: String {
     case RaspberryPi2 // Pi 2 with 40 pin header
     case RaspberryPi3 // Pi 3 with 40 pin header
     case RaspberryPi4 // Pi 4 with 40 pin header
+    case RaspberryPi4_2024 // Pi 4 with 40 pin header, new gpios ids added from Kernel 6.60 onward
     case CHIP
     case BeagleBoneBlack
     case OrangePi
